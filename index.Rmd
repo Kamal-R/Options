@@ -1,5 +1,6 @@
 --- 
-title: "Financial Literacy?"
+title: "A Retirement Manifesto"
+subtitle: A Modern-Day Guide to Planning for Your Retirement
 author: "Kamal Rai"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
