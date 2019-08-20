@@ -1,0 +1,15 @@
+language: R
+  sudo: false
+  cache:
+  packages: true
+  
+  script:
+  - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
+  
+  deploy:
+  provider: pages
+  local_dir: _book
+  skip_cleanup: true
+  keep-history: true
+  github_token: $stat545_GITHUB_PAT
+  target_branch: gh-pages
