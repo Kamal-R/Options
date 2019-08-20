@@ -1,6 +1,6 @@
 --- 
-title: "A Minimal Book Example"
-author: "Yihui Xie"
+title: "Financial Literacy?"
+author: "Kamal Rai"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
