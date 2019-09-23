@@ -1,7 +1,6 @@
 language: R
-  sudo: false
-  cache:
-  packages: true
+  cache: packages
+  pandoc_version: 1.19.2.1
   
 before_script:
   - chmod +x ./_build.sh
