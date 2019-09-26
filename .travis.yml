@@ -1,25 +1,10 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
-language: R
-dist: xenial
-sudo: false
-cache:
-  packages: true
-  directories:
-  - $HOME/.npm
-branches:
-  only: 
-    - master
-  
+language: r
+pandoc_version: 1.19.2.1
 
 before_script:
-- nvm install node
-- npm install -g netlify-cli
-- Rscript -e 'blogdown::install_hugo()'
-- mkdir public
+  - chmod +x ./_build.sh
+  - chmod +x ./_deploy.sh
 
 script:
-- Rscript -e 'blogdown::build_site(local = FALSE)'
-
-after_success:
-- ./deploy.sh
+  - ./_build.sh
+  - ./_deploy.sh
