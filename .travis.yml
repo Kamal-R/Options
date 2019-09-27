@@ -16,7 +16,7 @@ env:
   # NETLIFY_AUTH_TOKEN=d2c9cc7f4998773ec98973ef65916c29c54c65eabd9af68213a02dbc3fc5548a set in travis setting
 
 script:
-- Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::html_book")'
+- Rscript -e 'bookdown::render_book("index.Rmd")'
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_book")'
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'
 
