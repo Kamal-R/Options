@@ -1,38 +1,19 @@
 --- 
-title: "A Minimal Book Example"
-subtitle: "This a book from the cloud!" 
-author: "Alison Hill"
+title: "Understanding Options"
+subtitle: "" 
+author: "Kamal Rai"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
-description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
+description: ""
 ---
 
-# Deployed links {-}
+# Acknowledgments. 
 
-This book is built with Travis CI, pushed to the `gh-pages` branch on GitHub, then deployed to two places:
-
-1. A GitHub Project Page (https://apreshill.github.io/bookdown-travis-branch-deploy/)
-1. A Netlify site (https://bookdown-travis-branch-deploy.netlify.com/)
-
-# Prerequisites
-
-This is a _sample_ book written in **Markdown**. You can use anything that Pandoc's Markdown supports, e.g., a math equation $a^2 + b^2 = c^2$.
-
-The **bookdown** package can be installed from CRAN or Github:
-
-```{r eval=FALSE}
-install.packages("bookdown")
-# or the development version
-# devtools::install_github("rstudio/bookdown")
-```
-
-Remember each Rmd file contains one and only one chapter, and a chapter is defined by the first-level heading `#`.
-
-To compile this example to PDF, you need XeLaTeX. You are recommended to install TinyTeX (which includes XeLaTeX): <https://yihui.name/tinytex/>.
+This book is written in Rmarkdown and built with Travis CI. Each Rmd file contains one chapter, defined by the first-level heading `#`. 
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
