@@ -1,16 +1,23 @@
 language: R
 cache:                          # optional
   packages: true                # optional
-  directories: _bookdown_files  # optional
+  directories:
+  - $HOME/.npm  # optional
 pandoc_version: 2.3.1
 
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd")'
 
+before_install:
+  - nvm install stable
+  - npm install netlify-cli -g
+  
+env:
+  - NETLIFY_SITE_ID=d2c9cc7f4998773ec98973ef65916c29c54c65eabd9af68213a02dbc3fc5548a
+
 deploy:
-  provider: pages
-  local_dir: _book
-  skip_cleanup: true
-  github-token: $GITHUB_PAT    # Set in the settings page 
-  on:
-    branch: master
+  - provider: script
+    script: netlify deploy --dir _book --prod
+    skip_cleanup: true
+    on:
+      branch: master
