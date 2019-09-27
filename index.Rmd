@@ -1,7 +1,7 @@
 --- 
-title: "A Retirement Manifesto"
-subtitle: A Modern-Day Guide to Planning for Your Retirement
-author: "Kamal Rai"
+title: "A Minimal Book Example"
+subtitle: "This a book from the cloud!" 
+author: "Alison Hill"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
@@ -10,6 +10,13 @@ biblio-style: apalike
 link-citations: yes
 description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
 ---
+
+# Deployed links {-}
+
+This book is built with Travis CI, pushed to the `gh-pages` branch on GitHub, then deployed to two places:
+
+1. A GitHub Project Page (https://apreshill.github.io/bookdown-travis-branch-deploy/)
+1. A Netlify site (https://bookdown-travis-branch-deploy.netlify.com/)
 
 # Prerequisites
 
