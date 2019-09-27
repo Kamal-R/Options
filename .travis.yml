@@ -12,7 +12,7 @@ before_install:
   - export DEPLOY_MSG="${TRAVIS_COMMIT:0:7} ${TRAVIS_COMMIT_MESSAGE:0:70}"
   - wget http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz
   - tar -xzvf kindlegen_linux_2.6_i386_v2_9.tar.gz
-  - mv kindlegen usr/local/bin
+  - mv kindlegen bin
   
 env:
   - NETLIFY_SITE_ID=d875cc57-4232-44f4-8c88-5a0a5c24abc4
