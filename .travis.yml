@@ -13,7 +13,7 @@ before_install:
   
 env:
   - NETLIFY_SITE_ID=d875cc57-4232-44f4-8c88-5a0a5c24abc4
-  # NETLIFY_AUTH_TOKEN set in travis setting
+  # NETLIFY_AUTH_TOKEN=d2c9cc7f4998773ec98973ef65916c29c54c65eabd9af68213a02dbc3fc5548a set in travis setting
 
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd")'
