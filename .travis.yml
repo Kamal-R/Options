@@ -17,8 +17,8 @@ script:
 - Rscript -e 'bookdown::render_book("index.Rmd")'
 
 deploy:
-  - provider: script
-    script: netlify deploy --dir _book --prod
-    skip_cleanup: true
-    on:
-      branch: master
+  provider: script
+  script: netlify deploy --dir _book --prod
+  skip_cleanup: true
+  on:
+    branch: master
