@@ -13,7 +13,7 @@ description: ""
 
 # Acknowledgments. 
 
-This book is written in Rmarkdown and built with Travis CI. Each Rmd file contains one chapter, defined by the first-level heading `#`. 
+This book is written in Rmarkdown, hosted on Netlify, and built using Travis CI. The *Authoring Books and Technical Documents with R Markdown* at https://musing-aryabhata-b16338.netlify.com/ was very helpful in setting up Netlify and Travis CI. 
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
