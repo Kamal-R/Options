@@ -1,4 +1,4 @@
-book_filename: "bookdown-travis-branch-deploy"
+book_filename: "Testing"
 delete_merged_file: true
 language:
   ui:
