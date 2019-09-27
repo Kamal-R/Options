@@ -12,8 +12,8 @@ before_install:
   - export DEPLOY_MSG="${TRAVIS_COMMIT:0:7} ${TRAVIS_COMMIT_MESSAGE:0:70}"
   
 env:
-  - NETLIFY_SITE_ID=d2c9cc7f4998773ec98973ef65916c29c54c65eabd9af68213a02dbc3fc5548a
-    # NETLIFY_AUTH_TOKEN set in travis setting
+  - NETLIFY_SITE_ID=d875cc57-4232-44f4-8c88-5a0a5c24abc4
+  # NETLIFY_AUTH_TOKEN set in travis setting
 
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd")'
