@@ -14,6 +14,7 @@ before_install:
   
 env:
   - NETLIFY_SITE_ID=d2c9cc7f4998773ec98973ef65916c29c54c65eabd9af68213a02dbc3fc5548a
+    # NETLIFY_AUTH_TOKEN set in travis setting
 
 deploy:
   - provider: script
