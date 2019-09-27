@@ -22,7 +22,7 @@ script:
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::html_book")'
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_book")'
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'
-- Rscript -e "bookdown::kindlegen()"
+- Rscript -e 'bookdown::kindlegen("index.epub", exec = Sys.which("kindlegen"))'
 
 deploy:
   - provider: script
