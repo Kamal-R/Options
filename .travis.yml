@@ -10,7 +10,7 @@ before_install:
   - nvm install stable
   - npm install netlify-cli -g
   - export DEPLOY_MSG="${TRAVIS_COMMIT:0:7} ${TRAVIS_COMMIT_MESSAGE:0:70}"
-  - mkdir tmp/kindlegen
+  - mkdir -p tmp/kindlegen
   - wget -O - http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz | tar xz --directory=tmp/kindlegen
 
 env:
