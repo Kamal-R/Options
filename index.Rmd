@@ -11,7 +11,9 @@ link-citations: yes
 description: ""
 ---
 
-# Acknowledgments. 
+# Preface {-}
+
+## Acknowledgments {-}
 
 This book is written in Rmarkdown, hosted on Netlify, and built using Travis CI. The *Authoring Books and Technical Documents with R Markdown* at https://musing-aryabhata-b16338.netlify.com/ was very helpful in setting up Netlify and Travis CI. 
 
