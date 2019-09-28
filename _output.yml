@@ -12,7 +12,7 @@ bookdown::gitbook:
     fontsettings:
       theme: night
     sharing: 
-      linkedin: no
+      linkedin: yes
 
 bookdown::pdf_book:
   includes:
