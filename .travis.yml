@@ -14,9 +14,10 @@ before_install:
   - wget -O - http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz | tar xz --directory=/kindlegen
 
 env:
-  - NETLIFY_SITE_ID=d875cc57-4232-44f4-8c88-5a0a5c24abc4
-  - export PATH="/kindlegen/kindlegen:$PATH"
-  # NETLIFY_AUTH_TOKEN set in travis settings
+  global:
+    - NETLIFY_SITE_ID=d875cc57-4232-44f4-8c88-5a0a5c24abc4
+    - export PATH="/kindlegen/kindlegen:$PATH"
+    # NETLIFY_AUTH_TOKEN set in travis settings
 
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
