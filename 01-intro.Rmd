@@ -254,13 +254,13 @@ Apple_Calls_Percent_Return <-
   ( pmax( 0, (Apple_Stock_Price - Apple_Call_Strike_Price ) ) - Apple_Call_Cost ) / Apple_Call_Cost 
 Apple_Calls_Dollar_Return <- 100  * ( pmax( 0, (Apple_Stock_Price - Apple_Call_Strike_Price ) ) - Apple_Call_Cost )
   
-Apple_Call_Table <- tibble( "Stock Price" = currency(Apple_Stock_Price),
-                            "Percent Return " = percent(Apple_Shares_Percent_Return),
-                            "Dollar Return " = scales::dollar(Apple_Shares_Dollar_Return, negative_parens = TRUE), 
-                            " Percent Return" = percent(Apple_Calls_Percent_Return),
-                            " Dollar Return" =  scales::dollar(Apple_Calls_Dollar_Return, negative_parens = TRUE), 
-                            "Calls/Shares" = sign(Apple_Calls_Dollar_Return) * 
-                              percent(Apple_Calls_Dollar_Return / Apple_Shares_Dollar_Return ) )
+Apple_Call_Table <- data.frame( "Stock Price" = currency(Apple_Stock_Price),
+                                "Percent Return " = percent(Apple_Shares_Percent_Return),
+                                "Dollar Return " = scales::dollar(Apple_Shares_Dollar_Return, negative_parens = TRUE), 
+                                " Percent Return" = percent(Apple_Calls_Percent_Return),
+                                " Dollar Return" =  scales::dollar(Apple_Calls_Dollar_Return, negative_parens = TRUE), 
+                                "Calls/Shares" = sign(Apple_Calls_Dollar_Return) * 
+                                   percent(Apple_Calls_Dollar_Return / Apple_Shares_Dollar_Return ) )
 
 add_header_above( kable_styling( knitr::kable(x = Apple_Call_Table, booktabs = T,
                                                           caption = "Returns when Investing in 100 Shares or 1 Call"), 
