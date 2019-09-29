@@ -180,7 +180,7 @@ Put_cost <- 6.10
 
 Apple is trading at `r currency(Current_price)`. The September 20, 2019 call with a `r currency(Call_K)` strike lets its buyer purchase 100 shares of Apple for `r currency(Call_K)` each on September 20, 2019. It is trading for `r currency(100*Call_cost)` - the buyer is paying `r currency(100*Call_cost)`/100 = `r currency(Call_cost)` per share for this call. The September 20, 2019 put lets its buyer sell 100 shares of Apple for `r currency(Current_price)` each on September 20, 2019. It is trading for `r currency(100*Put_cost)` - the buyer is paying `r currency(100*Put_cost)`/100 = `r currency(Put_cost)` per share. 
 
-```{r Apple_Call_Option_Payoff, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+```{r Apple-Call-Option_Payoff, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
 Call_cost <- 6.84
 Call_K <- 205
 Current_price <- 205.44
@@ -242,7 +242,7 @@ Here's a payoff diagram of this call option. Below `r currency(Call_K)`, the buy
 
 This next table compares how much money a buyer can make with 100 shares of Apple at `r currency(Current_price)` and 1 call on Apple shares at `r currency(Call_cost)` (with a strike price of `r currency(Call_K)` that expires on September 20, 2019). The relative return column tell us how much the call owner participates in the upside (or downside) experienced by the shareholder. This last column is the most important - it will help us understand how to size our option investments. To give the dollar amounts some context, 100 shares of Apple at `r currency(Current_price)` will cost `r currency(Current_price)` x 100 = `r currency(100*Current_price)` to buy, and one call that gives the buyer the option to buy 100 shares of Apple at `r currency(Call_K)` on September 20, 2019 will cost `r currency(Call_cost)` x 100 = `r currency(100*Call_cost)`.
 
-``` {r Apple_Call_Table, echo = FALSE, tab = NULL}
+``` {r Apple-Call-Table, echo = FALSE, tab = NULL}
 Apple_Share_Price <- 205.44
 Apple_Call_Strike_Price <- 205
 Apple_Call_Cost <- 6.84
@@ -269,5 +269,4 @@ add_header_above( kable_styling( knitr::kable(x = Apple_Call_Table, booktabs = T
                                              full_width = FALSE ),
                  c("Stock" = 1, "If We Own 100 Shares" = 2, "If We Own 1 Call" = 2, "Relative Return" = 1) )
 ``````
-
 The buyer can make a ton of money with this call. To double his investment, he only needs to recover the `r currency(Apple_Call_Cost)` it cost to buy the call (done at the breakeven of `r currency(Apple_Call_Strike_Price)` + `r currency(Apple_Call_Cost)` = `r currency(Apple_Call_Strike_Price+Apple_Call_Cost)`), and have the shares go up another `r currency(Apple_Call_Cost)` to `r currency(Apple_Call_Strike_Price+Apple_Call_Cost)` + `r currency(Apple_Call_Cost)` = `r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)`. Remember that Apple was trading for `r currency(Apple_Share_Price)` when he bought the call. If he bought shares instead, the buyer would make (`r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Share_Price)`) / `r currency(Apple_Share_Price)` = `r percent(2*Apple_Call_Cost/Apple_Share_Price)` on his investment. By using calls, he makes (`r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Call_Strike_Price)` - `r currency(Apple_Call_Cost)`) / `r currency(Apple_Call_Cost)` = `r percent(Apple_Call_Cost/Apple_Call_Cost)`. `r percent(Apple_Call_Cost/Apple_Call_Cost)` seems so much larger than `r percent(2*Apple_Call_Cost/Apple_Share_Price)` that this seems impossible, but the way to think about this is by looking at how much of the upside in the stock the call buyer participates in. 
