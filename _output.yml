@@ -1,5 +1,5 @@
 bookdown::gitbook:
-  css: style.css
+  table_css: false
   config:
     toc:
       before: |
@@ -13,6 +13,7 @@ bookdown::gitbook:
       theme: night
     sharing: 
       linkedin: yes
+     
 
 bookdown::pdf_book:
   includes:
@@ -21,4 +22,5 @@ bookdown::pdf_book:
   citation_package: natbib
   keep_tex: yes
   
-bookdown::epub_book: default
+bookdown::epub_book: 
+  stylesheet: style.css
