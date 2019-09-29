@@ -180,7 +180,7 @@ Put_cost <- 6.10
 
 Apple is trading at `r currency(Current_price)`. The September 20, 2019 call with a `r currency(Call_K)` strike lets its buyer purchase 100 shares of Apple for `r currency(Call_K)` each on September 20, 2019. It is trading for `r currency(100*Call_cost)` - the buyer is paying `r currency(100*Call_cost)`/100 = `r currency(Call_cost)` per share for this call. The September 20, 2019 put lets its buyer sell 100 shares of Apple for `r currency(Current_price)` each on September 20, 2019. It is trading for `r currency(100*Put_cost)` - the buyer is paying `r currency(100*Put_cost)`/100 = `r currency(Put_cost)` per share. 
 
-```{r Apple-Call-Option-Payoff, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+```{r Apple-Call-Option_Payoff, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
 Call_cost <- 6.84
 Call_K <- 205
 Current_price <- 205.44
@@ -235,7 +235,6 @@ ggplot() +
 #        lty = c("solid", "dotdash"), 
 #        lwd = c(2, 2), cex = 0.75,
 #        col=c("black", "black"), bty = "n") 
-
 ```
 
 Here's a payoff diagram of this call option. Below `r currency(Call_K)`, the buyer loses `r currency(Call_cost)` per share, which is what he paid for the call. This is the entire cost of the call, since it expires worthless. Since he paid `r currency(Call_cost)` per share for the call, he has to make `r currency(Call_cost)` back before he becomes profitable. Therefore, his breakeven is `r currency(Call_K)` + `r currency(Call_cost)` = `r currency(Call_cost+Call_K)`. This is reflected in the payoff diagram, where his profits are negative when the stock is below `r currency(Call_cost+Call_K)` and positive when it is above `r currency(Call_cost+Call_K)`.
