@@ -3,10 +3,10 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-if ( !require("tidyverse") )   { install.packages("tidyverse"); }    require(tidyverse)
-if ( !require("kableExtra") )  { install.packages("kableExtra"); }   require(kableExtra)
-if ( !require("ggdark") )      { install.packages("ggdark"); }       require(ggdark)
-if ( !require("formattable") ) { install.packages("formattable"); }  require(formattable)
+if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
+if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
+if ( !require("ggdark") )      { install.packages("ggdark") };       require(ggdark)
+if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
 
 options(kableExtra.html.bsTable = T)
 ```
