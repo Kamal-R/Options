@@ -241,7 +241,7 @@ Here's a payoff diagram of this call option. Below `r currency(Call_K)`, the buy
 
 This next table compares how much money a buyer can make with 100 shares of Apple at `r currency(Current_price)` and 1 call on Apple shares at `r currency(Call_cost)` (with a strike price of `r currency(Call_K)` that expires on September 20, 2019). The relative return column tell us how much the call owner participates in the upside (or downside) experienced by the shareholder. This last column is the most important - it will help us understand how to size our option investments. To give the dollar amounts some context, 100 shares of Apple at `r currency(Current_price)` will cost `r currency(Current_price)` x 100 = `r currency(100*Current_price)` to buy, and one call that gives the buyer the option to buy 100 shares of Apple at `r currency(Call_K)` on September 20, 2019 will cost `r currency(Call_cost)` x 100 = `r currency(100*Call_cost)`.
 
-``` {r Apple_Call_Table, echo = FALSE}
+``` {r Apple_Call_Table, echo = FALSE, tab = NULL}
 Apple_Share_Price <- 205.44
 Apple_Call_Strike_Price <- 205
 Apple_Call_Cost <- 6.84
