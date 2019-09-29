@@ -9,6 +9,7 @@ if ( !require("ggdark") )      { install.packages("ggdark") };       require(ggd
 if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
 
 options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
 ```
 
 ## Options on Expiry Day
