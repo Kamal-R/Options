@@ -263,10 +263,9 @@ Apple_Call_Table <- data.frame( "Stock Price" = currency(Apple_Stock_Price),
                                 "Calls/Shares" = sign(Apple_Calls_Dollar_Return) * 
                                    percent(Apple_Calls_Dollar_Return / Apple_Shares_Dollar_Return ) )
 
-add_header_above( kable_styling( knitr::kable(x = Apple_Call_Table, booktabs = T,
+add_header_above( kable_styling( knitr::kable(x = Apple_Call_Table, booktabs = FALSE,
                                                           caption = "Returns when Investing in 100 Shares or 1 Call"), 
-                                             bootstrap_options = c("striped", "hover", "bordered", 
-                                                                   "condensed", "responsive"),
+                                             bootstrap_options = c("bordered", "condensed", "responsive"),
                                              latex_options = c("striped"),
                                              full_width = FALSE ),
                  c("Stock" = 1, "If We Own 100 Shares" = 2, "If We Own 1 Call" = 2, "Relative Return" = 1) )
