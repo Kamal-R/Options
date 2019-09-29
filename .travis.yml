@@ -1,5 +1,5 @@
 language: R
-sudo: true
+sudo: false
 cache:                          # optional
   packages: true                # optional
   directories:
@@ -21,9 +21,9 @@ env:
 
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
-- Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_book")'
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'
 - Rscript -e 'bookdown::kindlegen(exec="tmp/kindlegen/kindlegen")'  
+- Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_book")'
 
 deploy:
   - provider: script
