@@ -27,10 +27,10 @@ Suppose that stock of Company XYZ is trading at `r currency(Current_price)`, and
 The call empowers its buyer to purchase shares of Company XYZ for `r currency(Call_K)` in 60 days. The put empowers its buyer to sell shares of Company XYZ for `r currency(Put_K)` in 60 days. After the 60th day, the option expires and is worthless. Options are available on exchanges, so people can buy and sell them before they expire to avoid having them expire for nothing. Since options pricing can get complicated, we'll only be considering the profit (or loss) a buyer can experience on the expiry date of the option in this chapter. 
 
 ## Call Options
-```{r Call-Option-Payoff-Plot, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center", message=FALSE}
+```{r Call-Option-Payoff-Plot, echo=FALSE, fig.fullwidth = TRUE, fig.align = "center", message=FALSE}
 Call_cost <- 5
 Call_K <- 230
-x_min <- 200; x_max = 250
+x_min <- 210; x_max = 250
 Call_Payoff_Plot <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 1),
                             "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K) )
 
@@ -43,7 +43,7 @@ ggplot() +
                                          linetype = "dashed") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = "Payoff Of The XYZ Call Option On Expiry",
+  labs(title = "Payoff Of The XYZ Call On Expiry",
        x = "Stock Price",
        y = "Profit Per Share") +
   scale_color_manual(values = c('Shares'='white','Breakeven'='white','Breakeven'='white'),
@@ -271,5 +271,5 @@ add_header_above( kable_styling( knitr::kable(x = Apple_Call_Table, booktabs = T
 The buyer can make a ton of money with this call. To double his investment, he only needs to recover the `r currency(Apple_Call_Cost)` it cost to buy the call (done at the breakeven of `r currency(Apple_Call_Strike_Price)` + `r currency(Apple_Call_Cost)` = `r currency(Apple_Call_Strike_Price+Apple_Call_Cost)`), and have the shares go up another `r currency(Apple_Call_Cost)` to `r currency(Apple_Call_Strike_Price+Apple_Call_Cost)` + `r currency(Apple_Call_Cost)` = `r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)`. Remember that Apple was trading for `r currency(Apple_Share_Price)` when he bought the call. If he bought shares instead, the buyer would make (`r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Share_Price)`) / `r currency(Apple_Share_Price)` = `r percent(2*Apple_Call_Cost/Apple_Share_Price)` on his investment. By using calls, he makes (`r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Call_Strike_Price)` - `r currency(Apple_Call_Cost)`) / `r currency(Apple_Call_Cost)` = `r percent(Apple_Call_Cost/Apple_Call_Cost)`. `r percent(Apple_Call_Cost/Apple_Call_Cost)` seems so much larger than `r percent(2*Apple_Call_Cost/Apple_Share_Price)` that this seems impossible, but the way to think about this is by looking at how much of the upside in the stock the call buyer participates in. 
 
 Testing inline: <span class="fraction" data-top="`r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Share_Price)`" data-bottom="`r currency(Apple_Share_Price)`"></span>. 
-Testing. Testing inline: <span class="fraction" data-top="`r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Share_Price)`" data-bottom="`r currency(Apple_Share_Price)`"></span>. Testing. 
+Testing. Testing inline: <span class="fraction" data-top="`r currency(Apple_Call_Strike_Price+2*Apple_Call_Cost)` - `r currency(Apple_Share_Price)`" data-bottom="`r currency(Apple_Share_Price)`"></span>. Testing. Testing break (Kindle)...
 Testing inline: <span class="fraction" data-top="`r -currency(Apple_Share_Price)`" data-bottom="`r currency(Apple_Share_Price)`"></span>. 
