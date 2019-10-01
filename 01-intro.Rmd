@@ -265,7 +265,7 @@ Apple_Call_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
                               percent(Apple_Calls_Dollar_Return / Apple_Shares_Dollar_Return ) )
 
 add_header_above( kable_styling( knitr::kable(x = Apple_Call_Table, booktabs = T,
-                                                          caption = "Returns when Investing in 100 Shares or 1 Call"), 
+                                              caption = "Returns when Investing in 100 Shares or 1 Call"), 
                                              bootstrap_options = c("bordered", "condensed", "responsive"),
                                              latex_options = c("striped"),
                                              full_width = FALSE ),
@@ -362,19 +362,20 @@ Apple_Put_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
                            "Dollar Return " = scales::dollar(Apple_Shares_Dollar_Return, negative_parens = TRUE), 
                            " Percent Return" = percent(Apple_Puts_Percent_Return),
                            " Dollar Return" =  scales::dollar(Apple_Puts_Dollar_Return, negative_parens = TRUE), 
-                           "Calls/Shares" = sign(Apple_Puts_Dollar_Return) * 
+                           "Puts/Shares" = sign(Apple_Puts_Dollar_Return) * 
                              percent(Apple_Puts_Dollar_Return / Apple_Shares_Dollar_Return ) )
 
 add_header_above( kable_styling( knitr::kable(x = Apple_Put_Table, booktabs = T,
-                                                          caption = "Returns when Investing in 100 Shares or 1 Put"), 
+                                              caption = "Returns when Investing in 100 Shares or 1 Put"), 
                                              bootstrap_options = c("bordered", "condensed", "responsive"),
                                              latex_options = c("striped"),
                                              full_width = FALSE ),
                  c("Stock" = 1, "If We Own 100 Shares" = 2, "If We Own 1 Put" = 2, "Relative Return" = 1) )
 
 ```
-For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10\% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to \$184.90, the put buyer makes \$205 - \$184.90 - \$6.84 = \$14.00 per share, which is about \$14.00 / \$6.10 = 2.3 times (or 230\%) on his investment. This percentage may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
+For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10\% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is about \$14.00 / \$6.10 = 2.3 times (or 230\%) on his investment. This percentage may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
 
-The put buyer loses \$610 whenever the shares are above \$205 while the shareholder makes between 3.12\% to 16.82\%. When the shares are below the put buyer's breakeven of \$198.90, the put buyer makes money when the shareholder loses money. When the shares are at \$184.90, the put buyer captures 68.16\% of the downside of the stock. When the shares are at \$180, the put buyer captures 74.29\%; when the shares are \$150, the put buyer captures 88.20\%. This percentage gradually increases because the put buyer must recover the cost of buying the put before he can begin to earn profits.
+The put buyer loses `r currency(100*Apple_Put_Cost)` whenever the shares are above `r currency(Apple_Put_K)` while the shareholder makes between 3.12\% to 16.82\%. When the shares are below the put buyer's breakeven of `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer makes money when the shareholder loses money. When the shares are at `r currency(0.90*Apple_Current_Price)`, the put buyer captures 68.16\% of the downside of the stock. When the shares are at `r currency(Apple_Stock_Prices[2])`, the put buyer captures 74.29\%; when the shares are `r currency(Apple_Stock_Prices[1])`, the put buyer captures 88.20\%. This percentage gradually increases because the put buyer must recover the cost of buying the put before he can begin to earn profits.
 
 Much like the call, the put gives its buyer limited downside and strong upside participation. It also gives its buyer a way to make money when prices are falling, a magical property that we will use again and again when constructing investment portfolios. 
+
