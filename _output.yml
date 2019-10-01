@@ -1,5 +1,6 @@
 bookdown::gitbook:
   table_css: false
+  mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML.js"
   config:
     toc:
       before: |
