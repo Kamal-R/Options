@@ -11,6 +11,24 @@ if ( !require("formattable") ) { install.packages("formattable") };  require(for
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
 ```
+<!-- Source: https://developer.mozilla.org/en-US/docs/Mozilla/MathML_Project/test-mathml-css -->
+math {
+    display: inline;
+    text-indent: 0;
+}
+
+mfrac {
+    display: inline-table;
+    vertical-align: middle;
+    border-collapse: collapse;
+}
+mfrac {
+    display: table-row;
+}
+
+mi {
+    font-style: italic;
+}
 
 ## Options on Expiry Day
 ```{r Call-Demo, echo=FALSE}
