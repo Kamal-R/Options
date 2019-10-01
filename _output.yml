@@ -1,5 +1,6 @@
 bookdown::gitbook:
   table_css: false
+  css: style.css
   config:
     toc:
       before: |
