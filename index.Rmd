@@ -11,7 +11,9 @@ link-citations: yes
 description: ""
 ---
 
-# Preface {-}
+# Introduction {-}
+
+
 
 ## Acknowledgments {-}
 
@@ -20,7 +22,12 @@ This book is written in Rmarkdown using the _bookdown_ package, hosted on Netlif
 ## Sign Up For Updates {-}
 Click below to sign up to receive updates every time a new chapter is published. 
 
-<script async data-uid="244f107410" src="https://hustling-trailblazer-1491.ck.page/244f107410/index.js"></script>
+<!-- Source: https://stackoverflow.com/questions/25528067/ifelse-action-depending-on-document-type-in-rmarkdown -->
+```{r, results='asis', echo = FALSE} 
+if(knitr:::pandoc_to() == "html") {
+  cat('<script async data-uid="244f107410"src="https://hustling-trailblazer-1491.ck.page/244f107410/index.js"></script>')
+}
+```
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
