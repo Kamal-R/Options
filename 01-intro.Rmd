@@ -27,7 +27,7 @@ Suppose that stock of Company XYZ is trading at `r currency(Current_price)`, and
 The call empowers its buyer to purchase shares of Company XYZ for `r currency(Call_K)` in 60 days. The put empowers its buyer to sell shares of Company XYZ for `r currency(Put_K)` in 60 days. After the 60th day, the option expires and is worthless. Options are available on exchanges, so people can buy and sell them before they expire to avoid having them expire for nothing. Since options pricing can get complicated, we'll only be considering the profit (or loss) a buyer can experience on the expiry date of the option in this chapter. 
 
 ## Call Options
-```{r Call-Option-Payoff-Plot, echo=FALSE, fig.fullwidth = TRUE, fig.align = "center", message=FALSE}
+```{r Call-Option-Payoff-Plot, echo=FALSE, fig.fullwidth = TRUE, fig.align = "center", message = FALSE}
 Call_cost <- 5
 Call_K <- 230
 x_min <- 210; x_max = 250
@@ -104,7 +104,7 @@ Puts are a little strange if you haven't seen them before. Instead of giving the
 We're looking at a put with a `r currency(Put_K)` strike that cost `r currency(Put_cost)`. This put gives its buyer the option to sell shares of Company XYZ for `r currency(Put_K)` on its expiry date. The buyer makes money if the stock is below `r currency(Put_K)`. As an example, suppose the shares are trading at `r currency(Future_price)` on the put's expiry date. Then, the buyer can purchase them for `r currency(Future_price)` and sell them for `r currency(Put_K)`, for an instant gain of `r currency(Put_K-Future_price)`. Remembering that the put cost `r currency(Put_cost)`, he is left with a profit of `r currency(Put_K-Future_price-Put_cost)`. Looking at the payoff diagram, the buyer does indeed profit by `r currency(Put_K-Future_price-Put_cost)` per share when the shares are at `r currency(Future_price)`. 
 
 
-```{r Put-Option-Payoff-Plot, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+```{r Put-Option-Payoff-Plot, echo=FALSE, fig.fullwidth = TRUE, fig.align = "center", message = FALSE}
 Put_cost <- 5
 Put_K <- 180
 x_min <- 150; x_max = 200
@@ -180,7 +180,7 @@ Put_cost <- 6.10
 
 Apple is trading at `r currency(Current_price)`. The September 20, 2019 call with a `r currency(Call_K)` strike lets its buyer purchase 100 shares of Apple for `r currency(Call_K)` each on September 20, 2019. It is trading for `r currency(100*Call_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Call_cost)`" data-bottom="100"></span> = `r currency(Call_cost)` per share for this call. The September 20, 2019 put lets its buyer sell 100 shares of Apple for `r currency(Current_price)` each on September 20, 2019. It is trading for `r currency(100*Put_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Put_cost)`" data-bottom="100"></span> = `r currency(Put_cost)` per share. 
 
-```{r Apple-Call-Option_Payoff, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+```{r Apple-Call-Option_Payoff, echo=FALSE, fig.fullwidth = TRUE, fig.align = "center", message = FALSE}
 Call_cost <- 6.84
 Call_K <- 205
 Current_price <- 205.44
@@ -279,7 +279,7 @@ The takeaway here is that the call gives dollar-for-dollar participation to the 
 
 Even with these two drawbacks, a call still limits an investor's downside compared to owning shares and gives good participation to the upside. This is the picture painted by the payoff diagram - the most we can lose is the cost of the call, and we participate dollar for dollar in the upside of the stock (after reclaiming the cost of the call). This payoff profle comes at a cost - the call expires, but the shares do not. If we own shares that are down, we can continue holding them and hope for a rebound at the risk of potentially losing more money. With the call, the most we can lose is its cost but we have to contend with expiry dates. When we start discussing options investing strategies, we'll see how this means we will have to think about which expiry date we want, how to adjust to an earlier or later expiry date if our opinion changes during the trade, and so on. 
 
-```{r Apple-Put-Option-Payoff, echo=FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+```{r Apple-Put-Option-Payoff, echo=FALSE, fig.fullwidth = TRUE, fig.align = "center", message = FALSE}
 Apple_Put_Cost <- 6.10
 Apple_Put_K <- 205
 x_min = 180; x_max = 230
@@ -373,7 +373,7 @@ add_header_above( kable_styling( knitr::kable(x = Apple_Put_Table, booktabs = T,
                  c("Stock" = 1, "If We Own 100 Shares" = 2, "If We Own 1 Put" = 2, "Relative Return" = 1) )
 
 ```
-For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10\% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is about \$14.00 / \$6.10 = 2.3 times (or 230\%) on his investment. This percentage may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
+For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10\% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is <span class = "fraction" data-top="`r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)`" data-bottom="`r currency(Apple_Put_Cost)`"></span> = `r round( (Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)/Apple_Put_Cost,2 )` times his orginal investment of `r currency(Apple_Put_Cost)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
 
 The put buyer loses `r currency(100*Apple_Put_Cost)` whenever the shares are above `r currency(Apple_Put_K)` while the shareholder makes between 3.12\% to 16.82\%. When the shares are below the put buyer's breakeven of `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer makes money when the shareholder loses money. When the shares are at `r currency(0.90*Apple_Current_Price)`, the put buyer captures 68.16\% of the downside of the stock. When the shares are at `r currency(Apple_Stock_Prices[2])`, the put buyer captures 74.29\%; when the shares are `r currency(Apple_Stock_Prices[1])`, the put buyer captures 88.20\%. This percentage gradually increases because the put buyer must recover the cost of buying the put before he can begin to earn profits.
 
