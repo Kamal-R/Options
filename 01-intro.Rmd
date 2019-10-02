@@ -166,7 +166,7 @@ The breakeven of the put is `r currency(Put_K-Put_cost)`, because the buyer need
 
 
 
-## Example - Options on Apple
+## Apple: Calls and Puts
 
 Let’s look at options on Apple stock around 11:00am on August 28, 2019. Apple has options listed for a bunch of different dates: September 20, 2019, October 18, 2019, November 15, 2019, December 20, 2019, January 17, 2020 and so on. These are expiry dates - the last day a buyer can exercise their right to buy/sell a stock at the strike. Options on stocks are almost always for 100 shares - calls let their buyer purchase 100 shares at the strike, and puts let their buyer sell 100 shares at the strike. 
 
@@ -379,7 +379,7 @@ Much like the call, the put gives its buyer limited downside and strong upside p
 
 
 
-## Options at Different Strikes 
+## Apple: Different Strikes 
 ```{r Apple-Different-Strikes, echo = FALSE}
 Apple_Prices_K <- c(145, 180, 205, 230)
 Apple_Call_Costs <- c(78.45, 44.85, 23.63, 8.50)
@@ -508,9 +508,9 @@ ggplot() +
 
 The `r currency(Apple_Prices_K[3])` strike call is similar. We've drawn the payoff diagram this time, and it gives the breakeven to be `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])` When shares are below `r currency(Apple_Prices_K[3])`, the call expires worthless and the buyer loses `r currency(100*Apple_Call_Costs[3])`. The call buyer still loses money when shares are at `r currency(Apple_Future_Prices[3])` because `r currency(Apple_Future_Prices[3])` is below this call's breakeven of `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`. The call cost `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`, but the buyer will have only made `r currency(Apple_Future_Prices[3])` - `r currency(Apple_Prices_K[3])` = `r currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per share (`r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per call) before paying for the call. This leaves him with a loss of `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` - `r currency(Apple_Call_Costs[3])` = `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3] - Apple_Call_Costs[3])` per share.
 
-The `r currency(Apple_Prices_K[2])` strike call expires worthless if the shares are below `r currency(Apple_Prices_K[2])`, loses money when they are below the breakeven of \$180 + \$44.85 = \$224.85, and makes money when shares are above $224.85. The \$140 strike call expires worthless when shares are below \$140, loses money when shares are below the breakeven of \$140 + \$78.45 = \$218.45, and makes money when they are above \$218.45. The shareholder column is straightforward - their return is how much the stock moves by between September 11, 2019 and December 20, 2019. 
+The `r currency(Apple_Prices_K[2])` strike call expires worthless if the shares are below `r currency(Apple_Prices_K[2])`, loses money when they are below the breakeven of `r currency(Apple_Prices_K[2])` + `r currency(Apple_Call_Costs[2])` = `r currency(Apple_Prices_K[2] + Apple_Call_Costs[2])`, and makes money when the shares are above `r currency(Apple_Prices_K[2] + Apple_Call_Costs[2])`. The `r currency(Apple_Prices_K[1])` strike call expires worthless when shares are below `r currency(Apple_Prices_K[1])`, loses money when the shares are below the breakeven of `r currency(Apple_Prices_K[1])` + `r currency(Apple_Call_Costs[1])` = `r currency(Apple_Prices_K[1] + Apple_Call_Costs[1])`, and makes money when they are above `r currency(Apple_Prices_K[1] + Apple_Call_Costs[1])`. The shareholder column is straightforward - their return is how much the stock moves by between September 11, 2019 and December 20, 2019. 
 
-This table can give us even more useful insights. By comparing all the values in a column, we can see that the dollar returns of one \$145 strike call are always within \$100 dollars of 100 shares. The dollar returns of the \$180 strike call are always within \$200 dollars of owning 100 shares, except when the shares are priced at \$150 (where the \$180 call loses significantly less money). The \$205 and \$230 strike calls have sufficiently different behavior, essentally because their breakeven is higher. However, they have much lower maximum losses and achieve similar dollar returns after shares climb above their respective breakeven prices. 
+This table can give us even more useful insights. By comparing values across columns, we can see that the dollar returns of one `r currency(Apple_Prices_K[1])` strike call are always within \$100 dollars of the return from owning 100 shares. The dollar returns of the `r currency(Apple_Prices_K[2])` strike call are always within \$200 dollars of the return from owning 100 shares, except when the shares are priced at `r currency(Apple_Future_Prices[1])` (where the `r currency(Apple_Prices_K[2])` call loses significantly less money). The `r currency(Apple_Prices_K[3])` and `r currency(Apple_Prices_K[3])` strike calls have a different return profile than owning shares, essentally because their breakeven is higher. However, they have much lower maximum losses and achieve similar dollar returns after shares climb above their respective breakeven prices. 
 
 To summarize, here are the main ideas that we want to be thinking about when we're looking at options with different strike prices.
 
