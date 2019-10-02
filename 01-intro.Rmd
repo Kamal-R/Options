@@ -368,14 +368,193 @@ Apple_Put_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
 add_header_above( kable_styling( knitr::kable(x = Apple_Put_Table, booktabs = T,
                                               caption = "Returns when Investing in 100 Shares or 1 Put"), 
                                              bootstrap_options = c("bordered", "condensed", "responsive"),
-                                             latex_options = c("striped"),
                                              full_width = FALSE ),
                  c("Stock" = 1, "If We Own 100 Shares" = 2, "If We Own 1 Put" = 2, "Relative Return" = 1) )
-
 ```
 For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10\% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is <span class = "fraction" data-top="`r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)`" data-bottom="`r currency(Apple_Put_Cost)`"></span> = `r round( (Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)/Apple_Put_Cost,2 )` times his orginal investment of `r currency(Apple_Put_Cost)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
 
 The put buyer loses `r currency(100*Apple_Put_Cost)` whenever the shares are above `r currency(Apple_Put_K)` while the shareholder makes between 3.12\% to 16.82\%. When the shares are below the put buyer's breakeven of `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer makes money when the shareholder loses money. When the shares are at `r currency(0.90*Apple_Current_Price)`, the put buyer captures 68.16\% of the downside of the stock. When the shares are at `r currency(Apple_Stock_Prices[2])`, the put buyer captures 74.29\%; when the shares are `r currency(Apple_Stock_Prices[1])`, the put buyer captures 88.20\%. This percentage gradually increases because the put buyer must recover the cost of buying the put before he can begin to earn profits.
 
 Much like the call, the put gives its buyer limited downside and strong upside participation. It also gives its buyer a way to make money when prices are falling, a magical property that we will use again and again when constructing investment portfolios. 
+
+
+
+## Options at Different Strikes 
+```{r Apple-Different-Strikes, echo = FALSE}
+Apple_Prices_K <- c(145, 180, 205, 230)
+Apple_Call_Costs <- c(78.45, 44.85, 23.63, 8.50)
+Apple_Put_Costs <- c(0.32, 1.69, 5.45, 15.30)
+
+Apple_Current_Price <- 222.76
+Apple_Future_Prices <- c(150, 200, 220, 245, 300)
+```
+
+In the first example, we considered possible profits or losses when holding `r currency(Apple_Call_K)` strike options to their expiry date of September 20, 2019. There is nothing special about `r currency(Apple_Call_K)` or September 20, 2019. Many other strike prices and expiry dates are available. For the next example, we'll choose an expiry date of December 20, 2019 and consider the profit or loss for calls with strike prices of `r currency(Apple_Prices_K[1])`, `r currency(Apple_Prices_K[2])`, `r currency(Apple_Prices_K[3])`, and `r currency(Apple_Prices_K[4])`. On September 11, 2019, one share of Apple was trading at `r currency(Apple_Current_Price)` and its options prices are listed below.
+
+```{r Apple-Different-Strikes-Table, echo = FALSE}
+Apple_Different_Strikes <- tibble( "Strike Prices" = currency(Apple_Prices_K),
+                                   "1 Call" = currency(Apple_Call_Costs),
+                                   "1 Put" = currency(Apple_Put_Costs) ) 
+
+kable_styling( knitr::kable(Apple_Different_Strikes, 
+                            caption = "Cost on Sept. 11, 2019"), 
+               bootstrap_options = c("striped", "hover", "responsive"),
+               full_width = FALSE )
+```
+
+To keep the discussion simple, we’ll continue to focus on the price of the option on its expiry date. Remember, one call lets its buyer purchase 100 shares of Apple at its strike price, and one put lets its buyer sell 100 shares at its strike price. Let’s compare the dollar return of each call option to owning 100 shares if, on December 20, 2019, Apple's shares:
+
+1. Drop a lot to `r currency(Apple_Future_Prices[1])` .
+2. Drop a little to `r currency(Apple_Future_Prices[2])`.
+3. Stay roughly the same at `r currency(Apple_Future_Prices[3])`.
+4. Increase a little to `r currency(Apple_Future_Prices[4])`.
+5. Increase a lot to `r currency(Apple_Future_Prices[5])`.
+
+```{r Apple-Different-Strikes-Call-Payoff, echo = FALSE}
+Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = Apple_Future_Prices,
+                                               "100 Shares" = scales::dollar(100 * (Apple_Future_Prices - Apple_Current_Price),
+                                                                             negative_parens = TRUE), 
+                                               "1 $145 Strike Call" =  
+                                                 scales::dollar( 100 * ( pmax( 0, Apple_Future_Prices - Apple_Prices_K[1] ) -
+                                                                   Apple_Call_Costs[1] ), negative_parens = TRUE ),
+                                               "1 $180 Strike Call" = 
+                                                 scales::dollar( 100 * ( pmax(0, Apple_Future_Prices - Apple_Prices_K[2] ) -
+                                                                   Apple_Call_Costs[2] ), negative_parens = TRUE ),
+                                               "1 $205 Strike Call" = 
+                                                 scales::dollar( 100 * ( pmax( 0, Apple_Future_Prices - Apple_Prices_K[3] ) -
+                                                                   Apple_Call_Costs[3] ), negative_parens = TRUE ),
+                                               "1 $230 Strike Call" = 
+                                                 scales::dollar( 100 * ( pmax( 0, Apple_Future_Prices - Apple_Prices_K[4] ) -
+                                                                   Apple_Call_Costs[4] ), negative_parens = TRUE ) )
+
+kable_styling( knitr::kable(Apple_Different_Strikes_Call_Payoff, 
+                            caption = "Dollar Return if Held to Expiry"), 
+               bootstrap_options = c("striped", "hover", "responsive"),
+               full_width = FALSE )
+```
+
+To give these dollar returns some context, buying
+
+1. 100 shares costs `r currency(Apple_Current_Price)` x 100 = `r currency(100 * Apple_Current_Price)`
+2. 1 `r currency(Apple_Prices_K[1])` strike call costs `r currency(Apple_Call_Costs[1])` x 100 = `r currency(100 * Apple_Call_Costs[1])`
+3. 1 `r currency(Apple_Prices_K[2])` strike call costs `r currency(Apple_Call_Costs[2])` x 100 = `r currency(100 * Apple_Call_Costs[2])`
+4. 1 `r currency(Apple_Prices_K[3])` strike call costs `r currency(Apple_Call_Costs[3])` x 100 = `r currency(100 * Apple_Call_Costs[3])`
+5. 1 `r currency(Apple_Prices_K[4])` strike call costs `r currency(Apple_Call_Costs[4])` x 100 = `r currency(100 * Apple_Call_Costs[4])`
+
+
+The first thing to do when trying to make sense of option profit and loss numbers is draw to payoff diagrams. I'm only going to include a diagram for the `r currency(Apple_Prices_K[3])` strike call here, but please take a minute to draw the other payoff diagrams yourself. Trying to read ahead without them is dangerous - it might make turn the next few paragraphs an incomprehensible list of numbers.
+
+The `r currency(Apple_Prices_K[4])` strike call (the right-most column in the table) has the simplest profit and loss numbers. Even without a payoff diagram, just having the breakeven price in mind can help make sense of its column in the table below. The breakeven of this call is `r currency(Apple_Prices_K[4])` + `r currency(Apple_Call_Costs[4])` = `r currency(Apple_Prices_K[4]+Apple_Call_Costs[4])`. It costs `r currency(100*Apple_Call_Costs[4])` and expires worthless if Apple's shares are less than `r currency(Apple_Prices_K[4])` on December 20, 2019. If Apple's shares are at `r currency(Apple_Future_Prices[4])`, the call buyer makes `r currency(Apple_Future_Prices[4])` - `r currency(Apple_Prices_K[4])` - `r currency(Apple_Call_Costs[4])` = `r currency(Apple_Future_Prices[4] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per share, or `r 100 * currency(Apple_Future_Prices[4] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per call. If Apple's shares are at `r currency(Apple_Future_Prices[5])`, the call buyer makes `r currency(Apple_Future_Prices[5])`  - `r currency(Apple_Prices_K[4])` - `r currency(Apple_Call_Costs[4])` = `r currency(Apple_Future_Prices[5] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per share, or `r 100 * currency(Apple_Future_Prices[5] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per call. Those are indeed the profit and loss numbers in the table up above. 
+
+```{r Apple_205_Strike, echo = FALSE, fig.fullwidth = TRUE, fig.align = "center", message = FALSE}
+Call_Cost <- Apple_Call_Costs[3]
+Call_K <- Apple_Prices_K[3]
+x_min <- 190; x_max = 260 
+
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+Call_y <- -Call_Cost + (Call_x > Call_K) * (Call_x - Call_K)
+Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Call_y" = currency(-Call_Cost + (Call_x > Call_K) * (Call_x - Call_K)) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_y, color = "Shares"), linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K + Call_Cost, 
+                                         y = seq(from = -Call_Cost, to = x_max-Call_K, length=length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Payoff Of Apple's $205 Call On Expiry",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'='white','Breakeven'='white','Breakeven'='white'),
+                     labels = c("Profit Per Share",
+                                paste0("Breakeven Price = ", currency(Call_K + Call_Cost)),
+                                paste0("Breakeven Price = ", currency(Call_K + Call_Cost)) ),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
+  theme_classic() + 
+  dark_mode() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold",
+                                  margin = margin(10, 0, 10, 0)),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key=element_rect(fill="black"),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm")),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90)) 
+
+
+# plot(x = Call_x, y = -option_cost + (Call_x > Call_K)*(Call_x-Call_K), 
+#      type = 'l', lwd = 3,
+#      xlab = "Apple's Stock Price", ylab = "Profit Per Share",
+#      main = "Payoff Of The $145 Call Option On Expiry")
+# abline(v = Call_K + option_cost, lty = 2, lwd = 1)
+# abline(h = 0, lty = 2, lwd = 1)
+# legend("topleft", c("Profit Per Share",
+#                     paste0("Breakeven Price = $", Call_K + option_cost)),
+#        lty = c("solid", "dotdash"), 
+#        lwd = c(2, 2), cex = 0.75,
+#        col=c("black", "black"), bty = "n") 
+```
+
+The `r currency(Apple_Prices_K[3])` strike call is similar. We've drawn the payoff diagram this time, and it gives the breakeven to be `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])` When shares are below `r currency(Apple_Prices_K[3])`, the call expires worthless and the buyer loses `r currency(100*Apple_Call_Costs[3])`. The call buyer still loses money when shares are at `r currency(Apple_Future_Prices[3])` because `r currency(Apple_Future_Prices[3])` is below this call's breakeven of `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`. The call cost `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`, but the buyer will have only made `r currency(Apple_Future_Prices[3])` - `r currency(Apple_Prices_K[3])` = `r currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per share (`r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per call) before paying for the call. This leaves him with a loss of `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` - `r currency(Apple_Call_Costs[3])` = `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3] - Apple_Call_Costs[3])` per share.
+
+The `r currency(Apple_Prices_K[2])` strike call expires worthless if the shares are below `r currency(Apple_Prices_K[2])`, loses money when they are below the breakeven of \$180 + \$44.85 = \$224.85, and makes money when shares are above $224.85. The \$140 strike call expires worthless when shares are below \$140, loses money when shares are below the breakeven of \$140 + \$78.45 = \$218.45, and makes money when they are above \$218.45. The shareholder column is straightforward - their return is how much the stock moves by between September 11, 2019 and December 20, 2019. 
+
+This table can give us even more useful insights. By comparing all the values in a column, we can see that the dollar returns of one \$145 strike call are always within \$100 dollars of 100 shares. The dollar returns of the \$180 strike call are always within \$200 dollars of owning 100 shares, except when the shares are priced at \$150 (where the \$180 call loses significantly less money). The \$205 and \$230 strike calls have sufficiently different behavior, essentally because their breakeven is higher. However, they have much lower maximum losses and achieve similar dollar returns after shares climb above their respective breakeven prices. 
+
+To summarize, here are the main ideas that we want to be thinking about when we're looking at options with different strike prices.
+
+1. The less money we spend on a call, the lower our maximum loss. In this table, the maximum loss happens when the shares are worth \$150 (on expiry).
+2. The cheaper the calls are, the less money we lose in the worst case. When the shares are worth \$200, the calls lose a comparable amount of money as owning the shares.  
+3. When the stock goes up, the call lets us participate in most of the upside (after making back the cost of the call). The calls get almost all of gains when the shares are worth \$300, and most of the gains when the shares are worth \$245.
+4. If the shares do not go up by much, the call performs worse than owning shares because we cannot recover the cost of the call. This happens when the shares are at \$220, but the amount of money lost is relatively small.
+5. If the shares do not go down by much, the call will also perform worse than owning shares because the cost of the call will be more than decline in the price of the shares.
+
+This is the picture we get is we look at the table column-by-column. If we switch to looking at the table row-by-row, we can see how much of the gains or losses each call participated in, relative to someone who owns the shares. To make this easier, we'll look at a table of relative returns. 
+
+``` {r Apple-Different-Strikes-Relative-Payoff, echo = FALSE}
+Future_Prices <- c(150, 200, 220, 245, 300)
+Current_Price <- 222.76
+Future_Returns <-  Future_Prices - Current_Price
+
+Apple_Different_Strikes_Call_Relative_Payoff <- tibble( "Share Price" = currency(Future_Prices),
+                                          "100 Shares" = percent( sign(Future_Returns) ), 
+                                          "1 $145 Strike Call" = percent( sign(Future_Returns) / Future_Returns * 
+                                                                            ( pmax( 0, (Future_Prices - 145 ) ) - 78.45 ) ),
+                                          "1 $180 Strike Call" = percent( sign(Future_Returns) / Future_Returns * 
+                                                                            ( pmax( 0, (Future_Prices - 180 ) ) - 44.85 ) ),
+                                          "1 $205 Strike Call" = percent( sign(Future_Returns) / Future_Returns * 
+                                                                            ( pmax( 0, (Future_Prices - 205 ) ) - 23.63 ) ), 
+                                          "1 $230 Strike Call" = percent( sign(Future_Returns) / Future_Returns * 
+                                                                            ( pmax( 0, (Future_Prices - 230 ) ) - 8.50 ) ) )
+
+kable_styling( knitr::kable(Apple_Different_Strikes_Call_Relative_Payoff, 
+                            caption = "Relative Return if Held to Expiry"), 
+               bootstrap_options = c("striped", "hover", "responsive"),
+               full_width = FALSE )
+```
+
+The relative return table does an excellent job of capturing how much participation we get when there are extreme price movements (up or down). As we move across the \$150 row, the cheaper calls limit our downside. And in the \$245 and \$300 rows, they give good upside participation relative to owning 100 shares. The \$200 and \$220 rows are harder to interpret. The percentages are large, but we know from earlier that their dollar losses are small - they are still limited to the cost of the option. So while relative return tables are helpful, they can be difficult to understand without some sense of the magnitude of the dollar amounts. 
+
+The next thing to notice is that the price of an option varies wildly depending on its strike price. To understand why, we can decompose the price of an option into two components - time value and intrinsic value. The intrinsic value of an option is how much money the buyer would make if they exercised the option today. With Apple trading at \$222.76, the \$205 call costs \$23.63 and the \$205 put costs \$5.45. If we exercised the call today, we would make \$222.76 - \$205 = \$17.76. This is the intrinsic value of the call. The remaining \$23.63 - \$17.76 = \$5.87 is the time value of the call. The put has no intrinstic value, because Apple's shares at \$222.76 are trading well above its strike price of \$205. This means the entire \$5.87 cost of the put is from its time value. 
+
+The time value of an option slowly decays to \$0 as an option approaches expiry, leaving only its intrinsic value. This distinction between time value and instrinsic value helps explain the wide variation in options prices at expiry. If you're wondering about how to price options before their expiry date, we'll come back to that in much more detail later. There are lots of little details that obscure the big picture ideas we're trying to capture in this section. 
+
+The most extreme differences are in the \$145 strike call and \$300 strike put. At the \$145 strike, the call is worth \$64.85 and the put is worth \$0.96. With Apple trading at \$222.76, the \$145 call has \$222.76 - \$145 = \$77.76 of intrinsic value and \$78.45 - \$77.76 = \$0.69 of time value. The \$145 put, in comparison, carries no intrinsic value and \$0.32 of time value. The takeaway here is that the seemingly large difference in cost between the \$145 calls and \$145 puts is due to their different intrinsic values, and that they have roughly the same amount of time value. 
+
+To summarize time value and instrinsic value: 
+
+1. Intrinsic value is how much money we would make if we exercised the option right now. It tends to move in the same direction as Apple's shares.
+2. Time value is related to time to expiry. It gradually declines as the option gets closer to expiry. 
+3. Decomposing option prices into time value and intrinsic value can help us understand their prices.
 
