@@ -266,7 +266,7 @@ Sources:
 }
 
 .book.color-theme-2 .book-body .navigation {
-  color: #191919;
+  color: #284d80; /* Change color of navigation arrow (?) */
 }
 .book.color-theme-2 .book-body .navigation:hover {
   color: #fffff5;
@@ -340,7 +340,7 @@ Sources:
 /* Sets color for TOC font (?) */
 .book.color-theme-2 .book-summary ul.summary li a,
 .book.color-theme-2 .book-summary ul.summary li span {
-  color: #96aac5; /* A very faded grey */
+  color: #284d80; /* A very faded blue */
   background: transparent;
   font-weight: 600;
 }
