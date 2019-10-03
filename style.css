@@ -220,7 +220,7 @@ Sources:
   border-color: #929292;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table tr {
-  color: #b6c2d2; /* Sets the font color inside table cells */
+  color: #929292; /* Sets the font color inside table cells */
   background-color: #191919; /* Sets the color of alternating TOC rows (??) */
   border-color: #929292;
 }
