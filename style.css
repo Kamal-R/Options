@@ -198,7 +198,7 @@ Sources:
   border-color: #bdcadb;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h6 {
-  color: #FFFFFF;
+  color: #bdcadb;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal hr {
   background-color: #373b4e;
@@ -217,12 +217,12 @@ Sources:
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table th,
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table td {
-  border-color: #3b3f54;
+  border-color: #bdcadb;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table tr {
-  color: #b6c2d2;
-  background-color: #000000;
-  border-color: #000000;
+  color: #b6c2d2; /* Sets the font color inside table cells */
+  background-color: #000000; /* Sets the color of alternating TOC rows (??) */
+  border-color: #bdcadb;
 }
 
 /* Sets the font color of the main text (?) and alternating table rows */
@@ -312,7 +312,7 @@ Sources:
  /* Theme 2 */
  /* Sets backgroud and (?) font color for the TOC */
 .book.color-theme-2 .book-summary {
-  color: #bcc1d2; /* Slightly faded black */
+  color: #bcc1d2; /* Slightly faded black (blue-ish) */
   background: #020203;
   border-right: none;
 }
@@ -340,7 +340,7 @@ Sources:
 /* Sets color for TOC font (?) */
 .book.color-theme-2 .book-summary ul.summary li a,
 .book.color-theme-2 .book-summary ul.summary li span {
-  color: #96aac5;
+  color: #96aac5; /* A very faded grey */
   background: transparent;
   font-weight: 600;
 }
