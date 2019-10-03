@@ -365,7 +365,7 @@ Apple_Put_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
                            "Puts/Shares" = sign(Apple_Puts_Dollar_Return) * 
                              percent(Apple_Puts_Dollar_Return / Apple_Shares_Dollar_Return ) )
 
-add_header_above( kable_styling( knitr::kable(x = Apple_Put_Table, booktabs = T, longtable = T,
+add_header_above( kable_styling( knitr::kable(x = Apple_Put_Table, booktabs = T, 
                                               caption = "Returns when Investing in 100 Shares or 1 Put"), 
                                              bootstrap_options = c("bordered", "condensed", "responsive"),
                                              full_width = FALSE ),
