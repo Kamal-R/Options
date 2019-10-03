@@ -68,20 +68,20 @@ Sources:
  * Theme 2
  */
 .color-theme-2 .dropdown-menu {
-  background-color: #000000;
-  border-color: #000000;
+  background-color: #191919;
+  border-color: #191919;
 }
 .color-theme-2 .dropdown-menu .dropdown-caret .caret-inner {
   border-bottom: 9px solid #2d3143;
 }
 .color-theme-2 .dropdown-menu .buttons {
-  border-color: #000000;
+  border-color: #191919;
 }
 .color-theme-2 .dropdown-menu .button {
   color: #62677f;
 }
 .color-theme-2 .dropdown-menu .button:hover {
-  color: #000000;
+  color: #191919;
 }
 .book .book-header .font-settings .font-enlarge {
   line-height: 30px;
@@ -101,13 +101,13 @@ Sources:
 
 /* Sets the top toolbar and behind the body/toc (hidden by them) */
 .book.color-theme-2 .book-body {
-  color: #000000;
-  background: #000000;
+  color: #191919;
+  background: #191919;
 }
 
 /* Sets the background color of the body of the text */
 .book.color-theme-2 .book-body .page-wrapper .page-inner section {
-  background: #000000;
+  background: #191919;
 }
 .book.font-size-0 .book-body .page-inner section {
   font-size: 1.2rem;
@@ -180,10 +180,10 @@ Sources:
   background-color: #fbeecb;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal {
-  color: #bdcadb;
+  color: #929292;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal a {
-  color: #3eb1d0;
+  color: #960096; /* Hyperlink color */
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h1,
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h2,
@@ -191,14 +191,14 @@ Sources:
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h4,
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h5,
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h6 {
-  color: #bdcadb;
+  color: #929292;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h1,
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h2 {
-  border-color: #bdcadb;
+  border-color: #929292;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal h6 {
-  color: #bdcadb;
+  color: #929292;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal hr {
   background-color: #373b4e;
@@ -209,7 +209,7 @@ Sources:
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal pre,
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal code {
   color: #FFFFFF;
-  background: #000000;
+  background: #191919;
   border-color: #2d3143;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal .highlight {
@@ -217,17 +217,17 @@ Sources:
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table th,
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table td {
-  border-color: #bdcadb;
+  border-color: #929292;
 }
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table tr {
   color: #b6c2d2; /* Sets the font color inside table cells */
-  background-color: #000000; /* Sets the color of alternating TOC rows (??) */
-  border-color: #bdcadb;
+  background-color: #191919; /* Sets the color of alternating TOC rows (??) */
+  border-color: #929292;
 }
 
 /* Sets the font color of the main text (?) and alternating table rows */
 .book.color-theme-2 .book-body .page-wrapper .page-inner section.normal table tr:nth-child(2n) {
-  background-color: #000000;
+  background-color: #191919;
 }
 
 .book.color-theme-1 .book-header {
@@ -256,7 +256,7 @@ Sources:
   background: none;
 }
 .book.color-theme-2 .book-header h1 {
-  color: #bdcadb;
+  color: #929292;
 }
 .book.color-theme-1 .book-body .navigation {
   color: #afa790;
@@ -266,7 +266,7 @@ Sources:
 }
 
 .book.color-theme-2 .book-body .navigation {
-  color: #000000;
+  color: #191919;
 }
 .book.color-theme-2 .book-body .navigation:hover {
   color: #fffff5;
@@ -313,7 +313,7 @@ Sources:
  /* Sets backgroud and (?) font color for the TOC */
 .book.color-theme-2 .book-summary {
   color: #bcc1d2; /* Slightly faded black (blue-ish) */
-  background: #020203;
+  background: #191919; /* Background color for TOC (?) */
   border-right: none;
 }
 .book.color-theme-2 .book-summary .book-search {
@@ -326,7 +326,7 @@ Sources:
 
 /* Sets color for top/bottom lines denoting beginning/end of the TOC */
 .book.color-theme-2 .book-summary ul.summary li.divider {
-  background: #000000;
+  background: #191919;
   box-shadow: none;
 }
 .book.color-theme-2 .book-summary ul.summary li i.fa-check {
@@ -348,7 +348,7 @@ Sources:
 /* The color when we hover over a TOC section (?) */
 .book.color-theme-2 .book-summary ul.summary li.active > a,
 .book.color-theme-2 .book-summary ul.summary li a:hover {
-  color: #bdcadb; /* The font color when we hover over a TOC section */
-  background: #12121c; /* The background color when we hover over a TOC section */
+  color: #929292; /* The font color when we hover over a TOC section */
+  background: #212121; /* The background color when we hover over a TOC section */
   font-weight: 600;
 }

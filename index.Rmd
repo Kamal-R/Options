@@ -22,7 +22,7 @@ To be written later.
 This book is written in Rmarkdown using the _bookdown_ package, hosted on Netlify, and built using Travis CI. The _Authoring Books and Technical Documents with R Markdown_ at https://musing-aryabhata-b16338.netlify.com/ was very helpful in setting up Netlify and Travis CI. 
 
 ## Sign Up For Updates {-}
-Click below to sign up to receive updates every time a new chapter is published. 
+Click below to sign up to receive notifications every time a new chapter is published. 
 
 <!-- Source: https://stackoverflow.com/questions/25528067/ifelse-action-depending-on-document-type-in-rmarkdown -->
 ```{r, results='asis', echo = FALSE} 
