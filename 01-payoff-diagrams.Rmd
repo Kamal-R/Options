@@ -1,21 +1,28 @@
-# Options at Expiry {Options-At-Expiry}
+<!-- Each chapter is set to compile separately - include "global" set-up -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
 if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
-if ( !require("ggdark") )      { install.packages("ggdark") };       require(ggdark)
 if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
 ```
 
-``` {r Set-Global_Chapter_One-Variables, echo = FALSE}
-plot_bg <- "#191919"
-plot_fg <- "#929292"
+``` {r Set-Global-Chapter-Variables, echo = FALSE}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # #929292"
 ```
+
+# Thinking in Payoff Diagrams {#Payoff-Diagrams}
+We'll start our journey into understanding options by building our first tool - the payoff diagram. A payoff diagram show how much money an investment makes at different prices of our investment's shares.  They are the most powerful way to visualize how an option (or options strategy) might perform, so our goal in this chapter is to get comfortable with drawing and reading payoff diagrams.
+
+Our second goal is to understand how options perform compared to owning shares. To help us do that, we'll be using tables that compare the absolute and relative performance of those positions. Tables might be the second most powerful way to visualize how options perform, because they let us quickly compare the actual performance of different positions.  
+
+One last note: in our first few chapters, we're only going to be looking at how options perform on thier expiry date. In later chapters, we'll be talking about how options are priced before their expiry date, the option greeks, how to risk-manage an options position, and more. But before we get there, we have to build up our tools and look at when and why to use options. This will help put all the little details about these topics in context, so that we can actually apply them in our own trading. 
+
 
 ## Options on Expiry Day
 ```{r Call-Demo, echo=FALSE}
@@ -24,14 +31,18 @@ Call_K <- 230; Put_K <- 180
 Current_price <- 200
 Future_price <- 240
 ```
-Suppose that stock of Company XYZ is trading at `r currency(Current_price)`, and that we see the following two options available for purchase. 
+For the most part, we can buy and sell options, just like we can stocks. There are a few key differences, though. The first is that every option has an expiry date, and after they expire they are worthless. They're literally worth `r currency(0)` after they expire, and they can't be traded after that happens. The second is that not every stock has options available, and it can take longer to buy or sell after we put an order in. For big companies, this is not really an issue - companies like Apple and Microsoft should always have options available and they should trade very quickly. But if we wanted to trade options of smaller companies, we should keep these potential limitations in mind. 
+
+Our first look at options will be with a fictious company, Company XYZ. Company XYZ is trading at `r currency(Current_price)`. Suppose that we see the following two options available for purchase. 
 
 1. A `r currency(Call_K)` strike call that expires in 60 days and costs `r currency(Call_cost)`.
 2. A `r currency(Put_K)` strike put that expires in 60 days and costs `r currency(Put_cost)`. 
 
-The call empowers its buyer to purchase shares of Company XYZ for `r currency(Call_K)` in 60 days. The put empowers its buyer to sell shares of Company XYZ for `r currency(Put_K)` in 60 days. After the 60th day, the option expires and is worthless. Options are available on exchanges, so people can buy and sell them before they expire to avoid having them expire for nothing. Since options pricing can get complicated, we'll only be considering the profit (or loss) a buyer can experience on the expiry date of the option in this chapter. 
+This call option empowers its buyer to purchase shares of Company XYZ for `r currency(Call_K)` any time the markets are open in the next 60 days. This put empowers its buyer to sell shares of Company XYZ for `r currency(Put_K)` any time the markets are open in the next 60 days. After the 60th day, the option will expire and become worthless (worth `r currency(0)`). 
 
 ## Call Options
+Let's take our first look at a payoff diagram. It's on the call we saw for Company XYZ. 
+
 ```{r Call-Option-Payoff-Plot, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- 5
 Call_K <- 230
@@ -48,7 +59,7 @@ ggplot() +
                                          linetype = "dashed") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = "Payoff Of The XYZ Call On Expiry",
+  labs(title = "Buying Company XYZ's $230 Call",
        x = "Stock Price",
        y = "Profit Per Share") +
   scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
@@ -94,15 +105,15 @@ ggplot() +
 
 ```
 
-We'll use payoff diagrams to help visualize options. Payoff diagrams show how much money an investment makes at different prices of Company XYZ's shares. Our first payoff diagram shows the profit or loss of a call with a `r currency(Call_K)` strike that costs `r currency(Call_cost)` on its expiry date. Reading payoff diagrams is not too bad - suppose the shares are worth `r currency(Future_price)` at expiry. The buyer can use the call to purchase shares for `r currency(Call_K)` and immediately sell them for `r currency(Future_price)` This is a gain of `r currency(Future_price)` - `r currency(Call_K)` = `r currency(Future_price-Call_K)` per share. Remembering that he paid `r currency(Call_cost)` for the call, the buyer's profits are `r currency(Future_price-Call_K)` - `r currency(Call_cost)` = `r currency(Future_price-Call_K-Call_cost)` per share. If we look at the payoff diagram, the buyer's profit when the stock is at `r currency(Future_price)` is indeed `r currency(Future_price-Call_K-Call_cost)`. 
+Reading this payoff diagram is not too bad - suppose the shares are worth `r currency(Future_price)` at expiry. If we own the call, it gives us the power to purchase 100 shares for `r currency(Call_K)` each (on the expiry date) and immediately sell them for `r currency(Future_price)`, for a gain of `r currency(Future_price)` - `r currency(Call_K)` = `r currency(Future_price-Call_K)` per share. The call cost `r currency(Call_cost)`, so we end up making `r currency(Future_price-Call_K)` - `r currency(Call_cost)` = `r currency(Future_price-Call_K-Call_cost)` per share. Looking at the payoff diagram, the per-share profit when the stock is at `r currency(Future_price)` is indeed `r currency(Future_price-Call_K-Call_cost)`. 
 
-There are a couple more things on the payoff diagram we should make note of. The first is that even though the call lets the buyer purchase shares for `r currency(Call_K)`, he doesn't start making money until they reach `r currency(Call_K+Call_cost)` because he has to make back the `r currency(Call_cost)` he spent buying the option. `r currency(Call_K+Call_cost)` is such an important value that it has its own name - it's the breakeven price. The second is that the most the buyer can lose is the `r currency(Call_cost)` he spent buying the call. If the shares are `r currency(Call_K-30)`, `r currency(Call_K-50)`, or even `r currency(Call_K-Call_K)`, the buyer can just let the call expire and can never lose more than the `r currency(Call_cost)` he spent on the call. This places a hard limit on the amount of money the buyer can lose, regardless of what happens to Apple's shares. We'll come back to this idea of having limited downside again and again while trying to understand how to use options The third is that even with limited downside, the buyer still gets dollar for dollar participation in the upside of the stock on the expiry date of the call (after recovering the `r currency(Call_cost)` it cost to buy). 
+There are a couple more things to make note of. The first is that even though the call lets us purchase shares for `r currency(Call_K)`, we don't start making money until they reach `r currency(Call_K+Call_cost)` because we have to make back the `r currency(Call_cost)` we spent buying the option. `r currency(Call_K+Call_cost)` is such an important value that it has its own name - it's the breakeven price. The second is that the most we can lose is the `r currency(Call_cost)` we spent buying the call. If the shares are `r currency(Call_K-30)`, `r currency(Call_K-50)`, or even `r currency(Call_K-Call_K)`, we can just let the call expire and we'll never lose more than the `r currency(Call_cost)` we spent buying the call. This places a hard limit on the amount of money we can lose, regardless of what happens to Apple's shares. This gives us *limited downside*, an idea we'll come back to again and again. The third is that even with limited downside, we still gets dollar for dollar participation in the upside of the stock on the expiry date of the call (after recovering the `r currency(Call_cost)` it cost to buy). 
 
-This combination of limited downside and full participation to the upside is what makes options such a powerful tool to have in your investing toolkit. But we don't get this power for free. The day after the option expires, it becomes worthless. In exchange for giving us limited downside and full participation to the upside, the option puts us on the clock. We need the price to move in our favor before the option expires to make money. Lots of options investing strategies try to mitigate the (very negative) impact this clock can have on options investments, and we'll discuss some of them in a later chapter. For now, we want to focus on the big ideas, which are: having limited downside, having full participation to the upside, and being time-limited.
+This combination of limited downside and full participation to the upside is what make options such a powerful investing tool. But we don't get this power for free. Options put our investments on the clock - prices must move in our favor before the option expires or we lose money. For us to succesfully trade options, we'll want to develop strategies that to help manage the risk of running out of time. We'll discuss the later on, but for now we want to focus on three big ideas: having limited downside, having full participation to the upside, and being time-limited.
 
-Let's recap the decisions that a buyer of a call option could make at different prices of Company XYZ's stock. If the stock is below the strike price of `r currency(Call_K)` on the expiry date of the call, the buyer will not exercise the call. If he did, he would be buying the shares for more than they are worth on the market, and he would not make any money. If the stock is above `r currency(Call_K)` on expiry, he will exercise the call because he is buying shares for less than they are worth on the market and can immediately sell them at the higher market price. However, the buyer only makes profits after recovering the `r currency(Call_cost)` cost of the call. If the shares are between `r currency(Call_K)` and `r currency(Call_K+Call_cost)`, he is recovering some of the cost of the call, but still losing money. If the shares are above `r currency(Call_K+Call_cost)`, he will profit from the call. 
+Let's go through the decisions that we can make at different prices of Company XYZ's stock. If the stock is below the strike price of `r currency(Call_K)` on the call's expiry date, we will not exercise it. If we did, we would be buying the shares for more than they are worth on the market, and we wouldn't make any profit by selling them. If the stock is above `r currency(Call_K)` on expiry, we will exercise the call. We would be buying shares for less than they are worth on the market, and can immediately sell them at the market price. However, we only make profits after recovering the `r currency(Call_cost)` cost of the call. If the shares are between `r currency(Call_K)` and `r currency(Call_K+Call_cost)`, we will recover some of the cost of the call, but will still lose money. If the shares are above `r currency(Call_K+Call_cost)`, we will profit from the call. 
 
-The payoff diagram summarizes all of this information, and helps us see the price levels that go along with these decisions very quickly. This makes drawing payoff diagrams is one of the easiest and most effective ways that we can use to help ourselves understand how to trade options. While we won't draw the payoff diagram for every option strategy we talk about in this book, everything will make much more sense if you draw the missing payoff diagrams before reading the discussions on them. 
+The payoff diagram summarizes all of this information, and helps us see the price levels that go along with these decisions very quickly. Drawing payoff diagrams is one of the easiest and most effective ways to understand the potential profit or loss of an option.
 
 ## Put Options
 ```{r Put-Demo, echo=FALSE}
@@ -111,9 +122,9 @@ Call_K <- 230; Put_K <- 180
 Future_price <- 150
 ```
 
-Puts are a little strange if you haven't seen them before. Instead of giving their buyer the option to buy shares at a specific price, they give the buyer the option to sell shares at a specific price. This is the opposite of how we're used to thinkng, so don't worry if it doesn't click right away. 
+Puts are a little strange if you haven't seen them before. Instead of giving us the option to buy shares at a specific price, they give us the option to sell shares at a specific price. This is the opposite of how we're used to thinkng, so don't worry if it doesn't click right away. 
 
-We're looking at a put with a `r currency(Put_K)` strike that cost `r currency(Put_cost)`. This put gives its buyer the option to sell shares of Company XYZ for `r currency(Put_K)` on its expiry date. The buyer makes money if the stock is below `r currency(Put_K)`. As an example, suppose the shares are trading at `r currency(Future_price)` on the put's expiry date. Then, the buyer can purchase them for `r currency(Future_price)` and sell them for `r currency(Put_K)`, for an instant gain of `r currency(Put_K-Future_price)`. Remembering that the put cost `r currency(Put_cost)`, he is left with a profit of `r currency(Put_K-Future_price-Put_cost)`. Looking at the payoff diagram, the buyer does indeed profit by `r currency(Put_K-Future_price-Put_cost)` per share when the shares are at `r currency(Future_price)`. 
+We're looking at a put with a `r currency(Put_K)` strike that costs `r currency(Put_cost)`. This put gives us the option to sell shares of Company XYZ for `r currency(Put_K)`, and we'll make money if the stock is below `r currency(Put_K)`. If the shares are trading at `r currency(Future_price)`, then we can purchase 100 shares for `r currency(Future_price)` (each) and sell them for `r currency(Put_K)` (each), for an instant gain of `r currency(Put_K-Future_price)` per share. Remembering that the put cost us `r currency(Put_cost)`, we'll be left with a profit of `r currency(Put_K-Future_price-Put_cost)`. Looking at the payoff diagram, buyers of this put do indeed profit by `r currency(Put_K-Future_price-Put_cost)` per share when the shares are at `r currency(Future_price)`. 
 
 
 ```{r Put-Option-Payoff-Plot, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
@@ -133,7 +144,7 @@ ggplot() +
                                          linetype = "dashed") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = "Payoff Of The XYZ Put Option On Expiry",
+  labs(title = "Buying Company XYZ's $180 Put",
        x = "Stock Price",
        y = "Profit Per Share") +
   scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
@@ -181,8 +192,7 @@ ggplot() +
 
 ```     
 
-The breakeven of the put is `r currency(Put_K-Put_cost)`, because the buyer needs the shares to fall by `r paste0(Put_cost)` to recover the cost of the put. Similar to calls, the downside of a put is limited to its cost and they are time-limited (they have an expiry date). Unlike calls, their dollar-for-dollar "upside" participation happens when the stock they're following goes down. This is the big idea behind puts - they make money when prices go down. This idea opens up so many new investing strategies to us that the rest of this book is devoted to working through some of them. The big picture idea is that mixing and matching puts, calls, and shares lets us control how much our portfolio goes up (or down) when market prices go up. We'll come back to this idea every time we're going through an options strategy and working through how we can use it to help us construct risk-managed investments.
-
+The breakeven of the put is `r currency(Put_K-Put_cost)`, because we need the shares to fall by `r currency(Put_cost)` to recover the cost of buying the put. Similar to calls, we can't lose more than we paid for the put. Unlike calls, the dollar-for-dollar "upside" participation we get happens when the stock goes down. This is the big idea behind puts - they make money when prices go down. This is a magical property because it opens up so many new investing strategies. Some are simple and some are very complex. But they're all built the same way - by mixing and matching different combinations of puts, calls, and shares to control how much an investment portfolio goes up (or down) when market prices go up. We'll come back to this idea every time we use options to construct risk-managed investments, which we'll do many times in this book.
 
 
 ## Apple: Calls and Puts
@@ -218,7 +228,7 @@ ggplot() +
                                          linetype = "dashed") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = "Payoff Of The XYZ Call Option On Expiry",
+  labs(title = "Buying Apple's $205 Call",
        x = "Stock Price",
        y = "Profit Per Share") +
   scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
@@ -324,7 +334,7 @@ ggplot() +
                                          linetype = "dashed") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = "Payoff Of Apple's Put On Expiry",
+  labs(title = "Buying Apple's $205 Put",
        x = "Stock Price",
        y = "Profit Per Share") +
   scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
@@ -494,7 +504,7 @@ ggplot() +
                                          linetype = "dashed") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = "Payoff Of Apple's $205 Call On Expiry",
+  labs(title = "Buying Apple's $205 Call",
        x = "Stock Price",
        y = "Profit Per Share") +
   scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
@@ -590,4 +600,4 @@ The takeaway here is that the seemingly large difference in cost between the `r 
 2. Time value is related to time to expiry. It gradually declines as the option gets closer to expiry. 
 3. Decomposing option prices into time value and intrinsic value can help us understand their prices.
 
-Distinguishing bewteen the time and intrinsic value of an option has another advantage - it will serve as our foundation while we work through how to price and trade options before their expiry date. We'll discuss option pricing in much more detail later on. For this chapter, we've focused on building intuition behind a few big picture ideas that we'll be using for the rest of the book.
+Distinguishing bewteen the time and intrinsic value of an option has another advantage - it will serve as our foundation while we work through how to price and trade options before their expiry date. So far, we've focused on building intuition behind a few big picture ideas that we'll be using for the rest of the book - payoff diagrams, comparing absolute and relative performance with tables, and decomposing an option's price into different pieces. All of these tools will be extremely helpful when we discuss risk-managing options trades in later chapters.
