@@ -132,13 +132,13 @@ Put_cost <- 5
 Put_K <- 180
 x_min <- 150; x_max = 200
 
-Call_Payoff_Plot <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 1),
-                            "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K)  )
+Put_Payoff_Plot <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 1),
+                           "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K)  )
 
 ggplot() + 
-  geom_line(data = Call_Payoff_Plot, aes(Put_x, Put_y, color = "Shares"), linetype = "solid") +
-  geom_line(data = Call_Payoff_Plot, aes(Put_x, rep(0,length(Put_x)), color = "Breakeven"), linetype = "dashed") +
-  geom_line(data = Call_Payoff_Plot, aes(x = Put_K - Put_cost, 
+  geom_line(data = Put_Payoff_Plot, aes(Put_x, Put_y, color = "Shares"), linetype = "solid") +
+  geom_line(data = Put_Payoff_Plot, aes(Put_x, rep(0,length(Put_x)), color = "Breakeven"), linetype = "dashed") +
+  geom_line(data = Put_Payoff_Plot, aes(x = Put_K - Put_cost, 
                                          y = seq(from = -Put_cost, to = x_max-Put_K, length=length(Put_x)), 
                                          color = "Breakeven"),
                                          linetype = "dashed") +
@@ -197,7 +197,7 @@ The breakeven of the put is `r currency(Put_K-Put_cost)`, because we need the sh
 
 ## Apple: Calls and Puts
 
-Let’s look at options on Apple stock around 11:00am on August 28, 2019. Apple has options listed for a bunch of different dates: September 20, 2019, October 18, 2019, November 15, 2019, December 20, 2019, January 17, 2020 and so on. These are expiry dates - the last day a buyer can exercise their right to buy/sell a stock at the strike. Options on stocks are almost always for 100 shares - calls let their buyer purchase 100 shares at the strike, and puts let their buyer sell 100 shares at the strike. 
+Let’s look at options on Apple stock around 11:00am on August 28, 2019. Apple has options listed for a bunch of different dates: September 20, 2019, October 18, 2019, November 15, 2019, December 20, 2019, January 17, 2020 and so on. These are the expiry dates - the last day a buyer can exercise their right to buy/sell a stock at the strike price before the option becomes worthless. Options on stocks are almost always for 100 shares - calls let their buyer purchase 100 shares at the strike and puts let their buyer sell 100 shares at the strike - even though the price we'll see when we go to buy is their cost per share. For example, a call listed for `r currency(5)` will cost `r 100*currency(5)` because it lets us buy 100 shares at `r currency(5)` each. We call 100 the *multiplier*, because we have to call it something.
 
 ```{r Apple-205-Option-Price, echo = FALSE}
 Current_price <- 205.44
@@ -207,7 +207,7 @@ Call_cost <- 6.84
 Put_cost <- 6.10
 ```
 
-Apple is trading at `r currency(Current_price)`. The September 20, 2019 call with a `r currency(Call_K)` strike lets its buyer purchase 100 shares of Apple for `r currency(Call_K)` each on September 20, 2019. It is trading for `r currency(100*Call_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Call_cost)`" data-bottom="100"></span> = `r currency(Call_cost)` per share for this call. The September 20, 2019 put lets its buyer sell 100 shares of Apple for `r currency(Current_price)` each on September 20, 2019. It is trading for `r currency(100*Put_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Put_cost)`" data-bottom="100"></span> = `r currency(Put_cost)` per share. 
+Moving on to the example, Apple is trading at `r currency(Current_price)`. The September 20, 2019 call with a `r currency(Call_K)` strike us buy 100 shares of Apple for `r currency(Call_K)` (each) on September 20, 2019. It is trading for `r currency(100*Call_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Call_cost)`" data-bottom="100"></span> = `r currency(Call_cost)` per share for this call. The September 20, 2019 put lets its buyer sell 100 shares of Apple for `r currency(Current_price)` each on September 20, 2019. It is trading for `r currency(100*Put_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Put_cost)`" data-bottom="100"></span> = `r currency(Put_cost)` per share. 
 
 ```{r Apple-Call-Option_Payoff, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- 6.84
@@ -438,7 +438,7 @@ Apple_Different_Strikes <- tibble( "Strike Prices" = currency(Apple_Prices_K),
 
 kable_styling( knitr::kable(Apple_Different_Strikes, 
                             caption = "Cost on Sept. 11, 2019"), 
-               bootstrap_options = c("striped", "hover", "responsive"),
+               bootstrap_options = c("bordered", "condensed", "responsive"),
                full_width = FALSE )
 ```
 
@@ -469,7 +469,7 @@ Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = Apple_Future_Pric
 
 kable_styling( knitr::kable(Apple_Different_Strikes_Call_Payoff, 
                             caption = "Dollar Return if Held to Expiry"), 
-               bootstrap_options = c("striped", "hover", "responsive"),
+               bootstrap_options = c("bordered", "condensed", "responsive"),
                full_width = FALSE )
 ```
 
@@ -584,7 +584,7 @@ Apple_Different_Strikes_Call_Relative_Payoff <- tibble( "Share Price" = currency
 
 kable_styling( knitr::kable(Apple_Different_Strikes_Call_Relative_Payoff, 
                             caption = "Relative Return if Held to Expiry"), 
-               bootstrap_options = c("striped", "hover", "responsive"),
+               bootstrap_options = c("bordered", "condensed", "responsive"),
                full_width = FALSE )
 ```
 
