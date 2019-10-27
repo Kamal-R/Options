@@ -1,0 +1,121 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
+if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
+if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+
+options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
+```
+
+``` {r Set-Global-Chapter-Variables, echo = FALSE}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # "#929292"
+plot_fg_alt <- "#969696" # ??
+```
+
+# Option Pricing {#Option-Pricing}
+
+If we own an option, we can choose if we want to use it to buy (for a call) or sell (for a put) the stock at a prespecified price and time. Since an option gives us a claim to a stock, it makes sense that the price of an option depends on the price of its stock. Payoff diagram looks at how the price of an option changes as the price of its stock changes - they're fantastic tools for visualizing this dependence. 
+
+If we're just looking at the expiry date of the option, payoff diagrams are all we need. We can see all the possible outcomes, and mark the breakeven price. If we're holding the option to expiry, that's all we need to reason about our trades. But we're looking at option prices before their expiry date, we need more tools to help us understand how option prices change over time. Our goal in this chapter is to identify the different pieces that go into pricing an option, and see how they can help us make good trades. 
+
+While we won't go into the math of the Black-Scholes model, we'll be using its insights to give us the framework we need to discuss option pricing in a clear and understandable way. This model is no slouch - it won Merton and Scholes the 1997 Nobel Prize in Economics.^[Black passed away in 1995 and was not eligible for the award.] Just to be clear, we're not interested in the prices predicted by the Black-Scholes model, or any of its mathematical assumptions or derivations here. If you're interested in learning more about Black-Scholes, we'll discuss its virtues and limitations in an appendix. 
+
+What impacts the price of an option? Just looking at the payoff diagrams for an option at expiry, the price of the stock and the strike of the call affect the price of an option. We need the stock price to be above the strike price (for a call) or below the strike price (for a put) for the option to have value on its expiry day. We've also talked about time value and intrinsic value - intrinsic value is how much we make if we exercise the option right now, and time value is whatever's left. Options lose time value as they get closer to their expiry date. 
+
+There are two more - the *implied volatility* of an option, and the *risk-free (interest) rate*. You can think of the *risk-free rate* as the interest rate on a 1-month Treasury bill, which is 1.73% on October 25, 2019. Interest rates are so low these days that they don't have much impact the price of options that expire in 1-3 months. For options with longer expiry times, the *risk-free rate* has more of an impact. Once we've added up the contribution the strike price, stock price, and risk-free rate have to the price of an option, the *implied volatility* contributes whatever's left. 
+
+There are 5 major components that contribute to the price of an option. They are the: 
+
+  1. *Stock price* it's following.
+  2. *Strike price* of the option. 
+  3. *Time value* of an option. 
+  4. *Risk-free rate*. 
+  5. *Implied volatility*. 
+
+
+## Implied Volatilty {#Implied-Vol}
+
+What is *implied volatility*? We need to add some statistics to our toolbelt - namely, the normal distribution - to answer that. You might have heard of it by it's other name - the "bell curve". If you've had the misfortune of taking a statistics class, you might remember it from the countless hours you spent using z-tables and the empirical rule. 
+
+We're going to start our exploration into the normal distribution by drawing some pictures. Our first picture shows the *standard* normal distribution, with the empirical rule drawn on over the bell curve. 
+
+```{r Standard-Normal-Distribution, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+library(ggplot2)
+
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # "#929292"
+plot_fg_alt <- "#969696" # ??
+
+data_std <- data.frame( x = seq(from = -4, to = 4, by = 0.1), 
+                    y = dnorm(x = seq(from = -4, to = 4, by = 0.1), 
+                              mean = 0, sd = 1) )
+
+ggplot( data = data_std, aes(x = x, y = y) ) + 
+  geom_line() + 
+  # Vertical lines for empirical rule 
+  geom_segment(aes(x = x, xend = x, y = min(data_std$y), yend = y),
+               data = data_std[ data_std$x %in% c(-3,-2,-1,1,2,3), ],
+               lty = "dashed", size = 0.5) +
+  # Horizonal line for 1 standard deviation = 68% 
+  geom_ribbon(data = data.frame( x = seq(from = -1, to = 1, by = 0.1),
+                                 y = dnorm(x = seq(from = -1, to = 1, by = 0.1), 
+                                           mean = 0, sd = 1) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg, alpha="0.5") + 
+  geom_segment(aes(x = -1, xend = 1, y = 0.175, yend = 0.175), 
+               lty = "dashed", size = 0.2, col = "black",
+               arrow = arrow(ends = "both",
+                             length = unit(0.15, "inches"))) + 
+  geom_label(aes(label = "68%", x = 0, y = 0.175), col = "black", 
+             label.size = 0, label.padding = unit(0.1,"lines"), 
+             fill = plot_bg) +
+  # Horizonal line for 2 standard deviations = 95% 
+  geom_ribbon(data = data.frame( x = seq(from = -2, to = -1, by = 0.1),
+                                 y = dnorm(x = seq(from = -2, to = -1, by = 0.1), 
+                                           mean = 0, sd = 1) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg_alt, alpha="0.5") + 
+  geom_ribbon(data = data.frame( x = seq(from = 1, to = 2, by = 0.1),
+                                 y = dnorm(x = seq(from = 1, to = 2, by = 0.1), 
+                                           mean = 0, sd = 1) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg_alt, alpha="0.5") + 
+  geom_segment(aes(x = -2, xend = 2, y = 0.05, yend = 0.05),
+               lty = "dashed", size = 0.2, 
+               arrow = arrow(ends = "both",
+                             length = unit(0.15, "inches"))) +
+  geom_label(aes(label = "95%", x = 0, y = 0.05), col = "black",
+             label.size = 0, label.padding = unit(0.1,"lines"), 
+             fill = plot_bg) +
+  scale_size_identity() + 
+  scale_y_continuous(breaks = NULL) + 
+  scale_x_continuous(breaks = c(-3,-2,-1,0,1,2,3) ) +
+  labs(title = "Standard Normal Distribution",
+       x = "Z Score",
+       y = "Density") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+

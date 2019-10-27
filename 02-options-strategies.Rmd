@@ -17,7 +17,7 @@ plot_fg <- "#000000" # "#929292"
 plot_fg_alt <- "#969696" # ??
 ```
 
-# A First Look at Options Strategies {#Options-Strategies-First-Look}
+# A First Look at Options Strategies {#First-Look}
 
 Now that we're armed with payoff diagrams, we're going to work through understanding some options strategies -- the covered call (owning 100 shares and selling 1 call), the protective put (owning 100 shares and buying 1 put), and the straddle (buying 1 put and 1 call). Just like in Chapter \@ref(Payoff-Diagrams), we'll only be looking at payoff diagrams on the expiry date of the options. This will let us focus on the reasons why an investor would use these strategies, and their advantages and disadvantages compared to owning shares. In subsequent chapters, we'll discuss how to draw payoff diagrams for options before their expiry date, and how to use them to manage our options trades. 
 
@@ -484,7 +484,7 @@ Apple_Protective_Put <- tibble( "Share Price" = scales::dollar(Apple_Future_Pric
                                                                   negative_parens = TRUE), 
                                 "Buy 50 Shares" = scales::dollar(50*(Apple_Future_Prices - Apple_Current_Price), 
                                                                  negative_parens = TRUE),
-                                "Buy 100 Shares, Buy <br> 1 $205 Strike Put" = 
+                                "Buy 100 Shares, Buy 1 $205 Strike Put" = 
                                   scales::dollar( 100*(-Apple_Puts_Cost[3] + 
                                                          (Apple_Future_Prices - Apple_Current_Price) + 
                                                          pmax(0, Apple_Put_K - Apple_Future_Prices)), negative_parens = TRUE) )
@@ -675,4 +675,7 @@ legend("topleft", c("Protective Put - Profit Per Share",
 ```
 
 The first thing to notice is that the call has a slightly higher breakeven than the protective put - \$228.63 versus \$228.21. This makes sense, because we have to spend \$228.63 to buy the protective put, but only \$23.63 to buy the call. The difference of \$228.63 - \$23.63 = \$205 is sitting in the call owner's bank account earning interest. Savings accounts are earning around 1\% per year, whcih is 0.249\% every 3 months. We bought the options on September 11, 2019 and they expire on December 20, 2019, in about 3 months' time. The call owner will make an additional 3 months of interest from the cash in their savings account, which comes out to \$205 * 0.249\% = $0.51. This lowers the breakeven of the call by \$0.51, from \$228.63 to \$228.63 - \$0.51 = \$228.12. This is within pennies of the \$228.21 breakeven of the protective put. 
+
+
+## The (Ratio) Call Spread
 -->

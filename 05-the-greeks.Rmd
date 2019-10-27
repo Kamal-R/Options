@@ -1,0 +1,44 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
+if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
+if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+
+options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
+```
+
+``` {r Set-Global-Chapter-Variables, echo = FALSE}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # "#929292"
+plot_fg_alt <- "#969696" # ??
+```
+
+<!-- 
+# The Option Greeks {#The-Greeks}
+
+If you've ever had the pleasure (or is it misfortune?) of taking a rigorous mathemtical course on pricing options, you would have learned about the Black-Scholes-Merton pricing model. This model is no slouch - it won Merton and Scholes the 1997 Nobel Prize in Economics - but it has some limitations.^[Black, sadly, passed away in 1995 and was not eligible for the award.] For those who are interested in learning more about it, we'll discuss the derivation of the Black-Scholes-Merton model and its limitations in an appendix. In this chapter, our goal is to explain the insights of the Black-Scholes-Merton model using only high school math. 
+
+If we're being careful, we should note that the Black-Scholes-Merton model only applies to European options. European options can only be exercised by the buyer on the option's expiry date. American options, on the other hand, can be exercised on any date. We're only talking about options on stocks and ETFs in this book, and those are all American options. It's important for us to know if we are dealing with American or European options because early exercise can be a significant risk to an options strategy. We've seen this already, with the naked call and covered call. The covered call protects us against the risk of early exercise of the call we sold, while the naked call does not.  
+
+However, unless we're pricing options ourselves, this distinction isn't that important for understanding how to use the greeks in our own trading. That's because we're not that interested in the values of the greeks that any particular model produces. Let's think of the option greeks as a broader framework that we can use to understand the risk-reward proposition of options and options strategies. Every online broker will show us the option greeks for every option it lets us buy, and these values will be *good enough* for us to make intelligent trading decisions with. Our goal here is to understand how to use the greeks to risk-manage our options positions. 
+
+## Delta
+
+Delta is the most important greek. It tells us (approximately) how much we participate in the price movement of our stock. If our delta is 50, we participate in `r percent(50/100)` of the price movement of the stock. If a stock drops from `r currency(200)` to `r currency(196)` and we owned a 50 delta call, it would *lose* half of the `r currency(4)` decline, which is just `r currency(2)`. If we owned a 25 delta call, we would *lose* a quarter of the `r currency(4)` decline, or just `r currency(1)`. If we owned a 50 delta put, we would *gain* half of `r currency(4)`, which is `r currency(2)`. If we owned a 25 delta put, we would *gain* a quarter of `r currency(4)`, which is `r currency(1)`.`
+ 
+The delta of an option varies according to a number of different factors.  
+ 
+## Gamma
+ 
+## Theta
+ 
+Theta is the time value of an option. 
+ 
+## Vega
+ 
+Vega is the rate of change of 
+-->
