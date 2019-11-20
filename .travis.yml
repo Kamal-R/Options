@@ -22,7 +22,7 @@ env:
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'
-- Rscript -e 'bookdown::kindlegen(exec="tmp/kindlegen/kindlegen")'  
+# - Rscript -e 'bookdown::kindlegen(exec="tmp/kindlegen/kindlegen")'  
 # - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_document2")'
 
 deploy:
