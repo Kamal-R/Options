@@ -6,20 +6,22 @@ knitr::opts_chunk$set(echo = TRUE)
 if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
 if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
 if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+if ( !require("derivmkts") ) { install.packages("derivmkts") };  require(derivmkts)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
 ```
 
-``` {r Set-Global-Chapter-Variables, echo = FALSE}
+```{r Set-Global-Chapter-Variables, echo = FALSE}
 plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # "#929292"
 plot_fg_alt <- "#969696" # ??
 ```
 
-<!-- 
-# The Option Greeks {#The-Greeks}
 
+# The Greeks - Part 1 {#The-Greeks}
+
+<!-- 
 If you've ever had the pleasure (or is it misfortune?) of taking a rigorous mathemtical course on pricing options, you would have learned about the Black-Scholes-Merton pricing model. This model is no slouch - it won Merton and Scholes the 1997 Nobel Prize in Economics - but it has some limitations.^[Black, sadly, passed away in 1995 and was not eligible for the award.] For those who are interested in learning more about it, we'll discuss the derivation of the Black-Scholes-Merton model and its limitations in an appendix. In this chapter, our goal is to explain the insights of the Black-Scholes-Merton model using only high school math. 
 
 If we're being careful, we should note that the Black-Scholes-Merton model only applies to European options. European options can only be exercised by the buyer on the option's expiry date. American options, on the other hand, can be exercised on any date. We're only talking about options on stocks and ETFs in this book, and those are all American options. It's important for us to know if we are dealing with American or European options because early exercise can be a significant risk to an options strategy. We've seen this already, with the naked call and covered call. The covered call protects us against the risk of early exercise of the call we sold, while the naked call does not.  
@@ -42,3 +44,152 @@ Theta is the time value of an option.
  
 Vega is the rate of change of 
 -->
+
+It's essential to know your *greeks* so that you can adjust your options positions to changing market positions. My goal in this chapter is to introduce three greeks - *delta*, *gamma*, and *theta*. We'll look at two more - *vega* and *rho* - in the next chapter. 
+
+## Delta 
+
+Let's start by looking at a familiar payoff diagram and explaining what it means in terms of an option's delta.
+
+```{r Apple-Call-Option_Payoff, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- 6.84
+Call_K <- 205
+Current_price <- 205.44
+x_min = 180; x_max = 225
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+
+Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Call_y" = currency(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K)) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_y, color = "Shares"), linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K + Call_cost, 
+                                         y = seq(from = -Call_cost, to = x_max-Call_K, length=length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Buying Apple's $205 Call",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)),
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)) ),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+
+This payoff diagram is a flat line below \$205, and goes up dollar-for-dollar above \$205. That's all the information that's on this diagram. Even the breakeven price comes from those two facts - we added the \$6.84 cost of the call to \$205 to find it. So we have two parts to the payoff - a flat region with a slope of 0, and and a straight line with a slope of 1. Those slopes are the *delta* of the call option. 
+
+The *delta* of an option tells us how much we participate in the price movement of the stock. If the call is in-the-money, Apple is worth more than \$205 on its expiry day. So we can exercise the call, buy Apple for \$205, and sell it for more. We make the difference Apple's current price and \$205, which gives us dollar-for-dollar participation in the upside of Apple's stock once it is above \$205. Another way of saying that is that the call has a *delta* of 1 - it goes up by 1 dollar for every dollar Apple's stock goes up by (on it's expiry date).
+
+If the call is out-of-the-money, it expires worthless. As long as Apple's stock is under \$205 when the call expires, Apple's stock can go up as much as it likes and the call will still expiry worthless. The call does not participate in any of the upside in Apple's stock when it is below \$205. Another way of saying that is that the call has a *delta* of 0 - it does not go up in price at all while Apple's stock is below \$205. If Apple is at \$180 and goes up by \$20 to \$200, the call won't go up in value because it will still expire worthless. 
+
+Instead of having to reason through what would happen if we exercise the call, we can just look at its *delta*. It's not that helpful for options on their expiry date, but calls (and puts) always have *delta*. Even better, online brokers tell us the *delta* of an option so we don't have to calculate anything. That includes options far away from their expiry dates. 
+
+We're going to take our first look at the payoff diagram of an option well before its expiry date. This is *not* the payoff diagram of the Apple call up above - I've made it up to demonstrate some properties of the *delta* of a (call) option before it expires. The scenario is that its stock is currently at \$100, and I buy one \$100 strike call that is 6 months from expiring. 
+
+This payoff diagram looks at how much profit we would make if we sell the call later that same day. I've hilariously assumed that implied volatility never changes, which is totally *not* true. I'll revisit this example in the the implied volatility chapter but I want to focus on *delta* for now. 
+
+```{r MadeUp-Before-Expiry, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 80; x_max = 120
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 100, v = 0.12, 
+                                                  r=0.02, tt=0.5, d=0) })
+call_payoff <- call_price - Call_cost
+
+call_delta <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_delta[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[2] 
+}
+
+idx <- which(Call_x == Call_K)
+tangent_line <- call_delta[idx]*Call_x
+tangent_line <- tangent_line - tangent_line[idx]
+
+
+Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Call_delta" = currency(tangent_line),
+                            "Call_payoff" = currency(call_payoff) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, Call_delta, color = "Delta"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, Call_payoff, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K, 
+                                         y = seq(from = -3*Call_cost, 
+                                                 to = x_max-Call_K, 
+                                                 length=length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Buying Company XYZ's $100 Strike Call",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg, 'Delta'=plot_fg_alt, 'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                "Delta", 
+                                paste0("Breakeven Price = ", currency(Call_K))),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+Before we get going with *delta*, there's one thing to notice - the breakeven of the call is \$100, not the \$103.89 it would be if we have to recover the cost of the call. We've always had to do that before making money because we've only looking at the payoff of the call on it's expiry date until now. This call is 6 months from expiry, so we can sell it to someone else. We bought the call when Company XYZ was trading at \$100, so the call will be worth what we paid at \$100. That means that \$100 is our breakeven, like it says in the payoff diagram. 
+
+Here we go - our first look at *delta*. The payoff of the call is the solid black line, and it's delta is the solid grey line.  

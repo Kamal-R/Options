@@ -15,6 +15,7 @@ options(kableExtra.auto_format = FALSE)
 plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # "#929292"
 plot_fg_alt <- "#969696" # ??
+label_font_size <- 7.5
 ```
 
 # Option Pricing {#Option-Pricing}
@@ -23,9 +24,9 @@ If we own an option, we can choose if we want to use it to buy (for a call) or s
 
 If we're just looking at the expiry date of the option, payoff diagrams are all we need. We can see all the possible outcomes, and mark the breakeven price. If we're holding the option to expiry, that's all we need to reason about our trades. But we're looking at option prices before their expiry date, we need more tools to help us understand how option prices change over time. Our goal in this chapter is to identify the different pieces that go into pricing an option, and see how they can help us make good trades. 
 
-While we won't go into the math of the Black-Scholes model, we'll be using its insights to give us the framework we need to discuss option pricing in a clear and understandable way. This model is no slouch - it won Merton and Scholes the 1997 Nobel Prize in Economics.^[Black passed away in 1995 and was not eligible for the award.] Just to be clear, we're not interested in the prices predicted by the Black-Scholes model, or any of its mathematical assumptions or derivations here. If you're interested in learning more about Black-Scholes, we'll discuss its virtues and limitations in an appendix. 
+While we won't go into the math of the Black-Scholes model, we'll be using its insights to give us the framework we need to discuss option pricing in a clear and understandable way. This model is no slouch - it won the 1997 Nobel Prize in Economics. Just to be clear, we're not interested in the prices predicted by the Black-Scholes model, or any of its mathematical assumptions or derivations here. If you're interested in learning more about Black-Scholes, we'll discuss its virtues and limitations in an appendix. 
 
-What impacts the price of an option? Just looking at the payoff diagrams for an option at expiry, the price of the stock and the strike of the call affect the price of an option. We need the stock price to be above the strike price (for a call) or below the strike price (for a put) for the option to have value on its expiry day. We've also talked about time value and intrinsic value - intrinsic value is how much we make if we exercise the option right now, and time value is whatever's left. Options lose time value as they get closer to their expiry date. 
+What impacts the price of an option? Just looking at the payoff diagrams for an option at expiry, the price of the stock and the strike of the call affect the price of an option. We need the *stock price* to be above the *strike price* (for a call) or below the strike price (for a put) for the option to have value on its expiry day. We've also talked about *time value* and intrinsic value - intrinsic value is how much we make if we exercise the option right now, and time value is whatever's left. Options lose time value as they get closer to their expiry date. 
 
 There are two more - the *implied volatility* of an option, and the *risk-free (interest) rate*. You can think of the *risk-free rate* as the interest rate on a 1-month Treasury bill, which is 1.73% on October 25, 2019. Interest rates are so low these days that they don't have much impact the price of options that expire in 1-3 months. For options with longer expiry times, the *risk-free rate* has more of an impact. Once we've added up the contribution the strike price, stock price, and risk-free rate have to the price of an option, the *implied volatility* contributes whatever's left. 
 
@@ -37,20 +38,18 @@ There are 5 major components that contribute to the price of an option. They are
   4. *Risk-free rate*. 
   5. *Implied volatility*. 
 
+The only value that cannot be found quickly using market prices is the implied volatility, so we'll spend the rest of this chapter focusing on it. 
+
 
 ## Implied Volatilty {#Implied-Vol}
 
 What is *implied volatility*? We need to add some statistics to our toolbelt - namely, the normal distribution - to answer that. You might have heard of it by it's other name - the "bell curve". If you've had the misfortune of taking a statistics class, you might remember it from the countless hours you spent using z-tables and the empirical rule. 
 
+### The Standard Normal Distribution 
+
 We're going to start our exploration into the normal distribution by drawing some pictures. Our first picture shows the *standard* normal distribution, with the empirical rule drawn on over the bell curve. 
 
 ```{r Standard-Normal-Distribution, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
-library(ggplot2)
-
-plot_bg <- "#FFFFFF" # "#191919"
-plot_fg <- "#000000" # "#929292"
-plot_fg_alt <- "#969696" # ??
-
 data_std <- data.frame( x = seq(from = -4, to = 4, by = 0.1), 
                     y = dnorm(x = seq(from = -4, to = 4, by = 0.1), 
                               mean = 0, sd = 1) )
@@ -70,7 +69,7 @@ ggplot( data = data_std, aes(x = x, y = y) ) +
                lty = "dashed", size = 0.2, col = "black",
                arrow = arrow(ends = "both",
                              length = unit(0.15, "inches"))) + 
-  geom_label(aes(label = "68%", x = 0, y = 0.175), col = "black", 
+  geom_label(aes(label = "68%", x = 0, y = 0.175, size = label_font_size), col = "black", 
              label.size = 0, label.padding = unit(0.1,"lines"), 
              fill = plot_bg) +
   # Horizonal line for 2 standard deviations = 95% 
@@ -86,7 +85,7 @@ ggplot( data = data_std, aes(x = x, y = y) ) +
                lty = "dashed", size = 0.2, 
                arrow = arrow(ends = "both",
                              length = unit(0.15, "inches"))) +
-  geom_label(aes(label = "95%", x = 0, y = 0.05), col = "black",
+  geom_label(aes(label = "95%", x = 0, y = 0.05, size = label_font_size), col = "black",
              label.size = 0, label.padding = unit(0.1,"lines"), 
              fill = plot_bg) +
   scale_size_identity() + 
@@ -119,3 +118,174 @@ ggplot( data = data_std, aes(x = x, y = y) ) +
                                     angle = 90, colour = plot_fg) )
 ```
 
+The normal distribution is a *probability distribution* that governs how likely different future outcomes are. Any future event with more than one outcome can be described by a probability distribution. Typical examples are flipping a coin (which has two outcomes - heads or tails) and rolling a dice (which has six outcomes - 1, 2, 3, 4, 5, or 6). A probability distribution governs how likely those outcomes are. If we are flipping a fair coin, we expect to land heads half of the time and to land tails the other half of the time. If we were rolling a fair dice, we would expect to roll each number 1/6^th^ of the time. 
+
+We have good intuition for flipping coins and rolling dice, and the empirical rule helps us gain intuition when it applies. It says 68% of the future outcomes will be between -1 and 1, and 95% will be between -2 and 2. We didn't know what the future outcome would be when we rolled the dice, and we don't know now under the empirical rule. But when we say that the standard normal distribution *governs* how likely future events are, we know how likely seeing a number between -1 and 1 is, and how likely seeing a number between -2 and 2 is. That's better than nothing. 
+
+That's all a probability distribution can give us. We don't know what's going to happen in the future, so the best we can do is try to describe how likely we think future events are. We might even be wrong - we could think the empirical rule is a reasonable approximation of the future, only to find that 35% of future outcomes are between -1 and 1 (instead of 68%) and 60% are between -2 and 2 (instead of 95%). If that happened and we use the empirical rule to help us reason about the future, we could make a very bad decision. 
+
+In some ways, this is unavoidable - we don't know what's going to happen, so we have to make an assumption that helps us reason about the future. Assumptions that are wrong can still be helpful. We just have to be mindful about how they're wrong, and factor their shortcomings into our thinking when we're making our decision. This is an issue we'll have to confront for *implied volatility*. 
+
+Finally, I'd argue that being precise and putting a number on our forecasts is better than using vague words like "more likely" or "less likely". If we use actual numbers, we can track how accurate we are. A simple way to track forecast accuracy is if events happen as frequently as we believe they will. For example, an event that we believe will happen 40% of them time should happen 40% of the time. A more sophisticated way to track forecasting accuracy is the Brier Score, beautifully described in Philip Tetlock's book [Superforecasting](https://www.amazon.com/Superforecasting-Science-Prediction-Philip-Tetlock/dp/0804136718). 
+
+
+### The Normal Distribution 
+
+We've seen the standard normal distribution. It is centered at 0 and says 68% of future outcomes are between -1 and 1. We can center the normal distribution at any number - if we center it at 5, 68% of its values will be between 4 and 6 and 95% of its values will be between 3 and 7. We call the value the normal distribution is centered at its *mean*.
+
+```{r Normal-Mean-5, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+data_std <- data.frame( x = seq(from = 5-4, to = 5+4, by = 0.1), 
+                    y = dnorm(x = seq(from = 5-4, to = 5+4, by = 0.1), 
+                              mean = 5, sd = 1) )
+
+ggplot( data = data_std, aes(x = x, y = y) ) + 
+  geom_line() + 
+  # Vertical lines for empirical rule 
+  geom_segment(aes(x = x, xend = x, y = min(data_std$y), yend = y),
+               data = data_std[ data_std$x %in% (5 + c(-3,-2,-1,1,2,3)), ],
+               lty = "dashed", size = 0.5) +
+  # Horizonal line for 1 standard deviation = 68% 
+  geom_ribbon(data = data.frame( x = seq(from = 5-1, to = 5+1, by = 0.1),
+                                 y = dnorm(x = seq(from = 5-1, to = 5+1, by = 0.1), 
+                                           mean = 5, sd = 1) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg, alpha="0.5") + 
+  geom_segment(aes(x = 5-1, xend = 5+1, y = 0.175, yend = 0.175), 
+               lty = "dashed", size = 0.2, col = "black",
+               arrow = arrow(ends = "both",
+                             length = unit(0.15, "inches"))) + 
+  geom_label(aes(label = "68%", x = 5, y = 0.175, size = label_font_size), col = "black", 
+             label.size = 0, label.padding = unit(0.1,"lines"), 
+             fill = plot_bg) +
+  # Horizonal line for 2 standard deviations = 95% 
+  geom_ribbon(data = data.frame( x = seq(from = 5-2, to = 5-1, by = 0.1),
+                                 y = dnorm(x = seq(from = 5-2, to = 5-1, by = 0.1), 
+                                           mean = 5, sd = 1) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg_alt, alpha="0.5") + 
+  geom_ribbon(data = data.frame( x = seq(from = 5+1, to = 5+2, by = 0.1),
+                                 y = dnorm(x = seq(from = 5+1, to = 5+2, by = 0.1), 
+                                           mean = 5, sd = 1) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg_alt, alpha="0.5") + 
+  geom_segment(aes(x = 5-2, xend = 5+2, y = 0.05, yend = 0.05),
+               lty = "dashed", size = 0.2, 
+               arrow = arrow(ends = "both",
+                             length = unit(0.15, "inches"))) +
+  geom_label(aes(label = "95%", x = 5, y = 0.05, size = label_font_size), col = "black",
+             label.size = 0, label.padding = unit(0.1,"lines"), 
+             fill = plot_bg) +
+  scale_size_identity() + 
+  scale_y_continuous(breaks = NULL) + 
+  scale_x_continuous(breaks = 5 + c(-3,-2,-1,0,1,2,3) ) +
+  labs(title = "Normal Distribution - Centered at 5",
+       x = "Z Score",
+       y = "Density") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+
+We've only seen normal distributions where 68% of the values are within a distance of 1 from the center, and 95% of the values have been within a distance of 2 from the center. Distance tells us how far we are, without paying attention to sign. For example, the standard normal distribution is centered at 0, and 68% of the values are between -1 and 1. We can move from 0 to 1 or from 0 to -1, and only have moved by 1. So, 68% of its values are within a distance of 1 from its center. For the normal distribution centered at 5, 68% of its values are between 4 and 6. We can move from 5 to 4 or from 5 to 6 and only have moved by 1. So 68% of its values are as well. 
+
+We can generalize the normal distribution one more way, by saying that 68% of the values have to within a distance of any number from its center. Let's look at the standard normal distribution, but change it to make that distance 3 instead of 1. This will make 68% of the values be between -3 and 3, and 95% of the values be between -6 and 6. 
+
+```{r Normal-StdDev-3, , echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+data_std <- data.frame( x = seq(from = 3*-4, to = 3*4, by = 0.1), 
+                    y = dnorm(x = seq(from = 3*-4, to = 3*4, by = 0.1), 
+                              mean = 0, sd = 3) )
+
+ggplot( data = data_std, aes(x = x, y = y) ) + 
+  geom_line() + 
+  # Vertical lines for empirical rule 
+  geom_segment(aes(x = x, xend = x, y = min(data_std$y), yend = y),
+               data = data_std[ data_std$x %in% (3*c(-3,-2,-1,1,2,3)), ],
+               lty = "dashed", size = 0.5) +
+  # Horizonal line for 1 standard deviation = 68% 
+  geom_ribbon(data = data.frame( x = seq(from = 3*-1, to = 3*1, by = 0.1),
+                                 y = dnorm(x = seq(from = 3*-1, to = 3*1, by = 0.1), 
+                                           mean = 0, sd = 3*1) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg, alpha="0.5") + 
+  geom_segment(aes(x = 3*-1, xend = 3*1, y = 0.175/3, yend = 0.175/3), 
+               lty = "dashed", size = 0.2, col = "black",
+               arrow = arrow(ends = "both",
+                             length = unit(0.15, "inches"))) + 
+  geom_label(aes(label = "68%", x = 0, y = 0.175/3, size = label_font_size), col = "black", 
+             label.size = 0, label.padding = unit(0.1,"lines"), 
+             fill = plot_bg) +
+  # Horizonal line for 2 standard deviations = 95% 
+  geom_ribbon(data = data.frame( x = seq(from = 3*-2, to = 3*-1, by = 0.1),
+                                 y = dnorm(x = seq(from = 3*-2, to = 3*-1, by = 0.1), 
+                                           mean = 0, sd = 3) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg_alt, alpha="0.5") + 
+  geom_ribbon(data = data.frame( x = seq(from = 3*1, to = 3*2, by = 0.1),
+                                 y = dnorm(x = seq(from = 3*1, to = 3*2, by = 0.1), 
+                                           mean = 0, sd = 3) ), 
+              aes(ymin = 0, ymax = y), fill=plot_fg_alt, alpha="0.5") + 
+  geom_segment(aes(x = 3*-2, xend = 3*2, y = 0.05/3, yend = 0.05/3),
+               lty = "dashed", size = 0.2, 
+               arrow = arrow(ends = "both",
+                             length = unit(0.15, "inches"))) +
+  geom_label(aes(label = "95%", x = 0, y = 0.05/3, size = label_font_size), col = "black",
+             label.size = 0, label.padding = unit(0.1,"lines"), 
+             fill = plot_bg) +
+  scale_size_identity() + 
+  scale_y_continuous(breaks = NULL) + 
+  scale_x_continuous(breaks = 3*c(-3,-2,-1,0,1,2,3) ) +
+  labs(title = "Normal Distribution - Spread of 3",
+       x = "Z Score",
+       y = "Density") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+
+That is indeed what we see when we draw the picture. Just like with payoff diagrams, I'd strongly encourage you to draw normal distributions when we encounter them with options. Visualizing a distribution is the best way to understand what they say about future outcomes. Can you draw a normal distribution centered at 5 with a spread of 3? It should have 68& of its values between 2 and 8 and 95% of its values between -1 and 11. 
+
+If we're being mathematical, the center of a normal distribution is called its *mean* and its spread is called its *standard deviation*. For the normal distribution, these words literally mean what we've calling them so far. The *mean* is its center, and the *standard deviation* measures how spread out it is by specifying the distance we have move from the center to capture 68% of the future outcomes. I'll soon be calling the spread by another name: *implied volatility*.
+
+
+### Implied Volatility Redux
+
+We've almost built up enough machinery to say what the implied volatility is. The next thing we need to do is make some assumptions on the behavior of markets and market prices, so that we can use a probability distribution to describe the unknown returns we'll receive in the future. The Black-Scholes model makes a number of assumptions, many of them unrealistic. I'll quickly go through some of the assumptions and their implications, but I'm not that interested in the specifics of the model. 
+
+One of the assumptions is that we cannot make money from risk-free trades. This is the idea behind *replicating portfolios*. If we can create two portfolios with the same payoff diagram, they must have the same price. Otherwise, we could sell one and buy the other to make free money. Another assumption is that we pay no fees to the bank when we trade, which is becoming more true over time. A third assumption is that stock prices follow something called a geometric Brownian motion. This assumption leads to an option pricing formula in terms of the five components we described at the beginning of this chapter. 
+
+The third assumption implies that stock prices are log-normally distributed with *implied volatility* $\sigma$. This gives a great idea about what *implied volatility* is - it's the market's opinion of the spread of the stock over the next year. At this stage, you might ask why *implied volatility* cannot be directly observed by market prices. We could calculate the spread for the last year, but this approach has a serious shortcoming - it assumes the future (next year) will be exactly like the past (last year). That's very unlikely to be true. If it was, we wouldn't need to do much figure out what stocks to invest in. 
+
+So we can't observe the *implied volatility* from market prices - it has to be determined by a mathematical model. Black-Scholes is just one such model. Since the Black-Scholes model was introduced, many more option pricing models have been developed. They seek to make more realistic modeling assumptions and price options more accurately. 
