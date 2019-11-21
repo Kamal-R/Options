@@ -19,7 +19,7 @@ plot_fg_alt <- "#969696" # ??
 ```
 
 
-# The Greeks - Part 1 {#The-Greeks}
+# The Greeks (Part 1) {#First-Greeks}
 
 <!-- 
 If you've ever had the pleasure (or is it misfortune?) of taking a rigorous mathemtical course on pricing options, you would have learned about the Black-Scholes-Merton pricing model. This model is no slouch - it won Merton and Scholes the 1997 Nobel Prize in Economics - but it has some limitations.^[Black, sadly, passed away in 1995 and was not eligible for the award.] For those who are interested in learning more about it, we'll discuss the derivation of the Black-Scholes-Merton model and its limitations in an appendix. In this chapter, our goal is to explain the insights of the Black-Scholes-Merton model using only high school math. 
@@ -45,13 +45,14 @@ Theta is the time value of an option.
 Vega is the rate of change of 
 -->
 
-It's essential to know your *greeks* so that you can adjust your options positions to changing market positions. My goal in this chapter is to introduce three greeks - *delta*, *gamma*, and *theta*. We'll look at two more - *vega* and *rho* - in the next chapter. 
+It's essential to know your *greeks* so that you can adjust your options positions to changing market positions. My goal in this chapter is to introduce two greeks - *delta*, *gamma*. We'll look at four more greeks in the next two chapters - *theta* and *rho*, and then *sigma* and *vega*. Once we've armed ourselves with knowledge of the greeks, we'll look at two more options strategies - the straddle and the put spread. 
+
 
 ## Delta 
 
-Let's start by looking at a familiar payoff diagram and explaining what it means in terms of an option's delta.
+Let's start off with a familiar payoff diagram - Apple's \$205 strike call - and explain what is says about the call's delta. 
 
-```{r Apple-Call-Option_Payoff, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Call-Option-Payoff, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- 6.84
 Call_K <- 205
 Current_price <- 205.44
@@ -103,19 +104,17 @@ ggplot() +
                                     angle = 90, colour = plot_fg) )
 ```
 
-This payoff diagram is a flat line below \$205, and goes up dollar-for-dollar above \$205. That's all the information that's on this diagram. Even the breakeven price comes from those two facts - we added the \$6.84 cost of the call to \$205 to find it. So we have two parts to the payoff - a flat region with a slope of 0, and and a straight line with a slope of 1. Those slopes are the *delta* of the call option. 
+This call's payoff is a flat line below \$205, and goes up dollar-for-dollar above \$205. The two parts of the payoff diagram are all the information that's on this diagram. There is a flat region with a slope of 0, and a straight line with a slope of 1. Those slopes are the *delta* of the call option. 
 
-The *delta* of an option tells us how much we participate in the price movement of the stock. If the call is in-the-money, Apple is worth more than \$205 on its expiry day. So we can exercise the call, buy Apple for \$205, and sell it for more. We make the difference Apple's current price and \$205, which gives us dollar-for-dollar participation in the upside of Apple's stock once it is above \$205. Another way of saying that is that the call has a *delta* of 1 - it goes up by 1 dollar for every dollar Apple's stock goes up by (on it's expiry date).
+*Delta* tells us how much an option participates in the price movement of the stock. If Apple is worth more than \$205 when this call expires, we can exercise the call, buy Apple for \$205, and sell it for more than \$205. We make the difference Apple's current price and \$205, which gives us dollar-for-dollar participation to the upside. Another way of saying that is that this call has a *delta* of 1 - it goes up by 1 dollar for every dollar Apple's stock goes up - when Apple's shares are above \$205.
 
-If the call is out-of-the-money, it expires worthless. As long as Apple's stock is under \$205 when the call expires, Apple's stock can go up as much as it likes and the call will still expiry worthless. The call does not participate in any of the upside in Apple's stock when it is below \$205. Another way of saying that is that the call has a *delta* of 0 - it does not go up in price at all while Apple's stock is below \$205. If Apple is at \$180 and goes up by \$20 to \$200, the call won't go up in value because it will still expire worthless. 
+If the call is below \$205, it expires worthless. As long as Apple's stock stays under \$205, Apple's stock can go up as much as it likes and the call will still expires worthless. If Apple is at \$180 and goes up by \$20 to \$200, the call still expires worthless. Another way of saying that is that the call has a *delta* of 0 - it does not go up in price at all - when Apple's stock is below \$205. 
 
-Instead of having to reason through what would happen if we exercise the call, we can just look at its *delta*. It's not that helpful for options on their expiry date, but calls (and puts) always have *delta*. Even better, online brokers tell us the *delta* of an option so we don't have to calculate anything. That includes options far away from their expiry dates. 
+Calls (and puts) always have *delta*, and online brokers tell us what the *delta* of an option is so we don't even have to calculate it. That includes options far away from their expiry dates, which we'll finally look at in this chapter. It's for a ficticious company, Company XYZ, that is trading at \$100. I think XYZ's shares are going higher, so I buy a \$100 strike call for \$3.89. The call is 6 months away from expiring. 
 
-We're going to take our first look at the payoff diagram of an option well before its expiry date. This is *not* the payoff diagram of the Apple call up above - I've made it up to demonstrate some properties of the *delta* of a (call) option before it expires. The scenario is that its stock is currently at \$100, and I buy one \$100 strike call that is 6 months from expiring. 
+This payoff diagram looks at how much profit we would make if we sell the call later that same day. I've kept the implied volatility *sigma* of the option the same for all these different prices, which is completely unrealistic. I'll revisit this example when we talk about *sigma*, but I want to focus on *delta* for now. 
 
-This payoff diagram looks at how much profit we would make if we sell the call later that same day. I've hilariously assumed that implied volatility never changes, which is totally *not* true. I'll revisit this example in the the implied volatility chapter but I want to focus on *delta* for now. 
-
-```{r MadeUp-Before-Expiry, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r XYZ-Delta-Before-Expiry-100, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
 Call_K <- 100
 Current_price <- 100
@@ -158,12 +157,12 @@ ggplot() +
                                          linetype = "dashed") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = "Buying Company XYZ's $100 Strike Call",
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
        x = "Stock Price",
        y = "Profit Per Share") +
   scale_color_manual(values = c('Shares'=plot_fg, 'Delta'=plot_fg_alt, 'Breakeven'=plot_fg),
                      labels = c("Profit Per Share",
-                                "Delta", 
+                                "Delta (at $100)", 
                                 paste0("Breakeven Price = ", currency(Call_K))),
                      guide = "legend") + 
   guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
@@ -190,6 +189,527 @@ ggplot() +
         axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
                                     angle = 90, colour = plot_fg) )
 ```
-Before we get going with *delta*, there's one thing to notice - the breakeven of the call is \$100, not the \$103.89 it would be if we have to recover the cost of the call. We've always had to do that before making money because we've only looking at the payoff of the call on it's expiry date until now. This call is 6 months from expiry, so we can sell it to someone else. We bought the call when Company XYZ was trading at \$100, so the call will be worth what we paid at \$100. That means that \$100 is our breakeven, like it says in the payoff diagram. 
+Before we get going with *delta*, let's pause and think about breakeven. The best way to think about breakeven is that I pay for a call, and have to recover the cost of buying it before I can make money. In the examples from earlier, we looked at calls that were a couple months from expiring. I bought them in September or October, and they expired in November or December. But, I only looked at their payoffs on their expiry dates. For example, the \$205 strike Apple call cost \$6.84, and I've drawn its payoff on its expiry date. Since I spent \$6.84 on the call, I need Apple's shares to reach \$211.84 *on the expiry date* so that I can exercise the call and make that \$6.84 back. If I drew the payoff diagram the instant after I bought it, the call would still be worth \$6.84. I would be able to sell it and make back that \$6.84, so my breakeven would be \$205.
 
-Here we go - our first look at *delta*. The payoff of the call is the solid black line, and it's delta is the solid grey line.  
+The same logic holds for XYZ. This \$100 strike call costs \$3.89 and it expires in 6 months. If I was to hold the call until it's expiry date, I would need the stock to go up to \$103.89 so that I could make my money back. So if I drew the payoff diagram for this call on its expiry date, the breakeven would be \$103.89. But I've drawn the payoff diagram the instant after I bought it, which is 6 months from its expiry date. The XYZ call is still worth \$3.89, so I can sell it and get my \$3.89 back. So my breakeven is \$100, which is what it says on the payoff diagram. 
+
+With that out of the way, let's take our first look at *delta*, the slope of the call's payoff. The payoff is in black, and it's delta at \$100 is in grey. The payoff diagram shows that the grey line touches the black line at \$100, is fairly close within a few dollars of \$100, and gets further and further away as the stock moves away from \$100. If I was to re-phrase that in terms of *delta*, I would say that the *delta* at \$100 is a good approximation of the payoff near \$100, but it gets progressively worse as the stock moves away from \$100. 
+
+Within \$1 of \$100, I can't see a difference between the two lines. So, I can use the grey line to approximate how much I'll make when the stock goes up by \$1, and how much I'll lose when the stock goes down by \$1. You could eyeball the slope of the grey line off the graph, which I'll do in another example. But since we're given *delta* by our online brokers, I'm just going to give it to you - it's 0.5637. That means that if Company XYZ's stock goes up by \$1, we'll make \$0.56. If it goes down by \$1, we'll lose \$0.56. That's how I like to think about *delta* - its tells me (approximately) how much the call *participates* in the next \$1 move of the stock.
+
+It's super important to notice that calls (and puts) have a different delta for *every* price the stock can take. We can see this in the payoff diagram. The delta I drew only is *only* an exact match for the curve at \$100. As the stock moves away from \$100, it doesn't match the payoff at all. To drive this point home, I'm going to draw in the delta of this call when it's \$90 and \$110. 
+
+```{r XYZ-Before-Expiry-90, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 80; x_max = 120
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 100, v = 0.12, 
+                                                  r=0.02, tt=0.5, d=0) })
+call_payoff <- call_price - Call_cost
+
+call_delta <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_delta[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[2] 
+}
+
+idx <- which(Call_x == 90)
+tangent_line <- call_delta[idx]*Call_x
+tangent_line <- tangent_line - tangent_line[idx] + call_payoff[idx]
+
+Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Call_delta" = currency(tangent_line),
+                            "Call_payoff" = currency(call_payoff) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, Call_delta, color = "Delta"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, Call_payoff, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K, 
+                                         y = seq(from = -3*Call_cost, 
+                                                 to = x_max-Call_K, 
+                                                 length=length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg, 'Delta'=plot_fg_alt, 'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                "Delta (at $90)", 
+                                paste0("Breakeven Price = ", currency(Call_K))),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+
+This payoff diagram shows the delta of the call at \$90. It is 0.1398, or 13.98% - that tells us that when the stock is at \$90, the call will go up by (approximately) \$0.14 when Company XYZ's stock goes up by \$1.00 or down by (approximately) \$0.14 when it goes down by \$1.00. This is way less than the \$0.56 we saw when the stock was at \$100. In fact, the lower this stock goes, the closer the delta gets to 0. 
+
+This makes sense, because we know the delta *is* 0 if XYZ's shares are below \$100 when the call expires. There's still time for XYZ's shares to get back above \$100, because the call is 6 months from expiring. But the more the shares fall, the less likely that is. So the delta *should* get lower and lower as the shares fall. That's exactly what we see here, with the delta falling from 0.56 to 0.14 as the shares fall from \$100 to \$90. 
+
+```{r XYZ-Before-Expiry-110, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 80; x_max = 120
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 100, v = 0.12, 
+                                                  r=0.02, tt=0.5, d=0) })
+call_payoff <- call_price - Call_cost
+
+call_delta <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_delta[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[2] 
+}
+
+idx <- which(Call_x == 110)
+tangent_line <- call_delta[idx]*Call_x
+tangent_line <- tangent_line - tangent_line[idx] + call_payoff[idx]
+
+
+Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Call_delta" = currency(tangent_line),
+                            "Call_payoff" = currency(call_payoff) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, Call_delta, color = "Delta"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, Call_payoff, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K, 
+                                         y = seq(from = -3*Call_cost, 
+                                                 to = x_max-Call_K, 
+                                                 length=length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg, 'Delta'=plot_fg_alt, 'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                "Delta (at $110)", 
+                                paste0("Breakeven Price = ", currency(Call_K))),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+The delta of this call at \$110 is 0.9000 - that tells us that when the stock is at \$110, the call will go up by (approximately) \$0.90 when Company XYZ's stock goes up by \$1.00 or down by *approximately* \$0.90 when it goes down by \$1.00. This is way more than the \$0.56 we saw when the stock was at \$100, and the reason why should sound familiar. 
+
+The higher this stock goes, the closer the delta gets to 1. We know the delta *is* 1 if XYZ's shares are above \$100 when the call expires. There's still time for the shares to fall below \$100, but the higher the shares go the more likely they are to be above \$100 in 6 months' time. So delta *should* go up as the shares go up. And that's exactly what happens, with delta increasing from 0.56 to 0.90 as the shares jump from \$100 to \$110. 
+
+
+## Gamma
+
+Ok, so we know that *delta* changes as the price of XYZ's shares change. Instead of figuring out *delta* by drawing one straight line at a time, we can draw a diagram that shows how delta changes. It's not a payoff diagram, but it is simpler and faster way to visualize delta. 
+
+```{r XYZ-Delta, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 75; x_max = 125
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+
+call_delta <- vector(length = length(Call_x)) 
+for (ii in 1:length(Call_x)) { 
+  call_delta[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[2] 
+}
+
+Call_Delta <- tibble( "Call_x" = currency(seq(from = x_min, 
+                                              to = x_max, by = 1)),
+                      "Call_delta" = call_delta )
+
+Call_Delta_points <- tibble( "Call_x_points" = currency( c(90, 100, 110) ), 
+                             "Call_delta_points" = currency( c( call_delta[which(Call_x == 90)],
+                                                                call_delta[which(Call_x == 100)], 
+                                                                call_delta[which(Call_x == 110)] ) ),
+                             coords = c( paste("(",currency(90), ", ",
+                                               round(call_delta[which(Call_x == 90)],2), 
+                                               ")", sep=""),
+                                         paste("(",currency(100), ", ",
+                                               round(call_delta[which(Call_x == 100)],2), 
+                                               ")", sep=""),
+                                         paste("(",currency(110), ", ",
+                                               round(call_delta[which(Call_x == 110)],2), 
+                                               ")", sep="") ) )
+
+ggplot() + 
+  geom_line(data = Call_Delta, 
+            aes(Call_x, Call_delta), linetype = "solid") +
+  geom_point(data = Call_Delta_points, 
+             aes(Call_x_points, Call_delta_points)) +
+  geom_text(data = Call_Delta_points, size = 4,
+            aes( x = c(90,100,110), y = Call_delta_points, label = coords ),
+            hjust=c(0,0,0), vjust=c(1.5,1.5,1.5)) + 
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
+       x = "Stock Price",
+       y = "Delta") +
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+This diagram shows how the call's *delta* changes with the stock price. The three values for *delta* that we found earlier - 0.14 at \$90, 0.56 at \$100, and 0.90 at \$110 - are there, but so are a bunch more. Remember, *delta* tells us approximately how much we can expect the price of the call (or put) to move if the stock moves by \$1.00. But there's slightly more to the story - *delta* increases as the stock price goes up, and decreases as the stock goes down. When the stock is going up, we can expect to make slightly more than the *delta* says we should, and when the stock goes down we can expect to lose slightly less.
+
+If we want to have some idea of how much more or how much less, we need to know how fast delta is changing. Thankfully, one of the greeks tells us that. It's called *gamma*. Just like the slope of the payoff tells us how quickly the price of the call changes, the slope of this *delta* curve tells us how fast delta is changing. I'm going to use the same playbook to understand *gamma* that we did to understand *delta* - I'll draw some slopes at different points on the *delta* curve, and then I'll draw a diagram of *gamma* against the stock price. I'll even use the same points - \$90, \$100, and \$100 - that I did with *delta*.
+
+```{r XYZ-Gamma-Before-Expiry-100, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 80; x_max = 120
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+
+call_delta <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_delta[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[2] 
+}
+
+call_gamma <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_gamma[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[3] 
+}
+
+idx <- which(Call_x == 100)
+tangent_line <- call_gamma[idx]*Call_x
+tangent_line <- tangent_line - tangent_line[idx] + call_delta[idx]
+
+
+Call_Delta_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                           "Call_gamma" = currency(tangent_line),
+                           "Call_delta" = currency(call_delta) )
+
+ggplot() + 
+  geom_line(data = Call_Delta_Plot, 
+            aes(Call_x, Call_gamma, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Delta_Plot, 
+          aes(Call_x, Call_delta, color = "Gamma"), 
+          linetype = "solid") +
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
+       x = "Stock Price",
+       y = "Delta") +
+  scale_color_manual(values = c('Shares'=plot_fg_alt, 'Gamma'=plot_fg),
+                     labels = c("Delta",
+                                "Gamma (at $100)"),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+We've got *delta* ranging from 0 to 1 in black, and the call's *gamma* at \$100 in grey. Just like before, the grey line is a fantastic approximation of the black line near \$100, and gets worse the further away from \$100 the stock gets. Within \$1 of \$100, it's almost perfect. At \$100, the grey line is slightly higher than 0.5, and at \$110 it is near \$1. That's a rise of slightly less than 0.5 over \$10. The slope is just the rise (0.5) over the run (\$10), so this call's gamma at \$100 is a little smaller than 0.5/\$10 = 0.05 per dollar. 
+
+It actually equals 0.04642, so we got pretty close by eyeballing it. Once we know *gamma* or a good approximation of it, we have a better idea about how much money the call (or put) will make for a \$1 move in XYZ's stock. The *delta* of this call at \$100 is 0.56, which tells us that we'll make \$0.56 the first \$1 that XYZ's shares go up, and lose \$0.56 the first \$1 they go down. 
+
+But the *gamma* at \$100 is 0.04642. That tells us that *delta* increases by about 0.04 to 0.60 when the stock reaches \$101, and falls by about 0.04 to 0.52 when the stock reaches \$99. I'm rounding *gamma* to 0.04, because I want to get a quick and dirty idea of how the call will behave. That's because when I go to buy it, my online broker will tell me that this \$100 strike call has a *delta* of 0.5637 and a *gamma* of 0.04642. 
+
+If I wanted to know how much money I would make or lose for the next \$1 move in the stock, I have to do one more quick approximation. The *delta* increases from 0.56 to 0.60 when the stock increases from \$100 to \$101. I want to know how much of this \$1 move my call captures. It's not \$0.56 because the call's *delta* was going up from 0.56 as the shares went up to \$101 (because of *gamma*), and it's not \$0.60 because the call's *delta* just got to 0.60 when the shares got to \$101. I'm going to approximate it by splitting the difference between \$0.56 and \$0.60, and say that the call captures \$0.58 of the \$1 move higher. 
+
+I'll do the same thing for when the stock goes down by by \$1. The call's *delta* is 0.56 when the shares are at \$100, and it decreases to 0.52 when the shares fall to \$99. To approximate how much of the \$1 loss the call participates in, I'll split the difference between 0.56 and 0.52, and say that the call captures \$0.54 of the \$1 move lower. And even better than being able to do this once is being able to do it all the time. Our online broker will keep giving us new values for *delta* and *gamma* as the shares move around. We can just look them up, and do this quick and dirty calculation. That will give us a good idea of how our call (or put) will behave for the next \$1 move (up or down) in the stock.  
+
+We can eyeball gamma by making diagrams like this one. I'll make the same diagrams for when XYZ's shares are \$90 and \$110, because they'll help build your intuition about how *gamma* behaves. 
+
+```{r XYZ-Gamma-Before-Expiry-90, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 80; x_max = 120
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+
+call_delta <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_delta[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[2] 
+}
+
+call_gamma <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_gamma[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[3] 
+}
+
+idx <- which(Call_x == 90)
+tangent_line <- call_gamma[idx]*Call_x
+tangent_line <- tangent_line - tangent_line[idx] + call_delta[idx]
+
+
+Call_Delta_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                           "Call_gamma" = currency(tangent_line),
+                           "Call_delta" = currency(call_delta) )
+
+ggplot() + 
+  geom_line(data = Call_Delta_Plot, 
+            aes(Call_x, Call_gamma, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Delta_Plot, 
+          aes(Call_x, Call_delta, color = "Gamma"), 
+          linetype = "solid") +
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
+       x = "Stock Price",
+       y = "Delta") +
+  scale_color_manual(values = c('Shares'=plot_fg_alt, 'Gamma'=plot_fg),
+                     labels = c("Delta",
+                                "Gamma (at $90)"),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+
+The *delta*-curve flattens out as the shares fall under \$100, becoming almost completely flat by the time they reach \$80. Another way of saying that is that the *gamma* of the call decreases as the shares fall from \$100, and the *delta* of the call is close to 0 at \$80. And the numbers match the picture. At \$100, the call has 0.04642 of *gamma*. At \$90, the call has 0.0291 of *gamma*, which is less than 0.04642. 
+
+```{r XYZ-Gamma-Before-Expiry-110, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 80; x_max = 120
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+
+call_delta <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_delta[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[2] 
+}
+
+call_gamma <- vector(length = length(call_price)) 
+for (ii in 1:length(call_price)) { 
+  call_gamma[ii] <- greeks( bscall(s = x_min-1+ii, k = 100, v = 0.12, 
+                                   r=0.02, tt=0.5, d=0) )[3] 
+}
+
+idx <- which(Call_x == 110)
+tangent_line <- call_gamma[idx]*Call_x
+tangent_line <- tangent_line - tangent_line[idx] + call_delta[idx]
+
+
+Call_Delta_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                           "Call_gamma" = currency(tangent_line),
+                           "Call_delta" = currency(call_delta) )
+
+ggplot() + 
+  geom_line(data = Call_Delta_Plot, 
+            aes(Call_x, Call_gamma, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Delta_Plot, 
+          aes(Call_x, Call_delta, color = "Gamma"), 
+          linetype = "solid") +
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
+       x = "Stock Price",
+       y = "Delta") +
+  scale_color_manual(values = c('Shares'=plot_fg_alt, 'Gamma'=plot_fg),
+                     labels = c("Delta",
+                                "Gamma (at $110)"),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+
+This *delta*-curve also flattens out as the shares get over \$100, becoming almost flat by the time they reach \$120. Another way of saying that is that the *gamma* of the call is decreasing as the shares go above \$100, and the *delta* of the call is close to 0 at \$120. Once again, the numbers match the picture. At \$100, the call has 0.04642 of *gamma*. At \$110, the call has 0.0187 of *gamma*, which is much less than 0.04642. 
+
+These two diagrams should make it clear - the gamma of an option peaks at (or very near) its strike price, and declines as the stock shares rise or fall away from it. If we think about it long enough, this should match our intuition. *Delta* measures how much this call *participates* in the price movements of a stock, and *gamma* measures how fast the participation is changing. The call expires worthless below its strike of \$100 but makes money over \$100, so the fastest changes in how much the call participates should happen near \$100. 
+
+## Payoff Diagram Redux
+
+```{r XYZ-Payoff-Diagram, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
+Call_K <- 100
+Current_price <- 100
+x_min = 80; x_max = 120
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 100, v = 0.12, 
+                                                  r=0.02, tt=0.5, d=0) })
+call_payoff <- call_price - Call_cost
+
+Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Call_payoff" = currency(call_payoff) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, Call_payoff, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, 
+            aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K, 
+                                         y = seq(from = -3*Call_cost, 
+                                                 to = x_max-Call_K, 
+                                                 length=length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "$100 Strike Call - 6 Months from Expiry",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg, 'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                paste0("Breakeven Price = ", currency(Call_K))),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+```
+Now that we know what to look for, we can actually get most of the information about *delta* and *gamma* from the humble payoff diagram. *Delta* is the slope of this curve. As we move from left to right, *delta* is always increasing. It goes from being near 0 at \$80 to near 1 at \$120. *Gamma* is the rate that *delta* (the slope of the payoff) is increasing. The curve is almost a flat line at \$80, which means that *delta* is near 0. It steepens dramatically between \$95 and \$105, which means that *gamma* increases most quickly near \$100. After \$115, the payoff is an almost straight line and cannot steepen much more, which means *delta* is approaching 1 and *gamma* is approaching 0. 
+
+Although I haven't gone through examples yet, you can build good understanding of how *delta* and *gamma* behave by looking at payoff diagrams. This will become an important skill that we'll build up when we look at options strategies like the straddle and try to understand how they behave. 
+
+There's also a broader risk-reward story here. The payoff of XYZ's call goes up faster and faster as the stock goes up, so we make money faster and faster. The flip side of that is that the payoff goes down slower and slower as the stock falls, so we lose money slower and slower. *Delta* and *gamma* try to describe this effect with numbers. And it's important to know what *delta* and *gamma* are, because they let us know how options are likely to behave for small price movements. But most of us won't be using *delta* or *gamma* to aggressively risk-manage positions the way a hedge fund or an algorithmic trading tool would. That's too complicated and time-consuming for most of us. 
+
+But we might use our knowledge of *delta* and *gamma* to construct favorable trades, and to effectively risk-manage them. We're going to do just that after we go through the three remaining greeks. Once we've finished explaining the greeks, we'll exploit our new knowledge to understand the construction and risk management of two more complicated option strategies - the straddle and the put spread. These examples will reveal the true power of the greeks, and how much they can help you make good options trades. 
+
+Before we move on to discussing *theta*, I have one final point on the shape of this call's payoff diagram before expiry: it's *asymmetric*. It's not the all-or-nothing setup we saw in the first two chapters, and we don't quite get dollar-for-dollar participation to the upside. It took an almost \$15 move to the upside in XYZ's stock to get close to dollar-for-dollar participation. I've already mentioned the asymmetry - we make more and more money as the stock goes up, and lose less and less money as the stock goes down. So even though the payoff diagram is different than what we've seen before, it still has favorable risk-reward characteristics that we can exploit in our trading. 
+
