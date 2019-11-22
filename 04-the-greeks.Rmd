@@ -45,12 +45,38 @@ Theta is the time value of an option.
 Vega is the rate of change of 
 -->
 
-It's essential to know your *greeks* so that you can adjust your options positions to changing market positions. My goal in this chapter is to introduce two greeks - *delta*, *gamma*. We'll look at four more greeks in the next two chapters - *theta* and *rho*, and then *sigma* and *vega*. Once we've armed ourselves with knowledge of the greeks, we'll look at two more options strategies - the straddle and the put spread. 
+Payoff diagrams are fantastic tools for visualizing how an option price's changes as the price of its stock changes. If we're holding the option to expiry, a payoff diagram is all we need to understand our trade. But before their expiry date, we need tools to help us understand how option prices change over time. Our goal is to build up those tools so we can use them to make good trades. 
 
+The Black-Scholes model gives us those tools. This model is no slouch - it's inventors won the 1997 Nobel Prize in Economics. Just to be clear, I'm not going into the math of the Black-Scholes model or the prices it predicts. I'm only interested in the tools it gives that help us understand how option prices. And yes, we can understand the tools without knowing the details of the model. 
+
+## Why Learn the Greeks? 
+
+What impacts the price of an option? Payoff diagrams tell us that the price of the stock and the strike price of the option are super important. We need the stock to be above its strike price (for a call) or below its strike price (for a put) for the option to be worth anything. We talked about time value and intrinsic value in Chapter 2 - intrinsic value is how much we make if we exercise the option right away, and time value is what's left. Options lose time value as they get closer to their expiry date - we call the rate they lose it *theta*. 
+
+*Theta* was our first *greek*. In this section, we'll take on the rest of the greeks. We'll start in this chapter with *delta* and *gamma*. In the next chapter, we'll do *vega*. We'll wrap up by circling back to *theta* and talking about *rho*. Why 5 greeks? Because 5 major components contribute to the price of an option. We've got 3 of them so far, but there are 2 more. Listing all 5, we have the:
+
+  1. *Stock price* it's following.
+  2. *Strike price* of the option. 
+  3. *Implied volatility*. 
+  4. *Time value* of an option. 
+  5. *Risk-free rate*. 
+
+The first two - the stock price and strike price - influence *delta* and *gamma*, the two greeks we'll be talking about in this chapter. The time value of an option decays at a rate of *theta*. The risk-free rate is the interetst rate of a short-term government bond. like the 1-month Treasury bill. The risk-free rate is associated with *rho*, which tells us how changes in the risk-free rate affect the price of an option. 
+
+The only component from that list that we can't read off a market price is the implied volatility. Implied volatility is the most complicated idea in option pricing, and *vega* measures how changes in implied volatility affect the price of an option. Before getting to *vega*, we're going to spend a lot of time on implied volatility so that it's as clear as can be. 
+
+It's essential that you learn the *greeks*, so that you can:
+
+  1. Construct options positions that have the risk-reward characteristics you want.
+  2. Adjust your options to changing market conditions. 
+  
+Once we've armed ourselves with knowledge of the greeks, we'll look at two more options strategies - the straddle and the put spread - to show how to use the greeks to construct and manage an options trade. 
+
+That's all coming up. In this chapter, we're going to start by  with *delta* and *gamma*. 
 
 ## Delta 
 
-Let's start off with a familiar payoff diagram - Apple's \$205 strike call - and explain what is says about the call's delta. 
+Here's a familiar payoff diagram - Apple's \$205 strike call. What does it say about the call's *delta*?
 
 ```{r Apple-Call-Option-Payoff, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- 6.84
@@ -642,7 +668,7 @@ This *delta*-curve also flattens out as the shares get over \$100, becoming almo
 
 These two diagrams should make it clear - the gamma of an option peaks at (or very near) its strike price, and declines as the stock shares rise or fall away from it. If we think about it long enough, this should match our intuition. *Delta* measures how much this call *participates* in the price movements of a stock, and *gamma* measures how fast the participation is changing. The call expires worthless below its strike of \$100 but makes money over \$100, so the fastest changes in how much the call participates should happen near \$100. 
 
-## Payoff Diagram Redux
+## The Payoff Diagram
 
 ```{r XYZ-Payoff-Diagram, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)

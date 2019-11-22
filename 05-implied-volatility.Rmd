@@ -20,29 +20,29 @@ label_font_size <- 7.5
 
 # Option Pricing {#Option-Pricing}
 
-If we own an option, we can choose if we want to use it to buy (for a call) or sell (for a put) the stock at a prespecified price and time. Since an option gives us a claim to a stock, it makes sense that the price of an option depends on the price of its stock. Payoff diagram looks at how the price of an option changes as the price of its stock changes - they're fantastic tools for visualizing this dependence. 
+Payoff diagrams are fantastic tools for visualizing how an option price's changes as the price of its stock changes. If we're holding the option to expiry, a payoff diagram is all we need to understand our trade. But before their expiry date, we need tools to help us understand how option prices change over time. Our goal is to build up those tools so we can use them to make good trades.
 
-If we're just looking at the expiry date of the option, payoff diagrams are all we need. We can see all the possible outcomes, and mark the breakeven price. If we're holding the option to expiry, that's all we need to reason about our trades. But we're looking at option prices before their expiry date, we need more tools to help us understand how option prices change over time. Our goal in this chapter is to identify the different pieces that go into pricing an option, and see how they can help us make good trades. 
+The Black-Scholes model gives us those tools. This model is no slouch - it's inventors won the 1997 Nobel Prize in Economics. Just to be clear, I'm not going into the math of the Black-Scholes model or the prices it predicts. I'm only interested in the tools it gives that help us understand how option prices. And yes, we can understand the tools without knowing the details of the model. 
 
-While we won't go into the math of the Black-Scholes model, we'll be using its insights to give us the framework we need to discuss option pricing in a clear and understandable way. This model is no slouch - it won the 1997 Nobel Prize in Economics. Just to be clear, we're not interested in the prices predicted by the Black-Scholes model, or any of its mathematical assumptions or derivations here. If you're interested in learning more about Black-Scholes, we'll discuss its virtues and limitations in an appendix. 
+What impacts the price of an option? Payoff diagrams tell us that the price of the stock and the strike price of the option are super important. We need the stock to be above its strike price (for a call) or below its strike price (for a put) for the option to be worth anything. We talked about time value and intrinsic value in Chapter 2 - intrinsic value is how much we make if we exercise the option right away, and time value is what's left. Options lose time value as they get closer to their expiry date - we call the rate they lose it *theta*. 
 
-What impacts the price of an option? Just looking at the payoff diagrams for an option at expiry, the price of the stock and the strike of the call affect the price of an option. We need the *stock price* to be above the *strike price* (for a call) or below the strike price (for a put) for the option to have value on its expiry day. We've also talked about *time value* and intrinsic value - intrinsic value is how much we make if we exercise the option right now, and time value is whatever's left. Options lose time value as they get closer to their expiry date. 
-
-There are two more - the *implied volatility* of an option, and the *risk-free (interest) rate*. You can think of the *risk-free rate* as the interest rate on a 1-month Treasury bill, which is 1.73% on October 25, 2019. Interest rates are so low these days that they don't have much impact the price of options that expire in 1-3 months. For options with longer expiry times, the *risk-free rate* has more of an impact. Once we've added up the contribution the strike price, stock price, and risk-free rate have to the price of an option, the *implied volatility* contributes whatever's left. 
-
-There are 5 major components that contribute to the price of an option. They are the: 
+*Theta* was our first *greek*. In this section, we'll take on the rest of the greeks. We'll start in this chapter with *delta* and *gamma*. In the next chapter, we'll do *vega*. We'll wrap up by circling back to *theta* and talking about *rho*. Why 5 greeks? Because 5 major components contribute to the price of an option. We've got 3 of them so far, but there are 2 more. Listing all 5, we have the:
 
   1. *Stock price* it's following.
   2. *Strike price* of the option. 
-  3. *Time value* of an option. 
-  4. *Risk-free rate*. 
-  5. *Implied volatility*. 
+  3. *Implied volatility*. 
+  4. *Time value* of an option. 
+  5. *Risk-free rate*. 
 
-The only value that cannot be found quickly using market prices is the implied volatility, so we'll spend the rest of this chapter focusing on it. 
+The first two - the stock price and strike price - influence *delta* and *gamma*, the two greeks we'll be talking about in this chapter. The time value of an option decays at a rate of *theta*. The risk-free rate is the interetst rate of a short-term government bond. like the 1-month Treasury bill. The risk-free rate is associated with *rho*, which tells us how changes in the risk-free rate affect the price of an option. 
 
+The only component from that list that we can't read off a market price is the implied volatility. Implied volatility is the most complicated idea in option pricing, and *vega* measures how changes in implied volatility affect the price of an option. Before getting to *vega*, we're going to spend a lot of time on implied volatility so that it's as clear as can be. 
+
+That's all coming up. We'll start in this chapter by talking about *delta* and *gamma*. 
 
 ## Implied Volatilty {#Implied-Vol}
 
+<!--
 What is *implied volatility*? We need to add some statistics to our toolbelt - namely, the normal distribution - to answer that. You might have heard of it by it's other name - the "bell curve". If you've had the misfortune of taking a statistics class, you might remember it from the countless hours you spent using z-tables and the empirical rule. 
 
 ### The Standard Normal Distribution 
@@ -289,3 +289,5 @@ One of the assumptions is that we cannot make money from risk-free trades. This 
 The third assumption implies that stock prices are log-normally distributed with *implied volatility* $\sigma$. This gives a great idea about what *implied volatility* is - it's the market's opinion of the spread of the stock over the next year. At this stage, you might ask why *implied volatility* cannot be directly observed by market prices. We could calculate the spread for the last year, but this approach has a serious shortcoming - it assumes the future (next year) will be exactly like the past (last year). That's very unlikely to be true. If it was, we wouldn't need to do much figure out what stocks to invest in. 
 
 So we can't observe the *implied volatility* from market prices - it has to be determined by a mathematical model. Black-Scholes is just one such model. Since the Black-Scholes model was introduced, many more option pricing models have been developed. They seek to make more realistic modeling assumptions and price options more accurately. 
+
+-->
