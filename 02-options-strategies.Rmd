@@ -675,7 +675,4 @@ legend("topleft", c("Protective Put - Profit Per Share",
 ```
 
 The first thing to notice is that the call has a slightly higher breakeven than the protective put - \$228.63 versus \$228.21. This makes sense, because we have to spend \$228.63 to buy the protective put, but only \$23.63 to buy the call. The difference of \$228.63 - \$23.63 = \$205 is sitting in the call owner's bank account earning interest. Savings accounts are earning around 1\% per year, whcih is 0.249\% every 3 months. We bought the options on September 11, 2019 and they expire on December 20, 2019, in about 3 months' time. The call owner will make an additional 3 months of interest from the cash in their savings account, which comes out to \$205 * 0.249\% = $0.51. This lowers the breakeven of the call by \$0.51, from \$228.63 to \$228.63 - \$0.51 = \$228.12. This is within pennies of the \$228.21 breakeven of the protective put. 
-
-
-## The (Ratio) Call Spread
 -->

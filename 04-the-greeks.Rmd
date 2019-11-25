@@ -63,20 +63,20 @@ What impacts the price of an option? Payoff diagrams tell us that the price of t
 
 The first two - the stock price and strike price - influence *delta* and *gamma*, the two greeks we'll be talking about in this chapter. The time value of an option decays at a rate of *theta*. The risk-free rate is the interetst rate of a short-term government bond. like the 1-month Treasury bill. The risk-free rate is associated with *rho*, which tells us how changes in the risk-free rate affect the price of an option. 
 
-The only component from that list that we can't read off a market price is the implied volatility. Implied volatility is the most complicated idea in option pricing, and *vega* measures how changes in implied volatility affect the price of an option. Before getting to *vega*, we're going to spend a lot of time on implied volatility so that it's as clear as can be. 
+The only component from that list that we can't read off a market price is the implied volatility. Implied volatility is the most complicated idea in option pricing, and *vega* measures how changes in implied volatility affect the price of an option. Before getting to *vega*, we're going to spend a lot of time on implied volatility. It's the most important idea in all of options pricing, but it's not that complicated. The idea behind it is simple, and we want to make it as clear as can be. 
 
-It's essential that you learn the *greeks*, so that you can:
+Those are the 5 greeks. It's essential that you learn them, because knowing them allows you to: 
 
   1. Construct options positions that have the risk-reward characteristics you want.
   2. Adjust your options to changing market conditions. 
   
-Once we've armed ourselves with knowledge of the greeks, we'll look at two more options strategies - the straddle and the put spread - to show how to use the greeks to construct and manage an options trade. 
+Once we've armed ourselves with knowledge of the greeks, we'll look at two more options strategies - the straddle and the put spread - to show how to use the greeks to construct and manage options trades. 
 
-That's all coming up. In this chapter, we're going to start by  with *delta* and *gamma*. 
+That's all coming up. In this chapter, we'll start our journey by looking at *delta* and *gamma*. 
 
 ## Delta 
 
-Here's a familiar payoff diagram - Apple's \$205 strike call. What does it say about the call's *delta*?
+Here's a familiar payoff diagram - Apple's \$205 strike call. What does it tell us   about the call's *delta*?
 
 ```{r Apple-Call-Option-Payoff, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- 6.84
@@ -138,7 +138,7 @@ If the call is below \$205, it expires worthless. As long as Apple's stock stays
 
 Calls (and puts) always have *delta*, and online brokers tell us what the *delta* of an option is so we don't even have to calculate it. That includes options far away from their expiry dates, which we'll finally look at in this chapter. It's for a ficticious company, Company XYZ, that is trading at \$100. I think XYZ's shares are going higher, so I buy a \$100 strike call for \$3.89. The call is 6 months away from expiring. 
 
-This payoff diagram looks at how much profit we would make if we sell the call later that same day. I've kept the implied volatility *sigma* of the option the same for all these different prices, which is completely unrealistic. I'll revisit this example when we talk about *sigma*, but I want to focus on *delta* for now. 
+This payoff diagram looks at how much profit we would make if we sell the call later that same day. I've kept the implied volatility of the option the same for all these different prices, which is completely unrealistic. I'll revisit this example when we talk about implied volatility, but I want to focus on *delta* for now. 
 
 ```{r XYZ-Delta-Before-Expiry-100, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost <- bscall(s = 100, k = 100, v = 0.12, r=0.02, tt=0.5, d=0)
@@ -731,11 +731,11 @@ ggplot() +
 ```
 Now that we know what to look for, we can actually get most of the information about *delta* and *gamma* from the humble payoff diagram. *Delta* is the slope of this curve. As we move from left to right, *delta* is always increasing. It goes from being near 0 at \$80 to near 1 at \$120. *Gamma* is the rate that *delta* (the slope of the payoff) is increasing. The curve is almost a flat line at \$80, which means that *delta* is near 0. It steepens dramatically between \$95 and \$105, which means that *gamma* increases most quickly near \$100. After \$115, the payoff is an almost straight line and cannot steepen much more, which means *delta* is approaching 1 and *gamma* is approaching 0. 
 
-Although I haven't gone through examples yet, you can build good understanding of how *delta* and *gamma* behave by looking at payoff diagrams. This will become an important skill that we'll build up when we look at options strategies like the straddle and try to understand how they behave. 
+Although I haven't gone through examples yet, you can build good understanding of how *delta* and *gamma* behave just by looking at payoff diagrams. This is an important skill that we'll build up when we look at more options strategies. 
 
-There's also a broader risk-reward story here. The payoff of XYZ's call goes up faster and faster as the stock goes up, so we make money faster and faster. The flip side of that is that the payoff goes down slower and slower as the stock falls, so we lose money slower and slower. *Delta* and *gamma* try to describe this effect with numbers. And it's important to know what *delta* and *gamma* are, because they let us know how options are likely to behave for small price movements. But most of us won't be using *delta* or *gamma* to aggressively risk-manage positions the way a hedge fund or an algorithmic trading tool would. That's too complicated and time-consuming for most of us. 
+There's also a broader risk-reward story here. The payoff of XYZ's call goes up faster and faster as the stock goes up, so we make money faster and faster. The flip side of that is that the payoff goes down slower and slower as the stock falls, so we lose money slower and slower. *Delta* and *gamma* try to describe this effect with numbers, but most of us won't be using *delta* or *gamma* to aggressively risk-manage positions the way a hedge fund or an algorithm would. That's too complicated and time-consuming for most of us. 
 
-But we might use our knowledge of *delta* and *gamma* to construct favorable trades, and to effectively risk-manage them. We're going to do just that after we go through the three remaining greeks. Once we've finished explaining the greeks, we'll exploit our new knowledge to understand the construction and risk management of two more complicated option strategies - the straddle and the put spread. These examples will reveal the true power of the greeks, and how much they can help you make good options trades. 
+But we might use our knowledge of *delta* and *gamma* to construct favorable trades, and to effectively risk-manage them. We're going to do just that after we go through the three remaining greeks. Once we've finished explaining the greeks, we'll exploit our new knowledge to understand the construction and risk management of two more complicated option strategies - the straddle and the put spread. 
 
-Before we move on to discussing *theta*, I have one final point on the shape of this call's payoff diagram before expiry: it's *asymmetric*. It's not the all-or-nothing setup we saw in the first two chapters, and we don't quite get dollar-for-dollar participation to the upside. It took an almost \$15 move to the upside in XYZ's stock to get close to dollar-for-dollar participation. I've already mentioned the asymmetry - we make more and more money as the stock goes up, and lose less and less money as the stock goes down. So even though the payoff diagram is different than what we've seen before, it still has favorable risk-reward characteristics that we can exploit in our trading. 
+Before we move on to *vega*, I want to emphasis that this call's payoff diagram (before expiry) is still *asymmetric*. It's not the all-or-nothing setup we saw in the first two chapters, and we don't quite get dollar-for-dollar participation to the upside. It took an almost \$15 move to the upside in XYZ's stock to get close to that. But there's still asymmetry: we make more and more money as the stock goes up, and lose less and less money as the stock goes down. In one way or another, all options strategies boil down to trying to exploit that asymmetry. 
 

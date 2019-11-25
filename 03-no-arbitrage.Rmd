@@ -1,0 +1,134 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
+if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
+if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+
+options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
+```
+
+``` {r Set-Global-Chapter-Variables, echo = FALSE}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # "#929292"
+plot_fg_alt <- "#969696" # ??
+```
+
+<!-- Source: The Boy’s Guide To Pricing and Hedging, by Emanuel Derman -->
+# The Law of One Price 
+
+So you're in you're in your early 20's, and you've heard somewhere that you should start investing in the stock market. The sooner you start, the more money you'll have. So you go to the bank, talk to an investment advisor, and they somehow decide where to put your money. You leave, not really knowing how they did that or what investments you actually own. Has that every happened to you, or someone you know? It happened to me, and I couldn't figure out why I was giving my money to someone when I didn't understand what they were doing.
+
+The longer it went on, the more ridiculous it felt. So I put some work into it, and found that what they're doing is actually pretty simple. The problem is that the industry is so bogged down in the math and frameworks they use that they don't know how to communicate to people who don't know that language. This chapter is my attempt to explain the ideas you need to have a better understanding of what on earth that investment advisor is actually doing.  
+
+Together, these few simple ideas add up to a *way of thinking* about the financial world. They fit with our exploration of options because they, too, are focused on understanding risk-reward tradeoffs. Options let us *change* the risk-reward propsition of an investment, which is what makes them such a powerful investing tool. Payoff diagrams help us visualize that change, and are essential tools in helping us understand options trades. 
+
+If we want a broader view of risk-reward that extends beyond options, we need to talk about the ideas that underpin how sophisticated investors think about investing. In my opinion, there are only five, and they are: 
+
+  1. The Law of One Price 
+  2. Replication
+  3. Risk Neutrality
+  4. Diversification 
+  5. Hedging 
+
+The Law of One Price says that two investments that have the *same* payoffs should have the same price. Replication is the idea that we can find the price of an investment if we can find a collection of other investments with the same payoff. By The Law of One Price, they must have the same price. Diversification and hedging are risk-management techniques. Risk neutrality says that investments are *not* priced according to the chance that they could happen in the real world. That might seem unintuitive, but we'll go through a few examples of gambling that show that this is exactly what happens when markets are functioning properly. 
+Diversification says we can reduce the risk of our investments by buying as broad a spectrum of investments as we possibly can. If there are risks we cannot diversify away, we may be able to *hedge* them out of our portfolio. We've seen an example of hedging - the protective put hedges out the downside risk of owning a stock. 
+We'll go into more detail about each of these ideas next. 
+
+## The Law of One Price
+
+The Law of One Price is the most important one. It's the foundation of modern finance, and on some level is the only thing you need to know. Everything else is either a consequence of The Law of One Price, or an modeling assumption that only approximates reality. The Law of One Price says that two investments with the same payoffs must have the same price. The logic is simple - I shouldn't be able to make 
+
+## Replicating Portfolios
+
+You might have noticed that the payoff diagram of a protective put looks pretty close to the the payoff diagram of a call. Let's take another look when the put and call both have a \$205 strike and expire on December 20, 2019. Like some of our previous examples, we'll suppose that we bought Apple's shares at \$222.76 on September 11, 2019. The call is shown in blue, the protective put is red, and just owning shares is orange. The red and blue lines largely overlap, so they may be difficult to see. 
+
+```{r Replicate-Expiry-Payoffs, echo = FALSE, fig.height = 4, fig.width = 6, fig.align = "center"}
+Put_cost <- 5.45
+Call_cost <- 23.63
+Put_K <- 205; Call_K <- 205
+Put_x <- seq(from = 180, to = 260, by = 1)
+Call_x <- seq(from = 180, to = 260, by = 1)
+
+plot(x = Put_x, y = -Put_cost + ( Put_x - 222.76 ) + pmax(0, Put_K - Put_x), 
+     type = 'l', lwd = 3, ylim = c(-30, 30), 
+     col = alpha(rgb(255,0,0,maxColorValue=255),0.5),
+     xlab = "Apple's Stock Price", ylab = "Profit Per Share",
+     main = "A Replicating Portfolio - On The Expiry Date")
+lines(x = Put_x, y = Put_x - 222.76, col = "orange", lwd = 3)
+
+abline(v = 222.76 + Put_cost, lty = 2, lwd = 1, col = "red")
+abline(h = 0, lty = 2, lwd = 1, col = "red")
+
+lines(x = Put_x, y = - Call_cost + pmax( 0, Call_x - 205 ), lwd = 3, 
+      col = alpha(rgb(0,0,255,maxColorValue=255), 0.5) )
+abline(v = 205 + Call_cost, lty = 2, lwd = 1, col = "blue")
+abline(h = 0, lty = 2, lwd = 1, col = "blue")
+
+legend("topleft", c("Protective Put - Profit Per Share",
+                    paste0("Protective Put - Breakeven Price = $", 222.76 + Put_cost),
+                    "Call - Profit Per Share", 
+                    paste0("Call - Breakeven Price = $", 205 + Call_cost),
+                    "Owning Stock - Profit Per Share"),
+       lty = c("solid", "dotdash", "solid", "dotdash", "solid"), 
+       lwd = c(2, 2, 2), cex = 0.75,
+       col=c("red", "red", "blue", "blue", "orange"), bty = "n") 
+```
+
+The first thing to notice is that the call has a slightly higher breakeven than the protective put - \$228.63 versus \$228.21. This makes sense, because we have to spend \$228.63 to buy the protective put, but only \$23.63 to buy the call. The difference of \$228.63 - \$23.63 = \$205 is sitting in the call owner's bank account earning interest. Savings accounts are earning around 1\% per year, whcih is 0.249\% every 3 months. We bought the options on September 11, 2019 and they expire on December 20, 2019, in about 3 months' time. The call owner will make an additional 3 months of interest from the cash in their savings account, which comes out to \$205 * 0.249\% = $0.51. This lowers the breakeven of the call by \$0.51, from \$228.63 to \$228.63 - \$0.51 = \$228.12. This is within pennies of the \$228.21 breakeven of the protective put. 
+
+
+## Risk Neutrality
+
+Risk neutrality says that we *shouldn't* price investments according to their real-world probabilities. That sounds wrong, but let's take two examples that show why it makes perfect sense. 
+
+### Flipping Coins 
+
+Here's the scenario: we're flipping a fair coin, so half the time it lands on heads and the other half it lands on tails. If I said you win \$1 every time it lands on heads (and lose nothing when it lands on tails), you would probably be willing to pay \$0.50 to flip the coin. You win \$1 each time it lands on heads, and it lands on heads half the time. Since you can expect to make \$0.50 a flip, you'd like to pay less than \$0.50 to play. But \$0.50 seems like a fair number, and you'd probably do it. 
+
+Let's change the game a little. You win \$1 if the coin lands heads, and you lose \$1 if the coin lands tails. Half the time you'll make \$1 and half the time you'll lose \$1. Since you can expect to make \$0 per flip, a fair price to pay to play this game is \$0. Would you play this game for free? You could probably talk me into playing it, for maybe 5 flips. If I won money, great. If not, the most I could have lost is \$5. Which is about the price of a hot chocolate at Starbucks. 
+
+What if we sized up the numbers? You win \$1,000 if the coin lands heads, but lose \$1,000 if the coin lands tails. You can still expect to make \$0 per flip, so \$0 is a fair price to pay to play this game. But would you play a game where you're fairly likely to lose \$1,000? I probably wouldn't. It doesn't seem smart to me. 
+
+The point is even if you can expect to breakeven over time when you're gambling, you won't always play the game. You are likely *risk averse*, and don't want to sustain large losses. In order to entice you to play the game, the odds of you winning need to be better. For example, if the game paid \$2 if the coin landed heads and you only lost \$1 if the coin landed tails, you could expect to make \$1.50 per coin flip. So \$1.50 would be a fair price to pay. If the price was kept at \$1, you could expect to make \$0.50 per flip. I'd play that game, because it's basically free money. 
+
+Gambling and investing have some things in common. They both have breakeven prices. For gambling, it's how much we're willing to pay to play the game. For investing, it's the price . They both have the odds that we'll make money. When we're gambling, we're told the odds before placing our bets. For investing, we only have our opinion of what the odds are. They have some differences, too. When we're flipping coins or rolling dice, we're repeating the same game over and over again. When we're investing in stocks, we can't repeat the same investment later. Over time, the economic and market conditions will change. So too will the competitiveness and general business conditions of the company we're investing in. 
+
+But our *risk aversion* is part of our personality - our aversion to losing money should persist no matter what wager or investment we making. The only way to entice us to take the bet is to change our odds of making money. That means we don't invest according to the real-world chance of us making money, but rather some fictious distortion that satisfies our risk preferences. Our next example explains how this distortion can affect betting markets. 
+
+
+### Betting at the Race Track
+
+Here's the scenario: say you're the bookie at a race track and people are betting on a two-horse race. You believe that the first horse has a 20% chance of winning, and the second horse has a 80% chance of winning. You have to set odds before taking bets. If you follow your beliefs, you'll set the first horse at 4-1 odds and the second horse at 1-4 odds. If you haven't seen odds before, 4-1 mean you'll make \$4 in profit for every \$1 you wager. You'll get \$5 in total - the \$1 you wagered, and the \$4 in profit that you make. 1-4 odds means you'll make \$1 in profit profit for every \$4 you wager. You'll still get \$5 in total, but the numbers are flipped - you'll get the \$4 you wagered and only \$1 in profit. 
+
+You believe that the second horse is 4 times more likely to win than the first horse. People at the track will have different beliefs, so you don't expect 4 times as much money to be bet on the second horse. You might expect it to be kind of close, but not exactly 4-1. When you're done taking people's bets, they've put \$10,000 on the first horse and \$50,000 on the second horse. You've collected a total of \$60,000 and under the 4-1 odds you gave:
+  
+  1. If the first horse wins, you have to return the \$10,000 bet on it *and* pay an additional \$40,000 to the winners. That adds up to \$50,000 out of the \$60,000 you took in, so you've made \$10,000. 
+  2. If the second horse wins, you have to return the \$50,000 bet on it *and* pay an additional \$12,500 to the winners. That adds up to \$62,500 out of the \$60,000 you took in, so you've lost \$2,500. 
+  
+Now, *if* your beliefs are correct and the first horse really does have a 20% chance of winning (and the second horse an 80% chance of winning), then 20% of the time you'll make \$10,000 and 80% of the time you'll lose \$2,500. On average, you'll breakeven on the book. 
+
+$$\begin{aligned}
+  20% x $10,000 - 80% x $2,500 &= $2,000 - $2,000 \\
+                               &= $0
+\end{aligned}$$
+
+That's not bad, but you'd like to make some money for your troubles. You set the odds at what you believed the real-world probabilites are, and by doing that you can expect to not make or lose any money. That's not bad, but you want to make something for your trouble. The key to doing this is to set the odds so that you *never* lose money. You can achieve this by setting the odds in proportion with how much money is bet on each horse. Since \$10,000 has come in on the first horse and \$50,000 has come in on the second horse, you want to set the odds to 5-1 on the first horse.
+
+  1. If the first horse wins, you have to return the \$10,000 bet on it *and* pay out \$50,000 in winnings.
+  2. If the second horse wins, you have to return the \$50,000 bet on it *and* pay out \$10,000 in winnings.
+
+In both cases, you return exactly the \$60,000 you collected. This is slightly better than when you set the odds to 4-1. There, you were only guaranteed to not lose money on average. Here, you're guaranteed to not lose money *every* time. But you can do better still, and set the odds so that you *make* money every time. 
+
+The way to do this is to set the odds of ...
+
+What's the message this section on betting? That to ensure that you make a profit when people bet on on a horse race, shouldn't use the chances you think each horse has of winning when you're setting the odds. Instead, you should use some process that accounts for how much people bet on each horse, and *over-subscribe* your book to ensure you make a profit. We can employ similar strategies in the stock market, but they're not particularly relevant to options so I won't be going into more details in this book. 
+
+## Diversification
+
+
+
+## Hedging
