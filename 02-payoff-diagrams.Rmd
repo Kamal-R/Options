@@ -18,11 +18,11 @@ plot_fg_alt <- "#969696" # ??
 ```
 
 # Thinking in Payoff Diagrams {#Payoff-Diagrams}
-We'll start our journey into understanding options by building our first tool - the payoff diagram. A payoff diagram show how much money an investment makes at different prices of our investment's shares.  They are the most powerful way to visualize how an option (or options strategy) might perform, so our goal in this chapter is to get comfortable with drawing and reading payoff diagrams.
+We'll start our journey into understanding options by building our first tool - the payoff diagram. A payoff diagram show how much money an option makes as we change the price of the stock's shares. They are the best way to visualize how an option (or options strategy) might perform, so our goal in this chapter is to get comfortable with using them.
 
-Our second goal is to understand how options perform compared to owning shares. To help us do that, we'll be using tables that compare the absolute and relative performance of those positions. Tables might be the second most powerful way to visualize how options perform, because they let us quickly compare the actual performance of different positions.  
+Our second goal is to understand how options perform compared to owning shares. To help us do that, we'll be using tables that compare the absolute and relative performance of those positions. Tables let us quickly compare the actual performance of different positions, which is exactly what we need for this. 
 
-One last note: in our first few chapters, we're only going to be looking at how options perform on thier expiry date. In later chapters, we'll be talking about how options are priced before their expiry date, the option greeks, how to risk-manage an options position, and more. But before we get there, we have to build up our tools and look at when and why to use options. This will help put all the little details about these topics in context, so that we can actually apply them in our own trading. 
+In our first few chapters, we'll be looking at how options perform on their expiry date. Later on, we'll look at options are priced before their expiry date, the option greeks, how to risk-manage an options position, and how to build investment portfolios using options. But before we get there, we need to know when and why to use different options strategies. The payoff diagram and these tables give us the tools we need to figure that out.
 
 
 ## Options on Expiry Day

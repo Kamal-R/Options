@@ -1,0 +1,107 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
+if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
+if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+
+options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
+```
+
+``` {r Set-Global-Chapter-Variables, echo = FALSE}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # "#929292"
+plot_fg_alt <- "#969696" # ??
+```
+
+# What is an Option? 
+
+You might have heard stories about people who made \$100,000 in a week or \$1,000,000 in a year trading stock options, after starting out with $5,000 (or less) in the bank. You might have wondered - what are stock options and how did they do that? 
+
+This book is designed to answer those two questions. It will give you the knowledge you need to understand options and how people trade them. My goal is to explain options in a way that everyone can understand. The best way I've found to do that is use lots of diagrams and a few tables, and almost no math. 
+
+Every chapter is designed to give you tools you can use to understand options, or to use those tools as we walk through particular options strategies. By the time you reach the end of the book, you'll be able to construct your own options trades and understand the risk-reward tradeoffs of those trades. 
+
+A few words on what this book is not. It's not a recipe book that goes over 100 different options strategies. There are already many excellent books for that. [The Options Playbook!][https://www.optionsplaybook.com/] is my favorite one, and I use their site as a reference myself. It's not a record of options trades that I've made, alhtough I've included some of my trades to show how the tools you're building are useful in real trading.
+
+Most importantly, it's not a book about modeling or math. Mathematical or statistical modeling is very popular right now, and people often think if they understand their model, they will understand options. I think this is a very dangerous way of thinking. Saying you understand something because you have a model is like saying you can see in the dark after turning on a dying flashlight. You'll see better with the flashlight, just like the model will improve your understanding, but you won't really know where you're going. 
+
+This book tries to be an underpowered floodlight. You'll be able to see where you're going, but nothing will be overly sharp. The big advantage is that it will give you the tools you need to safely explore options strategies, so that you can find the ones that work for you. Continuing the lit room metaphor, once you've walked around long enough, you'll know where everything is. 
+
+
+## Forward Contracts 
+
+Before we get to options, we're going to meet the forward contract. Say you want a new pair of \$1000 shoes. If you buy them today, you'll pay \$1000. If you want to buy them in 6 months, you'd have to pay the price 6 months from now, and you're willing to pay up to \$1050 for them then. If you're worried they'll go up above \$1050, you might try finding someone who would agree to sell them to you in 6 months for \$1050. 
+
+That way, you know you'll always pay \$1050 6 months from now. It doesn't matter if they go up to \$1200 or down to \$900. When you come back in 6 months, you'll always pay \$1050. We call this a *forward contract*. A *forward contract* is where a seller agrees to sell something to a buyer in the future, but at a price they agree on today. This way, the buyer doesn't have to worry about the price going up and the seller doesn't have to worry about the price going down. 
+
+That's the key to the forward contract - it removes risk for the buyer and the seller, so they both have some reason to enter the contract. If the price goes up to \$1200 and the seller has to sell the shoes for \$1050, he "lost" the \$150 he could have made if he was able to sell them for \$1200. And if the price goes down to \$900, the buyer has "lost" the \$150 he would have saved if he was able to buy them for \$1050. If the buyer *and* the seller think that removing the risk is worth "losing" that money, they will probably agree to do the deal at \$1050 in 6 months. 
+
+We call \$1050 the *forward price*. You might ask - why is it \$1050? The price they agree to has to be fair. The buyer keeps \$1000 for 6 months and can earn interest on it, so he should be willing to pay more then \$1000. The seller has to continue to store the shoe for 6 months and take the risk of it being stolen or damaged. He should be asking for more than \$1000. So the forward price should be more than \$1000. How much more depends on how the buyer and seller value these factors (and perhaps others). 
+
+Let's say they agree to do the deal at \$1050. The key feature of a forward contract is that the buyer and seller *must* complete the transaction. The buyer must pay \$1050, and the seller must provide the shoes. Neither of them has the option to back out of the deal. If that's what both of them want, then a forward contract is a fantastic way to do that. But what if the buyer wants a deal where he only has to buy the shoes at \$1050 if 6 months if it saves him money? 
+
+
+## Options Contracts
+
+In other words, the buyer wants is the flexibility to buy them for \$1050 if they're over \$1050, but to buy them at the going price if they're under \$1050 in 6 months. If he finds someone willing to enter this deal, here's how much money he'll being paying for the shoes 6 months from now. 
+
+<!-- Insert picture of covered call (short put?) with strike price of $1050 -->
+
+This diagram shoes what the buyer pays for the shoes under this deal. If the shoes are selling for \$1050 or less, the buyer gets that much. If the shoes are selling for more than \$1050, the buyer only pays \$1050. We can see this in the diagram - the line flattens out above \$1050. Now it gets interesting - neither the buyer nor the seller knows if the shoes will be worth more than \$1050 6 months from now, but they might be. 
+
+That's a one-sided deal - only the buyer can benefit. He might save money and the seller might be lose money, but the other way can't happen. The seller gets nothing out this deal. To make it fair, the buyer would have to pay the seller to compensate him for his potentially lower profits. It gets even better - the buyer should be willing to pay the seller, because he is protecting himself against having to buy the shoes for more than \$1050. You can think of this as the buyer paying for *insurance* against the shoes getting more expensive.
+
+You can also flip it around - the seller might want the flexibility to sell someone the shoes for \$1050 if they're below that 6 months from now, but to sell them for more than \$1050 if they're above that. This is also a one-sided deal - the buyer gets nothing out of this deal. To make this deal, the seller should be willing to pay the buyer. You can think of this as the seller buying *insurance* against the shoes getting cheaper.
+
+<!-- Insert picture of a call (protective put?) with strike price of $1050 -->
+
+This diagram shows what the seller gets for the shoes under this deal. The flat line shows that when the shoes are below \$1050, he gets \$1050. And when they are above \$1050, he gets whatever they're going for. 
+
+These are *payoff diagrams*, and we'll be spending time with them in the next chapter. But one thing we can make note of here is that the two diagrams are like opposites of each other. We can see this more clearly if we overlay them both on the same plot. 
+
+<!-- Insert picture of a call (protective put?) + covered call (short put?) with strike price of $1050 -->
+
+Combining options like this is how you build options strategies, and we'll spend a fair amount of time showing how this works for the strategies we take up in this book. 
+
+Here's a question I'll plant in your mind that we'll return to when we get into something called implied volatility. The buyer has to pay to protect against prices going up, and the seller has to pay to protect against prices going down. They're both paying for protection on the shoes at \$1050 6 months from now. The diagrams are opposites of each other, so do they pay the same amount for protection? Or a different amount? 
+
+
+## Options are Insurance
+
+What are options? They are exactly this kind of insurance. Instead of shoes, we're now talking about shares of some company. Let's call it Company XYZ. There are two basic types of options. 
+
+  1. A *call* gives its owner the option to buy shares at a pre-specified price on a pre-specified date in the future. The *call* gives its owner protection against the price of shares going up between now and the future.
+  2. A *put* gives its owner the option to sell shares at a pre-specified price on a pre-specified date in the future. The *put* gives its owner protection against the price of the shares going down between now and the future.
+
+Perhaps because of this close relationship with insurance, the price of an option (a call or put) is called its *premium*. There are options strategies that explicitly use options as insurance. We'll meet one such strategy, the *protective put*, before long. But there are many other strategies that have nothing to do with insuring against prices going up or down. These strategies try to profit in changes in the price of the option contract.
+
+
+## Pricing Insurance Contracts
+
+We'll go into more specific details about how options are priced later, but for now let's just think of them as insurance contract. What could make your car insurance more expensive? Here's what I came up with: 
+
+  1. How many accidents you have been in. 
+  2. Your demographics - gender and age.
+  3. How many companies are offering car insurance in your area.
+  4. Your deductible. 
+  
+A deductible is how much you have to pay out-of-pocket before your insurance coverage kicks in. For example, if you have car insurance with a \$1000 deductible, the insurance won't cover the first \$1000 it costs to repair or replace your car. The higher your deductible, the lower your insurance premium will be. Because you'll end up paying more of the insurance bill, and the insurance company will pay less of it. 
+
+What could make health insurance more expensive? Here's what I came up with: 
+
+  1. If not forbidden by law, pre-existing conditions.
+  2. Your demographics - gender and age.
+  3. If you are a smoker. 
+  4. Your deductible. 
+  
+You get the idea - anything that makes paying out a claim more likely takes up the price of insurance. We can apply the same logic to *calls* and *puts*. The more likely the price movement we're insuring against is to happen, the more expensive the insurance will be.
+
+A *call* protects us against the price going up. If the shares goes up, the call should get more expensive. Think about it this way: if you're buying those shoes and waited 3 months to buy protection against them going up in price, you'd have to pay more to buy them at \$1050 (in 3 months) if they had already went up from \$1000 to \$1100 while you waited. 
+
+A *put* protects us against the price going down. If the shares go down, the put should get more expensive. If you're selling those shoes and waited 3 months to buy protection against them going down in price, you'd have to pay more to sell them at \$1050 (in 3 months) if they had already gone down from \$1000 to \$900 while you waited. 
+
+There's more to pricing insurance contracts. We've just brushed the surface on how increasing the chances of the event you're insuring against actually happening makes the insurance more expensive. Beyond that, we also have to account for the interest someone who doesn't have insurance could make if they saved all those insurance payments and put them into a bank account. But we've built good intution - let's move on to options. 
