@@ -20,6 +20,17 @@ label_font_size <- 7.5
 
 # Implied Volatility And Vega {#Implied-Vol-Vega}
 
+<!-- TAKE 3: A Success? -->
+
+Implied volatility is strange because it is *unobserable* - we cannot look at a price chart and know what the implied volatility is. We have to use a statistical model to infer the implied volatility of an option. But what is implied volatility measuring? At a high level, it tells us the plausible range of values a stock can take. It is quoted by online brokers as the percentage of the current price the stock is likely to move in the next year.
+
+The 
+
+
+<!--
+
+TAKE 2: FAILED??
+
 The first thing to know about implied volatility (or *sigma*) is that you can't read off a chart. It has to be estimated by a mathematical model. The data you use, the modeling assumptions you make, and the tool you use to perform the estimation all play a roll in the the estimate of *sigma* you produce. Investors use many different techniques to estimate *sigma*, but I imagine they mostly produce the same results. If for no other reason than if a particular was wrong too often, they would make lots of poor trades and simply go bankrupt.
 
 ## Implied Volatilty {#Implied-Vol}
@@ -28,9 +39,9 @@ There are two major volatility measurements - implied volatility and historical 
 
 The key to understanding implied volatility is that we have make a modeling assumption that gives it meaning. Options are continuously priced by the market, and their value at any point in time depends on how likely their stock is to be above its strike price. That means that to price the option, we have to make an assumption about what governs the path of XYZ's future prices. 
 
-<!-- 
 I need two change-of-measure results, both obtained via Girsanov's theorem.
 
+**COMMENT OUT**
 Source: https://pdfs.semanticscholar.org/2315/bbe439680db469a8f0519bebd9b07c68f384.pdf
 Under P: If dSt = mu dt + simga dWt is an arithmetic Brownian motion, St ~ N( S0 + mu*t, sigma*sqrt(t) )
 Under Q: If dSt = exp(-rt) sigma dWt*, St ~ N( S0*exp(rt),  exp(rt)*sigma*sqrt( (1-exp(2rt)) / 2r ) )
@@ -40,8 +51,7 @@ Under P: If dSt = St mu dt + St sigma dWt is a geometric Brownian motion,
   St ~ N( S0*exp(mu*t), sqrt(S0^2 * exp(2*mu*t) * (exp(sigma^2*t)-1 ) ) )
 Under Q: By Girsanov's theorem - under Q, with r = mu - sigma^2 / 2, 
   St ~ N( S0*exp(r*t), sqrt(S0^2 * exp(2*r*t) * (exp(sigma^2*t)-1 ) ) )
--->
-
+**COMMENT OUT**
 
 I'm going walk through two possible assumptions about the model that governs XYZ's future prices. The first is they are governed by a Brownian motion, and the second is that they are governed by a Geometric Brownian motion. If the market is pricing an implied volatility of 15 and I assume that XYZ's future stock price is governed by a Brownian motion, 
 
@@ -134,7 +144,7 @@ I've said implied volatility is \$3, which it is. But your online broker (and ev
 
 One way to think of implied volatility is as a multiplier on the range of a stock's plausible future prices. Two extreme examples should make this very clear. The first example says the \$100 strike call on XYZ has an extremely low implied volatility of 1 (or \$0.50, in dollars per 6 months). If it does, the market thinks XYZ will end up between \$99.50 and \$100.50 68% of the time and between \$99 and \$101 95% of the time. The second example says the \$100 strike call on XYZ has a much higher implied volatility of 10 (or \$5, in dollars per 6 months). This says the market thinks XYZ will end up between \$95 and \$105 68% of the time, and between \$90 and \$110 95% of the time. 
 
-<!-- INSERT PICTURE -->
+**COMMENT OUT** INSERT PICTURE **COMMENT OUT**
 
 Let me ask you: Which one of those \$100 calls would you pay more for? The one with an implied volatility of 1 or the implied volatility of 10? The best outcome I can reasonably expect to get when the implied volatility is 1 is that XYZ goes up to \$101. When the implied volatility is at 10, I can reasonably expect XYZ to reach \$110. I can only the cost of the call, but I make every dollar it goes over its strike price of \$100 by (after paying for the call). If I can make \$1 with the first call and \$10 for the second, guess which one I'm willing to pay less for? It's the first one, with an implied volatility of 1.
 
@@ -145,9 +155,16 @@ We should take a quick look at the lognormal distribution. I'll match the mean a
 
 
 ## Vega
+-->
+
+
+
 
 
 <!--
+
+TAKE 1: FAILED
+
 What is *implied volatility*? We need to add some statistics to our toolbelt - namely, the normal distribution - to answer that. You might have heard of it by it's other name - the "bell curve". If you've had the misfortune of taking a statistics class, you might remember it from the countless hours you spent using z-tables and the empirical rule. 
 
 ### The Standard Normal Distribution 

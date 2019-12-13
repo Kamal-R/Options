@@ -1,28 +1,294 @@
 <!-- Each chapter is set to compile separately - include "global" set-up -->
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
 if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
 if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
 if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+if ( !require("grDevices") ) { install.packages("grDevices") };  require(formattable)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
 ```
 
-``` {r Set-Global-Chapter-Variables, echo = FALSE}
+``` {r Set-Global-Chapter-Variables}
 plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # "#929292"
 plot_fg_alt <- "#969696" # ??
+
+options_theme <- function() {
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+}
 ```
 
 # Strategies for Momentum Stocks
 
+The two options strategies we've seen so far - the protective put and covered call - don't have much of a directional bias. The protective put is more valuable to you if you think the market is going down, and covered calls may be more attractive you don't think the market is going up too much. But the primary motivation of the protective put is to protect against potential losses, and the primary motivation for the call is to extract yield (and perhaps reduce volatility). 
+
+The next three options strategies we'll see - the bull call spread, the bull calender spread, and the bullish 3-way - do have a bias. They are all ways to express the view that the underlying stock if going higher. They all have different risk-reward characteristics, but they are fundamenally ways to express bullish viewpoints. 
+
+
 ## The Bull Call Spread
 
+It's November 26, 2019 and the S&P 500 ETF, SPY, just closed at \$314.08. You've got \$100,000 and you think the market might be going up 3%-5% in the next month. You want to capture the move, and you have \$100,000 in your account. If you invest the \$100,000 in SPY and it goes up 3%, you'll make \$3,000. If it goes up 5%, you'll make \$5,000. 
+
+Instead of buying shares of SPY, you could buy a call that expires on December 20, 2019.  To figure out how many calls you should buy to match the returns you would get from owning the shares, notice that if you have \$100,000 to invest and SPY is trading at \$314.08, you can buy \$100,000 / \$314.08 = 318 shares. Remember that each call is for 100 shares, so we can't quite match 318. You'll have to decide between buying 3 calls or 4 calls. For this section, I'm going to use 3 calls. 
+
+After the market close on November 29, 2019, the \$322 call is trading at \$0.36 per share and the \$325 call is at \$0.16 per share. For the \$322 call, 3 calls will cost 3 calls x 100 shares per call x \$0.36 = \$108. For the \$325 call, 3 calls will cost 3 calls x 100 shares per call x \$0.16 = \$48. Before getting to the bull call spread, I'm going to look at what happens if you buy the December 20, 2019 call at \$322 *or* \$325. Very quickly, here are the payoff diagrams for these two calls on their expiry date of December 20, 2019.  
+
+<!-- Insert the payoff diagrams of the SPY \$322 calls and \$325 calls on their expiry date. -->
+```{r Call-Option-Payoff-SPY-322-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- 0.36
+Call_K <- 322
+x_min <- 310; x_max = 335
+Call_Payoff_Plot <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 1),
+                            "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_y, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K + Call_cost, 
+                                         y = seq(from = -15*Call_cost, to = x_max-Call_K, 
+                                                 length = length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Buying SPY's $322 Call",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)),
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)) ),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
+  options_theme()
+```
+
+```{r Call-Option-Payoff-SPY-325-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- 0.16
+Call_K <- 325
+x_min <- 310; x_max = 335
+Call_Payoff_Plot <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 1),
+                            "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_y, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K + Call_cost, 
+                                         y = seq(from = -35*Call_cost, to = x_max-Call_K, 
+                                                 length = length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Buying SPY's $325 Call",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)),
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)) ),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
+  options_theme()
+```
 
 
-## The Calender Spread 
+If SPY is up by 3% on December 20, it'll be trading at \$314.08 x 1.03 = \$323.50. If you bought the \$322 call, you'll make \$323.50 - \$322 - \$0.36 = \$1.14 per share, for a \$1.14 / \$0.36 = 317% gain. The \$325 call will expire worthless, since \$323.50 is below it's strike price of \$325. If SPY is up by 5% on December 20, it'll be trading at 314.08 x 1.05 = \$329.87. If you bought the \$322 call, you'll make \$329.87 - \$322 - \$0.36 = \$7.51, for a \$7.51 / \$0.36 = 2086% gain. 
+
+If the 3%-5% move happens before the expiry date, you'll have to decide if you want to take profits early. You'll have less profits because the calls will have *delta* than they do on their expiry date. But, you won't run the risk of having the calls expire worthless. Quickly again, here are the (approximate) payoff diagrams for these two calls 10 days before they expire. 
+
+<!-- Insert (approximate) payoff diagrams of the SPY \$322 calls and \$325 calls one week before expiry. 
+  +  ADD commentary -->
+
+Let's summarize all of these possible dollar and percentage returns with a table. 
+
+<!-- Insert table comparing all of these returns. -->
+
+These are dramatically different returns, and it raises the question - how do you decide between buying the \$322 call and the \$325 call? If you are buying calls to try and capture the market as it moves higher, you have a *directional* view - you think the market is going higher. This is a very different way to use options than protective put and covered call. Those don't have strong directional views. 
+
+Don't get me wrong - the strategies might be more appealing if you think the market will move in your favor. You'll be more willing to pay for a protective put if you think the market is likely to go down, and you'll be more willing to sell calls if you don't think the market is unlikely to go much higher. But the primary reason to enter a protective put is to construct a risk-reward profile with tightly controlled exposure to downside risks. And the primary reason to write covered calls is to collect income while reducing the volatility of your portfolio.  
+
+Buying calls gives you tightly controlled downside risk - you can only lose the cost of the call. But if you hold the calls to expiry, you'll lose your entire investment if your directional view (*and* the timing of the move) is wrong. Is there a better way to express your view that the S&P 500 is going up 3%-5% in the next month? We want more consistent gains than the wide range that we saw in that table, and (hopefully) more gains.
+
+One thing you could do is split your money between the \$322 call and \$325 call. You'd probably buy 4 calls if you did that - 2 \$322 calls and 2 \$325 calls. That's one way of splitting the different. The 2 \$322 calls would cost \$72 and the 2 \$325 calls would cost \$32, for a total cost of \$104. Buying 3 \$325 calls costs about the same, at \$108. Let's compare the payoff diagrams of these two trades. 
+
+<!-- Insert payoff diagram comparing 2 $322 calls + 2 $325 calls vs. 3 $322 calls -->
+```{r Payoff-SPY-2*322-and-2*325-Calls-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost_322 <- 0.36; Call_cost_325 <- 0.16
+Call_K_322 <- 322; Call_K_325 <- 325
+x_min <- 310; x_max = 335
+Call_Payoff_Plot <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 1),
+                            "Call_322" = -Call_cost_322 + (Call_x > Call_K_322)*(Call_x-Call_K_322),
+                            "Call_325" = -Call_cost_325 + (Call_x > Call_K_325)*(Call_x-Call_K_325) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, 2*Call_322 + 2*Call_325, color = "Shares-Main"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven-Main"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_cost_322 + Call_cost_325 + Call_K_322, 
+                                         y = seq(from = -15*Call_cost_322, to = 3.5*(x_max-Call_K_322), 
+                                                 length = length(Call_x)), 
+                                         color = "Breakeven-Main"),
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, 3*Call_322, color = "Shares-Alt"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven-Alt"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_cost_322 + Call_K_322, 
+                                         y = seq(from = -15*Call_cost_322, to = 3.5*(x_max-Call_K_322), 
+                                                 length = length(Call_x)), 
+                                         color = "Breakeven-Alt"),
+                                         linetype = "dashed") +
+  # Duplicated to overcome fading from introducing transparency
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_cost_322 + Call_K_322, 
+                                         y = seq(from = -15*Call_cost_322, to = 3.5*(x_max-Call_K_322), 
+                                                 length = length(Call_x)), 
+                                         color = "Breakeven-Alt"),
+                                         linetype = "dashed") +
+  # End duplicated code...
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Comparing the Two Strategies",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares-Main'=plot_fg,'Breakeven-Main'=plot_fg, 
+                        'Shares-Alt'=plot_fg_alt,'Breakeven-Alt'=adjustcolor(plot_fg_alt, alpha.f = 0.6)),
+                     labels = c("Buy: 2 $322 Calls, 2 $325 Calls",
+                                paste0("Breakeven = ", currency(Call_cost_322 + Call_cost_325 +
+                                                                        Call_K_322)),
+                                "Buy: 3 $322 Calls",
+                                paste0("Breakeven = ", currency(Call_cost_322 + Call_K_322))),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c(plot_fg, plot_fg,
+                                                            plot_fg_alt, plot_fg_alt),
+                                                  linetype = c("solid", "dashed",
+                                                               "solid", "dashed") ))) + 
+  options_theme()
+```
+
+```{r Payoff-SPY-3*322-Calls-Expiry, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+Call_cost <- 0.36
+Call_K <- 322
+x_min <- 310; x_max = 335
+Call_Payoff_Plot <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 1),
+                            "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K) )
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, 3*Call_y, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Call_K + Call_cost, 
+                                         y = seq(from = -15*Call_cost, to = 3*(x_max-Call_K), 
+                                                 length = length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Buying 3 SPY $322 Calls",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
+                     labels = c("Profit Per Share",
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)),
+                                paste0("Breakeven Price = ", currency(Call_K + Call_cost)) ),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
+  options_theme()
+```
+Another thing you could do is put on a bull call spread. This is where you buy an option with a lower strike and sell an option with a higher strike. In this example, you'd buy the \$322 call and sell the \$325 call. The \$322 call costs \$0.36 per share, and the \$325 call costs \$0.16 per share. This trade costs \$0.36 - \$0.16 = \$0.20 per share to enter. Getting exposure to 300 shares costs \$60, which is close to the $48 you would have paid for 3 \$325 calls. How do the payoff diagrams compare? 
+
+<!-- Insert payoff diagram: buying the \$322 call + selling the \$325 call = $322-$325 bull call spread -->
+
+If you put together buying a call at \$322 and selling a call at \$325, you get a \$322-\$325 bull call spread. The protective put paired owning stock with buying a put, and the covered call paired owning stock with selling calls. In both cases, the option served as a risk management tool. It limits our downside in the protective put and reduces our volatility in the covered call. Owning the put in the protective put didn't introduce any additional risks - it removed downside risk. And selling the call in the covered call didn't introduce any additional risks - it just removed potential upside. If the call we sold ended up being exercised, we had the shares to meet the call. 
+
+It's very important to understand how the bull call spread works, because we want it to have limited downside and to give us strong participation to the upside of the market. You have make sure you put bull call spreads on properly, because you don't own any shares of SPY. If you don't execute buying the \$322 call and selling the \$325 call together (as a *net debit*), you might be in trouble. Because when you sell a call, you can lose a ton of money if the stock moves higher. Owning the shares protects in the covered call, and owning a call with a lower strike (the \$322 call) protects us in the bull call spread. 
+
+The payoff diagram of the \$322-\$325 bull call spread (on its expiry date) is shown *after* the equals sign. It looks like a slanted step. It's flat below \$322 and flat above \$325, and makes all its money between \$322 and \$325. Why is that? Both the \$322 call and \$325 call have no value below \$322, so the line's flat. Between \$322 and \$325, the \$322 call participates dollar-for-dollar in the upside of SPY while the \$325 call *still* has no value. Above \$325, the \$325 call participates dollar-for-dollar in the upside of SPY. You *sold* the \$325 call, so you have to pay those dollars. Luckily, the \$322 call you bought gives you a dollar for every dollar you have to pay. That makes the payoff diagram a flat line above \$325, which means that the \$322-\$325 bull call spread captures *no* upside above \$325. 
+
+A simpler way of thinking of that is that you're selling all of your upside above \$325 in exchange for cutting the cost of entering the position. The bull call spread costs \$0.20, which is about half as the cost ( \$0.36) of the \$322 call. Reducing the breakeven from \$322.36 to \$322.20 doesn't sound that exciting, but you can exploit the lower cost of entering the bull call spread another way - you can buy 4 \$322-\$325 bull call spreads for \$80, which is close to the \$72 cost of 2 \$322 calls. Let's compare the payoff diagrams of 4 \$322-\$325 call spreads to 2 \$325 calls. 
+
+<!-- Insert payoff diagram: 4 $322-$325 bull call spreads vs. 2 $322 calls -->
+
+I should also compare the \$322-\$325 bull call spread to buying 2 \$322 calls and 2 \$325 calls. To make the comparison fair, I have to try to match the cost of entering each position. Buying 2 \$322 calls and 2 \$325 calls costs \$104. Each \$322-\$325 bull call spread costs \$20, so 5 \$322-\$325 bull call spreads costs \$100. That's as close as we can get to \$104. So how do their payoff diagrams compare? 
+
+<!-- Insert payoff diagram: 5 $322-$325 bull call spreads vs. 2 $322 calls and 2 $325 calls -->
+
+
+
+
+How do the payoff diagrams of these two strategies compare on their expiry date?
+
+<!-- Insert payoff diagram comparing 3 \$322 - \$325 bull call spread to 3 $325 calls calls -->
+
+
+
+If we're only expecting A new options trade I've been thinking about - the $322-$325 call spread on the SPY, both for the December expiry. 
+
+
+This is where you buy the \$322 call (currently at \$0.36) and sell the \$325 call (currently at \$0.16), for a net cost of \$0.20 per share. That's a net cost of \$20 per 100 shares. If SPY ends up below \$322, both calls expire worthless and you lose the \$20 per 100 shares. If the SPY ends above $322.20 (the breakeven of this trade), you make money. 
+
+The most you can make is when SPY is at or above \$325, because the \$325 call you sold will claw back (dollar-for-dollar) any gains the \$322 call you bought when SPY is above \$325. This is actually good, because it means that the \$322 call is hedging out all the risk of selling the \$325 call (as long as you pair them). If you just sold the \$325 call, you'd be on the hook for a potentially huge payment to someone if SPY got much over \$325. And that'd be really bad, so pairing them is good. 
+
+The way to think of the trade is that you're giving up the gains in SPY above \$325 in exchange for lowering your option premium from \$0.36 (the cost to buy the \$322 call) to \$0.20 (the net cost of buying the \$322 call and selling the \$325 call). And we aren't taking on any risk from having sold the \$325 call, because the $322 call we bought hedges it all out. 
+
+The bias behind this trade is that I think there is a high probability that SPY is going to be between \$322 and \$325 when those December calls expire. That's one reason someone would do this bull call spread. It's also a more speculative position, so lowering the cost of entering it is also good. I'm not concerned about SPY going above \$325, but if I was I'd adjust the \$325 call I was selling higher. 
+
+Here's the kicker - when the SPY is at \$325, you make \$2.80 per share (the call you bought lets you buy shares of the SPY at \$322, so you'll make \$3 minus the \$0.20 you spent opening the position). You spent \$0.20 per share, so you'll be up 14x on your investment if that happens. If the SPY gets to the midpoint between \$322 and \$325 - that's \$323.50 - you'll make \$1.30 (\$1.50 from the \$322 call minus the \$0.20 you spent opening the position). That's 6.5x on your investment of $0.20 per share. 
+
+A lazier way to put this trade on is to buy \$322 calls on SPY. Then I'm paying more (\$0.36 for the $322 call), but it's a simpler trade.
+
+
+## The Bull Calender Spread 
+
+The bull calender spread is a bull call spread where you mis-match the expiry dates of the two calls. This lets us change the risk-reward characteristics of the trade, and possibly better match them to our risk preferences. 
 
 ## The Bullish 3-Way
+
+This is the most complicated options strategy we've seen so far. It consists of three options, which is weird to think about. To help us, we're going to draw the payoff diagram of the strategy first, and then break it down into its different pieces. 
+
+
+## Adjusting Market Positioning
+
+The tables breaking down the relative performance of these three strategies make it clear - they give us a tremendous amount of market participation in any upward moves, while letting us risk very little capital. Instead of viewing them as outright bullish positions, we can return to our *options are insurance* roots and consider these strategies as ways to insure against the price of shares going higher.
+
+In a trading framework, that means using them in a tactical manner to adjust our market exposure. Think about it this way - if we don't own shares of Apple and they go off to the races, we'll miss out on a lot of money. What happens if Apple goes up 10% in a month? If we invested \$500,000, we'd make \$50,000 but we'd be risking \$500,000 (more realistically, \$200,000 - Apple is very unlikely to go down more than 40% in a month). If I wanted to make \$50,000k using these three momentum strategies, how much would I have to invest? The tables give us a good idea. 
+
+  1. If we use a bull call spread: between ... and ... (...% - ...% of \$500,000). 
+  2. If we use a bull calender spread: between ... and ... (...% - ...% of \$500,000) .
+  3. If we use a bullish 3-way: between ... and ... (...% - ...% of \$500,000). 
+  
+That's way less money, but the problem is we have to be right about the stock moving higher. If we're wrong, everything expires worthless and we lose whatever it cost for us to enter the position. If we're right just a few percent of the time, we'll still make money. But there's another way to view these positions - as a very cheap way for us to adjust our market positioning (the market *beta* of our portfolio).
+
+  
+

@@ -1,7 +1,7 @@
 <!-- Each chapter is set to compile separately - include "global" set-up -->
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
 if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
 if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
@@ -15,6 +15,31 @@ options(kableExtra.auto_format = FALSE)
 plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # "#929292"
 plot_fg_alt <- "#969696" # ??
+
+options_theme <- function() {
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                  margin = margin(10, 0, 10, 0),
+                                  colour = plot_fg),
+        legend.justification=c(0,1), 
+        legend.position=c(0,1), 
+        legend.title = element_blank(),
+        legend.key = element_rect(fill = plot_bg, color = plot_bg),
+        legend.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+        legend.text = element_text(colour = plot_fg),
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90, colour = plot_fg) )
+}
 ```
 
 # A First Look at Options Strategies {#First-Look}
@@ -35,7 +60,7 @@ There are two components to a covered call. The first is that we sell a call. Si
 
 The `r currency(Apple_Call_K)` strike call costs `r currency(Apple_Call_Cost)`, so we can sell the `r currency(Apple_Call_K)` call that expires on December 20, 2019 for `r currency(Apple_Call_Cost)`. The payoff diagram (on  December 20, 2019) for someone who has sold this call is:  
 
-```{r Apple-Sell-Call-Option-Payoff, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Sell-Call-Option-Payoff, out.width = "80%", fig.align = "center", message = FALSE}
 Apple_Call_Cost <- 8.50
 Apple_Call_K <- 230
 x_min <- 210; x_max = 260
@@ -63,44 +88,10 @@ ggplot() +
   scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,'Breakeven'=plot_fg),
                      labels = c("Profit Per Share",
                                 paste0("Breakeven Price = ", currency(Apple_Call_K + Apple_Call_Cost)),
-                                paste0("Breakeven Price = ", currency(Apple_Call_K + Apple_Call_Cost)) ),
+                                paste0("Breakeven Price = ", currency(Apple_Call_K + Apple_Call_Cost))),
                      guide = "legend") + 
   guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
-  theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5, face="bold", 
-                                  margin = margin(10, 0, 10, 0),
-                                  colour = plot_fg),
-        legend.justification=c(0,1), 
-        legend.position=c(0,1), 
-        legend.title = element_blank(),
-        legend.key = element_rect(fill = plot_bg, color = plot_bg),
-        legend.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.text = element_text(colour = plot_fg),
-        text = element_text(size=16), 
-        panel.border = element_blank(), 
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
-        panel.background = element_rect(fill = plot_bg, color = plot_bg),
-        plot.background = element_rect(fill = plot_bg, color = plot_bg),
-        axis.line = element_line(colour = plot_bg),
-        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
-                                    colour = plot_fg),
-        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
-                                    angle = 90, colour = plot_fg) )
-
-
-# plot(x = Call_x, y = option_cost - (Call_x > Call_K)*(Call_x-Call_K), 
-#      type = 'l', lwd = 3,
-#      xlab = "Apple's Stock Price", ylab = "Profit Per Share",
-#      main = "Payoff Of The Call Option On Expiry")
-# abline(v = Call_K + option_cost, lty = 2, lwd = 1)
-# abline(h = 0, lty = 2, lwd = 1)
-# legend("topleft", c("Profit Per Share",
-#                     paste0("Breakeven Price = $", Call_K + option_cost)),
-#        lty = c("solid", "dotdash"), 
-#        lwd = c(2, 2), cex = 0.75,
-#        col=c("black", "black"), bty = "n") 
+  options_theme()
 ```
 
 Before making our first stab at understanding this payoff diagram, remember that we're on the other side of the trade as the buyer. If we sell this call, we collect the `r currency(Apple_Call_Cost)` the buyer pays for it. If Apple's shares are below `r currency(Apple_Call_K)` on December 20, 2019, the call expires worthless and we keep the `r currency(Apple_Call_Cost)`. This is our best case scenario. If Apple's shares are above `r currency(Apple_Call_K)`, the buyer gets to purchase 100 shares for `r currency(Apple_Call_K)` each. But, remember that the buyer isn't profitable until the shares go above his breakeven of `r currency(Apple_Call_K)` + `r currency(Apple_Call_Cost)` = `r currency(Apple_Call_K+Apple_Call_Cost)`. Flipping that around, the seller will not lose money until Apple's shares are above `r currency(Apple_Call_K+Apple_Call_Cost)`. They will, however, gradually lose the `r currency(Apple_Call_Cost)` of potential profit they could have made by selling the call as Apple's shares move from `r currency(Apple_Call_K)` to `r currency(Apple_Call_K+Apple_Call_Cost)`. 
@@ -109,7 +100,7 @@ We're only considering the payoff of the call on its expiry date in this section
 
 Luckily, we can fix this problem by selling covered calls. A covered call is when we sell 1 call but already own 100 shares of the stock. If we have the 100 shares that we may have to give the buyer, we'll never be forced to frantically scramble for cash. Let's look at a payoff diagram of a covered call - buying 100 shares of Apple at `r currency(Apple_Current_Price)` each and selling 1 call for `r currency(Apple_Call_Cost)` x 100 = `r currency(100*Apple_Call_Cost)`.
 
-```{r Apple-Covered-Call-Payoff-Diagram, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Covered-Call-Payoff-Diagram, out.width = "80%", fig.align = "center", message = FALSE}
 Apple_Call_Cost <- 8.50
 Apple_Call_K <- 230
 x_min <- 190; x_max = 260 
@@ -120,14 +111,17 @@ Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by
                                                   pmax(0, Call_x - Apple_Call_K)) ) 
 
 ggplot() + 
-  geom_line(data = Call_Payoff_Plot, aes(Call_x, Covered_Call_y, color = "Shares"), linetype = "solid") +
-  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Covered_Call_y, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
   geom_line(data = Call_Payoff_Plot, aes(x = Apple_Current_Price - Apple_Call_Cost, 
                                          y = seq(from = -4*Apple_Call_Cost, to = x_max-Apple_Call_K, 
                                                  length=length(Call_x)), 
                                          color = "Breakeven"),
                                          linetype = "dashed") +
-  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_x - Apple_Current_Price, color = "Own_Shares"), linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_x - Apple_Current_Price, color = "Own_Shares"), 
+            linetype = "solid") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
   labs(title = "Selling Apple's $230 Covered Call",
@@ -137,51 +131,10 @@ ggplot() +
                                 'Breakeven'=plot_fg,"Own_Shares"=plot_fg_alt),
                      labels = c("Covered Call - Profit Per Share",
                                 "Owning Shares - Profit Per Share",
-                                paste0("Breakeven Price = ", currency(Apple_Current_Price - Apple_Call_Cost)) ),
+                                paste0("Breakeven Price = ", currency(Apple_Current_Price - Apple_Call_Cost))),
                      guide = "legend") + 
   guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
-  theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5, face="bold", 
-                                  margin = margin(10, 0, 10, 0),
-                                  colour = plot_fg),
-        legend.justification=c(0,1), 
-        legend.position=c(0,1), 
-        legend.title = element_blank(),
-        legend.key = element_rect(fill = plot_bg, color = plot_bg),
-        legend.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.text = element_text(colour = plot_fg),
-        text = element_text(size=16), 
-        panel.border = element_blank(), 
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
-        panel.background = element_rect(fill = plot_bg, color = plot_bg),
-        plot.background = element_rect(fill = plot_bg, color = plot_bg),
-        axis.line = element_line(colour = plot_bg),
-        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
-                                    colour = plot_fg),
-        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
-                                    angle = 90, colour = plot_fg) )
-
-
-# plot(x = Call_x, y = option_cost + Call_x - 222.76 - pmax(0, Call_x - Call_K), 
-#      type = 'l', lwd = 3, ylim = c(-20, 30), 
-#      xlab = "Apple's Stock Price", ylab = "Profit Per Share",
-#      main = "Payoff of a Covered Call Option on Expiry")
-# lines(x = Call_x, y = Call_x - 222.76, col = "orange", lwd = 3)
-
-# abline(v = 222.76 - option_cost, lty = 2, lwd = 1)
-# abline(h = 0, lty = 2, lwd = 1)
-# abline(v = 230 + option_cost, lty = 2, lwd = 1, col = "orange")
-# abline(h = (230 - 222.76) + option_cost, lty = 2, lwd = 1, col = "orange")
-
-# legend("topleft", c("Covered Call - Profit Per Share",
-#                     "Owning Stock - Profit Per Share",
-#                     paste0("Breakeven Price = $", 222.76 - option_cost)),
-#                     # paste0("Just Owning Shares Is More Profitable Above = $", 230 + option_cost )),
-#        lty = c("solid", "solid", "dotdash"), 
-#        lwd = c(2, 2, 2), cex = 0.75,
-#        col=c("black", "orange", "black"), bty = "n") 
+  options_theme()
 ```
 
 By selling a call with a strike price of `r currency(Apple_Call_K)`, the call buyer gets all of the gains when Apple's shares are above `r currency(Apple_Call_K)`. This caps our upside of owning the shares at `r currency(Apple_Call_K)`, which is why the per-share profit of a covered call flattens out when the shares reach `r currency(Apple_Call_K)`. We always collect the `r currency(Apple_Call_Cost)` per share we make by selling the call, which is is cash that goes into our account. This is why the covered call (black line) makes `r currency(Apple_Call_Cost)` more profit than owning shares (orange line) whenever Apple's shares are below `r currency(Apple_Call_K)`. What's even better is that the `r currency(Apple_Call_Cost)` also reduces our breakeven to `r currency(Apple_Current_Price)` - `r currency(Apple_Call_Cost)` = `r currency(Apple_Current_Price-Apple_Call_Cost)`. 
@@ -192,7 +145,7 @@ Putting these together, we lose less money if Apple's shares fall below `r curre
 
 This ability to generate income is one of the covered call's most appealing attributes. For investors who seek to generate consistent (inflation-adjusted) income from their portfolio each year, the volatility-reducing characteristics of the covered call are also welcome. Let's go back to our trusty table, and compare owning 100 shares of Apple to owning 100 shares and selling 1 call. As before, the shares are bought at `r currency(Apple_Current_Price)`. We'll consider the profit or loss when the call is sold at a variety of different strike prices. For context, remember that: 
 
-```{r Apple-Options-Cost, echo = FALSE}
+```{r Apple-Options-Cost}
 Apple_Calls_K <- c(145, 180, 205, 230)
 Apple_Puts_K <- c(145, 180, 205, 230)
 Apple_Calls_Cost <- c(78.45, 44.85, 23.63, 8.50)
@@ -204,34 +157,29 @@ Apple_Puts_Cost <- c(0.32, 1.69, 5.45, 15.30)
 3. 1 1 `r currency(Apple_Calls_K[3])` strike call costs `r currency(Apple_Calls_Cost[3])` x 100 = `r 100*currency(Apple_Calls_Cost[3])`.
 4. 1 1 `r currency(Apple_Calls_K[4])` strike call costs `r currency(Apple_Calls_Cost[4])` x 100 = `r 100*currency(Apple_Calls_Cost[4])`.
 
-```{r Apple-Covered-Call-Different-Strikes, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Covered-Call-Different-Strikes, out.width = "80%", fig.align = "center", message = FALSE}
 Apple_Future_Prices <- c(100, 150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 
 Apple_Covered_Call <- tibble( "Share Price" = scales::dollar(Apple_Future_Prices, negative_parens = TRUE),
-                              "Buy 100 Shares" = 
-                                scales::dollar( 100 * ( Apple_Future_Prices - Apple_Current_Price ),
-                                                negative_parens = TRUE ), 
-                              "Buy 100 Shares, Sell 1 $145 Strike Call" = 
-                                scales::dollar( 100 * ( ( Apple_Calls_Cost[1] ) + 
-                                                          ( Apple_Future_Prices - Apple_Current_Price ) -
-                                                          pmax( 0, Apple_Future_Prices - Apple_Calls_K[1] ) ),
-                                                negative_parens = TRUE ),
-                              "Buy 100 Shares, Sell 1 $180 Strike Call" = 
-                                scales::dollar( 100 * ( ( Apple_Calls_Cost[2] ) + 
-                                                          ( Apple_Future_Prices - Apple_Current_Price ) -
-                                                          pmax( 0, Apple_Future_Prices - Apple_Calls_K[2] ) ),
-                                                negative_parens = TRUE ),
-                              "Buy 100 Shares, Sell 1 $205 Strike Call" = 
-                                scales::dollar( 100 * ( ( Apple_Calls_Cost[3] ) + 
-                                                          ( Apple_Future_Prices - Apple_Current_Price ) -
-                                                          pmax( 0, Apple_Future_Prices - Apple_Calls_K[3] ) ),
-                                                negative_parens = TRUE ),
-                              "Buy 100 Shares, Sell 1 $230 Strike Call" = 
-                                scales::dollar( 100 * ( ( Apple_Calls_Cost[4] ) + 
-                                                          ( Apple_Future_Prices - Apple_Current_Price ) -
-                                                          pmax( 0, Apple_Future_Prices - Apple_Calls_K[4] ) ),
-                                                negative_parens = TRUE ) )
+      "Buy 100 Shares" = scales::dollar( 100 * ( Apple_Future_Prices - Apple_Current_Price ),
+                                         negative_parens = TRUE ), 
+      "Buy 100 Shares, Sell 1 $145 Strike Call" = scales::dollar( 
+        100 * ( ( Apple_Calls_Cost[1] ) + ( Apple_Future_Prices - Apple_Current_Price ) -
+                  pmax( 0, Apple_Future_Prices - Apple_Calls_K[1] ) ),
+        negative_parens = TRUE ),
+      "Buy 100 Shares, Sell 1 $180 Strike Call" = scales::dollar( 
+        100 * ( ( Apple_Calls_Cost[2] ) + ( Apple_Future_Prices - Apple_Current_Price ) -
+                  pmax( 0, Apple_Future_Prices - Apple_Calls_K[2] ) ),
+        negative_parens = TRUE ),
+      "Buy 100 Shares, Sell 1 $205 Strike Call" = scales::dollar( 
+        100 * ( ( Apple_Calls_Cost[3] ) + ( Apple_Future_Prices - Apple_Current_Price ) -
+                  pmax( 0, Apple_Future_Prices - Apple_Calls_K[3] ) ),
+        negative_parens = TRUE ),
+      "Buy 100 Shares, Sell 1 $230 Strike Call" = 
+        scales::dollar( 100 * ( ( Apple_Calls_Cost[4] ) + ( Apple_Future_Prices - Apple_Current_Price ) -
+                                  pmax( 0, Apple_Future_Prices - Apple_Calls_K[4] ) ),
+                        negative_parens = TRUE ) )
 
 kable_styling( knitr::kable(Apple_Covered_Call, 
                             caption = "Dollar Return if Held to Expiry"), 
@@ -241,7 +189,7 @@ kable_styling( knitr::kable(Apple_Covered_Call,
 
 The first thing to notice is that the gains (or losses) of every covered call position is lower than just owning shares. Covered call compress the range of possible gains or losses, which reduces our *volatility*. Next, we'll examine the risk-reward tradeoff of selling covered calls at different strike prices. As always, the best way to do this is by drawing a diagram. I'm only showing the covered call with a `r currency(Apple_Calls_K[1])` strike. I'd strongly encourage drawing the the remaining diagrams, so that the next few paragraphs don't turn into an incomprehensible blur of numbers.
 
-```{r Apple-145-Covered-Call-Payoff-Diagram, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-145-Covered-Call-Payoff-Diagram, out.width = "80%", fig.align = "center", message = FALSE}
 Apple_Call_Cost <- 78.45
 Apple_Call_K <- 145
 Apple_Current_Price <- 222.76
@@ -249,18 +197,21 @@ Apple_Current_Price <- 222.76
 x_min = 120; x_max = 165
 Call_x <- seq(from = x_min, to = x_max, by = 1)
 Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
-                            "Covered_Call_y" = currency(Apple_Call_Cost + (Call_x - Apple_Current_Price) - 
-                                                  pmax(0, Call_x - Apple_Call_K)) ) 
+        "Covered_Call_y" = currency(Apple_Call_Cost + (Call_x - Apple_Current_Price) - 
+                                      pmax(0, Call_x - Apple_Call_K)) ) 
 
 ggplot() + 
-  geom_line(data = Call_Payoff_Plot, aes(Call_x, Covered_Call_y, color = "Shares"), linetype = "solid") +
-  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Covered_Call_y, color = "Shares"),
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
   geom_line(data = Call_Payoff_Plot, aes(x = Apple_Current_Price - Apple_Call_Cost, 
                                          y = seq(from = -1.25*Apple_Call_Cost, to = 1.25*x_max-Apple_Call_K, 
                                                  length=length(Call_x)), 
                                          color = "Breakeven"),
                                          linetype = "dashed") +
-  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_x - Apple_Current_Price, color = "Own_Shares"), linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_x - Apple_Current_Price, color = "Own_Shares"), 
+            linetype = "solid") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
   labs(title = "Selling Apple's $145 Covered Call",
@@ -270,47 +221,11 @@ ggplot() +
                                 'Breakeven'=plot_fg,"Own_Shares"=plot_fg_alt),
                      labels = c("Covered Call - Profit Per Share",
                                 "Owning Shares - Profit Per Share",
-                                paste0("Breakeven Price = ", currency(Apple_Current_Price - Apple_Call_Cost)) ),
+                                paste0("Breakeven Price = ", 
+                                       currency(Apple_Current_Price - Apple_Call_Cost))),
                      guide = "legend") + 
   guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
-  theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5, face="bold", 
-                                  margin = margin(10, 0, 10, 0),
-                                  colour = plot_fg),
-        legend.justification=c(0,1), 
-        legend.position=c(0,1), 
-        legend.title = element_blank(),
-        legend.key = element_rect(fill = plot_bg, color = plot_bg),
-        legend.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.text = element_text(colour = plot_fg),
-        text = element_text(size=16), 
-        panel.border = element_blank(), 
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
-        panel.background = element_rect(fill = plot_bg, color = plot_bg),
-        plot.background = element_rect(fill = plot_bg, color = plot_bg),
-        axis.line = element_line(colour = plot_bg),
-        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
-                                    colour = plot_fg),
-        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
-                                    angle = 90, colour = plot_fg) )
-
-
-# plot(x = Call_x, y = option_cost + Call_x - 222.76 - pmax(0, Call_x - Call_K), 
-#      type = 'l', lwd = 3, ylim = c(-30, 20), 
-#      xlab = "Apple's Stock Price", ylab = "Profit Per Share",
-#      main = "Payoff of a $145 Covered Call Option on Expiry")
-# lines(x = Call_x, y = Call_x - 222.76, col = "orange", lwd = 3)
-
-# abline(v = 222.76 - option_cost, lty = 2, lwd = 1)
-# abline(h = 0, lty = 2, lwd = 1)
-
-# legend("topleft", c("Covered Call - Profit Per Share",
-#                     paste0("Breakeven Price = $", 222.76 - option_cost)),
-#        lty = c("solid", "dotdash"), 
-#        lwd = c(2, 2), cex = 0.75,
-#        col=c("black", "black"), bty = "n") 
+  options_theme()
 ```
 
 This payoff diagram looks strange for two reasons. The first is that the black line barely gets above `r currency(0)` we make so little money after shares go above the breakeven price, and the second is that we lose so much more money if we just owned shares. This puts the grey
@@ -323,31 +238,31 @@ Let's look at a `r currency(Apple_Calls_K[2])` strike covered call. It has a bre
 
 That is more than we can make in a savings account or Treasury bond, and our breakeven is reasonably low. Apple would have to fall by slightly over `r percent(20/100)` in 3 months to fall below breakeven. While Apple could fall by `r percent(20/100)`, it's pretty unlikely. We have already considered the payoff diagram of the `r currency(Apple_Calls_K[4])` covered call - it had a breakeven of `r currency(Apple_Current_Price - Apple_Calls_Cost[4])` and can reasonably be expected to yield over `r percent(10/100)` per year. This is much higher than the `r percent( ( ( Apple_Calls_Cost[1] ) + ( Apple_Future_Prices - Apple_Current_Price ) - pmax( 0, Apple_Future_Prices - Apple_Calls_K[1] ) )[2] / Apple_Current_Price)` yield of the `r currency(Apple_Calls_K[1])` covered call or the `r percent( ( ( Apple_Calls_Cost[2] ) + ( Apple_Future_Prices - Apple_Current_Price ) - pmax( 0, Apple_Future_Prices - Apple_Calls_K[2] ) )[3] / Apple_Current_Price)` yield of the `r currency(Apple_Calls_K[2])` covered call, it comes at the cost of having a much higher breakeven price. The key takeaway is that we can achieve covered calls at the  higher yields  more yield comes at the cost of having a higher breakeven prices. 
 
-```{r Apple-Covered-Call-Different-Strikes-Relative, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Covered-Call-Different-Strikes-Relative, out.width = "80%", fig.align = "center", message = FALSE}
 Apple_Future_Prices <- c(100, 150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 Apple_Future_Returns <-  Apple_Future_Prices - Apple_Current_Price
 
 Apple_Covered_Call_Relative <- tibble( "Share Price" = Apple_Future_Prices,
-                              "Buy 100 Shares" = sign(Apple_Future_Returns) * 
-                                percent( ( Apple_Future_Prices - Apple_Current_Price ) / 
-                                           ( Apple_Future_Prices - Apple_Current_Price ) ), 
-                              "Buy 100 Shares, Sell 1 $145 Strike Call" = sign(Apple_Future_Returns) * 
-                                percent( ( ( Apple_Calls_Cost[1] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
-                                    pmax( 0, Apple_Future_Prices - Apple_Calls_K[1] ) ) / 
-                                ( Apple_Future_Prices - Apple_Current_Price ) ),
-                              "Buy 100 Shares, Sell 1 $180 Strike Call" = sign(Apple_Future_Returns) * 
-                                percent( ( ( Apple_Calls_Cost[2] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
-                                    pmax( 0, Apple_Future_Prices - Apple_Calls_K[2] ) ) / 
-                                ( Apple_Future_Prices - Apple_Current_Price ) ),
-                              "Buy 100 Shares, Sell 1 $205 Strike Call" = sign(Apple_Future_Returns) * 
-                                percent( ( ( Apple_Calls_Cost[3] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
-                                    pmax( 0, Apple_Future_Prices - Apple_Calls_K[3] ) ) / 
-                                ( Apple_Future_Prices - Apple_Current_Price ) ),
-                              "Buy 100 Shares, Sell 1 $230 Strike Call" = sign(Apple_Future_Returns) * 
-                                percent( ( ( Apple_Calls_Cost[4] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
-                                    pmax( 0, Apple_Future_Prices - Apple_Calls_K[4] ) ) / 
-                                ( Apple_Future_Prices - Apple_Current_Price ) ) )
+      "Buy 100 Shares" = sign(Apple_Future_Returns) * 
+        percent( ( Apple_Future_Prices - Apple_Current_Price ) / 
+                   ( Apple_Future_Prices - Apple_Current_Price ) ), 
+      "Buy 100 Shares, Sell 1 $145 Strike Call" = sign(Apple_Future_Returns) * 
+        percent( ( ( Apple_Calls_Cost[1] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
+                     pmax( 0, Apple_Future_Prices - Apple_Calls_K[1] ) ) / 
+                   ( Apple_Future_Prices - Apple_Current_Price ) ),
+      "Buy 100 Shares, Sell 1 $180 Strike Call" = sign(Apple_Future_Returns) * 
+        percent( ( ( Apple_Calls_Cost[2] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
+                     pmax( 0, Apple_Future_Prices - Apple_Calls_K[2] ) ) / 
+                   ( Apple_Future_Prices - Apple_Current_Price ) ),
+      "Buy 100 Shares, Sell 1 $205 Strike Call" = sign(Apple_Future_Returns) * 
+        percent( ( ( Apple_Calls_Cost[3] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
+                     pmax( 0, Apple_Future_Prices - Apple_Calls_K[3] ) ) / 
+                   ( Apple_Future_Prices - Apple_Current_Price ) ),
+      "Buy 100 Shares, Sell 1 $230 Strike Call" = sign(Apple_Future_Returns) * 
+        percent( ( ( Apple_Calls_Cost[4] ) + ( Apple_Future_Prices - Apple_Current_Price ) - 
+                     pmax( 0, Apple_Future_Prices - Apple_Calls_K[4] ) ) / 
+                   ( Apple_Future_Prices - Apple_Current_Price ) ) )
 
 kable_styling( knitr::kable(Apple_Covered_Call_Relative, 
                             caption = "Relative Return if Held to Expiry"), 
@@ -381,7 +296,7 @@ A protective put is buying 100 shares and 1 put of the same stock. The protectiv
 
 Let's compare the possible gains and losses of three different investments - 100 shares of Apple, 50 shares of Apple, and 100 shares and 1 `r currency(Apple_Calls_K[3])` strike put of Apple. To help us stay focused on the big picture, we'll just be looking at the price of the put on its expiry date of December 20, 2019. As always, our first shot at understanding this strategy is by looking at its payoff diagram.
 
-```{r Apple-Protective-Put-205-Strike-Payoff-Diagram, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Protective-Put-205-Strike-Payoff-Diagram, out.width = "80%", fig.align = "center", message = FALSE}
 Apple_Put_Cost <- 5.45
 Apple_Put_K <- 205
 Apple_Current_Price <- 222.76
@@ -404,7 +319,8 @@ ggplot() +
                                                  length=length(Put_x)), 
                                          color = "Breakeven"),
                                          linetype = "dashed") +
-  geom_line(data = Put_Payoff_Plot, aes(Put_x, Put_x - Apple_Current_Price, color = "Own_Shares"), linetype = "solid") +
+  geom_line(data = Put_Payoff_Plot, aes(Put_x, Put_x - Apple_Current_Price, color = "Own_Shares"), 
+            linetype = "solid") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
   labs(title = "Buying Apple's $205 Protective Put",
@@ -417,47 +333,7 @@ ggplot() +
                                 paste0("Breakeven Price = ", currency(Apple_Current_Price + Apple_Put_Cost)) ),
                      guide = "legend") + 
   guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
-  theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5, face="bold", 
-                                  margin = margin(10, 0, 10, 0),
-                                  colour = plot_fg),
-        legend.justification=c(0,1), 
-        legend.position=c(0,1), 
-        legend.title = element_blank(),
-        legend.key = element_rect(fill = plot_bg, color = plot_bg),
-        legend.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.text = element_text(colour = plot_fg),
-        text = element_text(size=16), 
-        panel.border = element_blank(), 
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
-        panel.background = element_rect(fill = plot_bg, color = plot_bg),
-        plot.background = element_rect(fill = plot_bg, color = plot_bg),
-        axis.line = element_line(colour = plot_bg),
-        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
-                                    colour = plot_fg),
-        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
-                                    angle = 90, colour = plot_fg) )
-
-
-# plot(x = Put_x, y = -option_cost + ( Put_x - 222.76 ) + pmax(0, Put_K - Put_x), 
-#      type = 'l', lwd = 3, ylim = c(-30, 30), 
-#      xlab = "Apple's Stock Price", ylab = "Profit Per Share",
-#      main = "Payoff of a $205 Protective Put on Expiry")
-# lines(x = Put_x, y = Put_x - 222.76, col = "orange", lwd = 3)
-
-# abline(v = 222.76 + option_cost, lty = 2, lwd = 1)
-# abline(h = 0, lty = 2, lwd = 1)
-# 
-# lines(x = Put_x, y = Put_x)
-# 
-# legend("topleft", c("Protective Put - Profit Per Share",
-#                     paste0("Breakeven Price = $", 222.76 + option_cost),
-#                     "Owning Stock - Profit Per Share"),
-#        lty = c("solid", "dotdash", "solid"), 
-#        lwd = c(2, 2, 2), cex = 0.75,
-#        col=c("black", "black", "orange"), bty = "n") 
+  options_theme()
 ```
 
 As a quick reminder, we bought Apple's shares at `r currency(Apple_Current_Price)` on September 11, 2019 and a `r currency(Apple_Puts_K[3])` strike put that expires on December 20, 2019 and costs `r currency(Apple_Puts_Cost[3])`. The breakeven is `r currency(Apple_Current_Price)` + `r currency(Apple_Puts_Cost[3])` = `r currency(Apple_Current_Price+Apple_Puts_Cost[3])`, but this doesn't tell the whole story of the protective put. Whenever Apple's shares are `r currency(Apple_Puts_Cost[3])` or below, we can only lose `r currency(Apple_Puts_K[3])` - `r currency(Apple_Current_Price)` = `r currency(Apple_Puts_K[3]-Apple_Current_Price)` from owning the shares plus `r currency(Apple_Puts_Cost[3])` from purchasing the put, for a maximum total loss of `r currency(Apple_Puts_K[3])` - `r currency(Apple_Current_Price)` - `r currency(Apple_Puts_Cost[3])` = `r currency(Apple_Puts_K[3]-Apple_Current_Price-Apple_Puts_Cost[3])`. This is the *magical* property of the put - on it's expiry date, a put goes up by a dollar for every dollar Apple's stock goes down. We bought a put with a strike price of `r currency(Apple_Puts_K[3])`. Once Apple's stock is below `r currency(Apple_Puts_K[3])`, the put cancels out, dollar-for-dollar, any loses from owning Apple's shares. 
@@ -474,20 +350,20 @@ The second reason is psychological. While stocks tend to go up other the long ru
 
 And remember, we don't have to buy puts all the time. Just when we think the benefits they provide are worth their costs.
 
-```{r Apple-Protective-Put-205-Strike-Table, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Protective-Put-205-Strike-Table, out.width = "80%", fig.align = "center", message = FALSE}
 Apple_Future_Prices <- c(100, 150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 Apple_Put_K <- 205
 
 Apple_Protective_Put <- tibble( "Share Price" = scales::dollar(Apple_Future_Prices, negative_parens = TRUE),
-                                "Buy 100 Shares" = scales::dollar(100*(Apple_Future_Prices - Apple_Current_Price), 
-                                                                  negative_parens = TRUE), 
-                                "Buy 50 Shares" = scales::dollar(50*(Apple_Future_Prices - Apple_Current_Price), 
-                                                                 negative_parens = TRUE),
-                                "Buy 100 Shares, Buy 1 $205 Strike Put" = 
-                                  scales::dollar( 100*(-Apple_Puts_Cost[3] + 
-                                                         (Apple_Future_Prices - Apple_Current_Price) + 
-                                                         pmax(0, Apple_Put_K - Apple_Future_Prices)), negative_parens = TRUE) )
+     "Buy 100 Shares" = scales::dollar(100*(Apple_Future_Prices - Apple_Current_Price), 
+                                       negative_parens = TRUE), 
+     "Buy 50 Shares" = scales::dollar(50*(Apple_Future_Prices - Apple_Current_Price), 
+                                      negative_parens = TRUE),
+     "Buy 100 Shares, Buy 1 $205 Strike Put" = scales::dollar( 
+       100 * (-Apple_Puts_Cost[3] + (Apple_Future_Prices - Apple_Current_Price) + 
+                pmax(0, Apple_Put_K - Apple_Future_Prices)), 
+       negative_parens = TRUE) )
 
 kable_styling (knitr::kable(Apple_Protective_Put, escape = FALSE,
                             caption = "Dollar Return if Held to Expiry"),
@@ -501,7 +377,7 @@ The breakeven of the protective put is `r currency(Apple_Current_Price)` + `r cu
 
 How do we chose the strike price of the protective put? By looking at the payoff diagram, the strike price of the put defines what the maximum loss we can take on our investment. With a strike price of `r currency(Apple_Put_K)`, we lose `r -100*currency(Apple_Puts_K[3]-Apple_Current_Price-Apple_Puts_Cost[3])` when the shares are at `r currency(Apple_Put_K)` and `r -100*currency(Apple_Puts_K[3]-Apple_Current_Price-Apple_Puts_Cost[3])` at any price below `r currency(Apple_Put_K)` By thinking through the maximum loss we're willing to tolerate, we can chose the strike price (and expiry date) of the put. 
 
-```{r NLY-Protective-Put, echo = FALSE}
+```{r NLY-Protective-Put}
 NLY_Put_Cost <- 0.66
 NLY_Put_K <- 9
 NLY_Current_Price <- 8.90
@@ -510,7 +386,7 @@ NLY_Div <- 0.25
 
 In addition to its other benefits, using protective puts can help us create trades with an attractive risk-reward propostion. For example, on September 24, 2019, Annaly Capital Management (ticker NLY) is trading at `r currency(NLY_Current_Price)` and the January 17, 2020 put with a strike price of `r currency(NLY_Put_K)` is trading for `r currency(NLY_Put_Cost)`. To make this trade even more appealing, NLY is scheduled to make two dividend payments of `r currency(NLY_Div)` each between September 24, 2019 and January 17, 2020. Assuming that NLY makes these two dividend payments, the payoff diagram for this protective put is: 
 
-```{r NLY-Protective-Put-Plot, echo = FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r NLY-Protective-Put-Plot, out.width = "80%", fig.align = "center", message = FALSE}
 x_min <- 7; x_max <- 11
 Put_x <- seq(from = x_min, to = x_max, by = 0.1)
 Put_Payoff_Plot <- tibble( "Put_x" = currency(seq(from = x_min, to = x_max, by = 1)),
@@ -540,52 +416,11 @@ ggplot() +
                                 'Breakeven'=plot_fg,"Own_Shares"=plot_fg_alt),
                      labels = c("Protective Put - Profit Per Share (with dividends)",
                                 "Owning Shares - Profit Per Share (with dividends)",
-                                paste0("Breakeven Price = ", currency(NLY_Current_Price + NLY_Put_Cost - 2*NLY_Div)) ),
+                                paste0("Breakeven Price = ", 
+                                       currency(NLY_Current_Price + NLY_Put_Cost - 2*NLY_Div)) ),
                      guide = "legend") + 
   guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
-  theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5, face="bold", 
-                                  margin = margin(10, 0, 10, 0),
-                                  colour = plot_fg),
-        legend.justification=c(0,1), 
-        legend.position=c(0,1), 
-        legend.title = element_blank(),
-        legend.key = element_rect(fill = plot_bg, color = plot_bg),
-        legend.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.text = element_text(colour = plot_fg),
-        text = element_text(size=16), 
-        panel.border = element_blank(), 
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
-        panel.background = element_rect(fill = plot_bg, color = plot_bg),
-        plot.background = element_rect(fill = plot_bg, color = plot_bg),
-        axis.line = element_line(colour = plot_bg),
-        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
-                                    colour = plot_fg),
-        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
-                                    angle = 90, colour = plot_fg) )
-
-
-# Put_x <- seq(from = 7, to = 11, by = 0.1)
-# 
-# plot(x = Put_x, y = -NLY_Put_Cost + ( Put_x - NLY_Current_Price ) + pmax(0, NLY_Put_K - Put_x) + 2*NLY_Div, 
-#      type = 'l', lwd = 3, ylim = c(-3, 3), 
-#      xlab = "Annaly Capital Management's Stock Price", ylab = "Profit Per Share",
-#      main = "Payoff of a $9 Protective Put on Expiry")
-# lines(x = Put_x, y = Put_x - NLY_Current_Price - 2*NLY_Div, col = "orange", lwd = 3)
-# 
-# abline(v = NLY_Current_Price + NLY_Put_Cost - 2*NLY_Div, lty = 2, lwd = 1)
-# abline(h = 0, lty = 2, lwd = 1)
-# 
-# lines(x = Put_x, y = Put_x)
-# 
-# legend("topleft", c("Protective Put - Profit Per Share (with dividends)",
-#                     paste0("Breakeven Price = $", NLY_Current_Price + NLY_Put_Cost - 2*NLY_Div),
-#                     "Owning Stock - Profit Per Share (with dividends)"),
-#        lty = c("solid", "dotdash", "solid"), 
-#        lwd = c(2, 2, 2), cex = 0.75,
-#        col=c("black", "black", "orange"), bty = "n") 
+  options_theme()
 ```
 
 The black line shows the protective put. It's maximum loss is miniscule. To see why, we'll break down how the difference components of this investment contribute to the maximum loss. We receive `r 2*currency(NLY_Div)` in dividends, and pay `r currency(NLY_Put_Cost)` for the put. We bought the shares for `r currency(NLY_Current_Price)`, and the put has a strike price of `r currency(NLY_Put_K)`. This means the put has `r currency(NLY_Put_K-NLY_Current_Price)` in instrinsic value, which it contributes to the calculation. Putting these together, our maximum loss is `r 2*currency(NLY_Div)` - `r currency(NLY_Put_Cost)` + `r currency(NLY_Put_K-NLY_Current_Price)` = `r currency(2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price)`, or just <span class = "fraction" data-top="`r -currency(2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price)`" data-bottom="`r currency(NLY_Current_Price)`"></span> = `r -percent( ( 2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price ) / NLY_Current_Price )` of our original investment in NLY. The key takeway for an investor is that regardless of what happens to NLY's shares, the most we can lose on January 17, 2020 is `r currency(2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price)` per share if NLY pays its two scheduled dividends. 
