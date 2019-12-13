@@ -124,9 +124,9 @@ ggplot() +
 ```
 
 
-If SPY is up by 3% on December 20, it'll be trading at \$314.08 x 1.03 = \$323.50. If you bought the \$322 call, you'll make \$323.50 - \$322 - \$0.36 = \$1.14 per share, for a \$1.14 / \$0.36 = 317% gain. The \$325 call will expire worthless, since \$323.50 is below it's strike price of \$325. If SPY is up by 5% on December 20, it'll be trading at 314.08 x 1.05 = \$329.87. If you bought the \$322 call, you'll make \$329.87 - \$322 - \$0.36 = \$7.51, for a \$7.51 / \$0.36 = 2086% gain. 
+If SPY is up by 3% on December 20, it'll be trading at \$314.08 x 1.03 = \$323.50. If you bought the \$322 call, you'll make \$323.50 - \$322 - \$0.36 = \$1.14 per share, for a \$1.14 / \$0.36 = 317% gain. The \$325 call will expire worthless, since \$323.50 is below it's strike price of \$325. If SPY is up by 4% on December 20, it'll be trading at 314.08 x 1.04 = \$326.64. If you bought the \$322 call, you'll make \$326.64 - \$322 - \$0.36 = \$4.28, for a \$4.28 / \$0.36 = 1189% gain. 
 
-If the 3%-5% move happens before the expiry date, you'll have to decide if you want to take profits early. You'll have less profits because the calls will have *delta* than they do on their expiry date. But, you won't run the risk of having the calls expire worthless. Quickly again, here are the (approximate) payoff diagrams for these two calls 10 days before they expire. 
+If the 3%-4% move happens before the expiry date, you'll have to decide if you want to take profits early. You'll have less profits because the calls will have *delta* than they do on their expiry date. But, you won't run the risk of having the calls expire worthless. Quickly again, here are the (approximate) payoff diagrams for these two calls 10 days before they expire. 
 
 <!-- Insert (approximate) payoff diagrams of the SPY \$322 calls and \$325 calls one week before expiry. 
   +  ADD commentary -->
@@ -210,7 +210,7 @@ ggplot() +
 Another thing you could do is put on a bull call spread. This is where you buy an option with a lower strike and sell an option with a higher strike. In this example, you'd buy the \$322 call and sell the \$325 call. The \$322 call costs \$0.36 per share, and the \$325 call costs \$0.16 per share. This trade costs \$0.36 - \$0.16 = \$0.20 per share to enter. Getting exposure to 300 shares costs \$60, which is as close as you can get to the $64 you would have paid for 4 \$325 calls. How do the payoff diagrams of these two trades compare? 
 
 <!-- Insert payoff diagram: buying the \$322 call + selling the \$325 call = $322-$325 bull call spread -->
-```{r Payoff-SPY-3*325-vs-4*Bull-Call-Spread-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Payoff-4*Bull-Call-Spreads-vs-SPY-3*325-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost_322 <- 0.36; Call_cost_325 <- 0.16
 Call_K_322 <- 322; Call_K_325 <- 325
 x_min <- 310; x_max = 335
@@ -282,7 +282,7 @@ The payoff diagram of the \$322-\$325 bull call spread (on its expiry date) is s
 A simpler way of thinking of that is that you're selling all of your upside above \$325 in exchange for cutting the cost of entering the position. The bull call spread costs \$0.20, which is about half as the cost ( \$0.36) of the \$322 call. Reducing the breakeven from \$322.36 to \$322.20 doesn't sound that exciting, but you can exploit the lower cost of entering the bull call spread another way - you can buy 4 \$322-\$325 bull call spreads for \$80, which is close to the \$72 cost of 2 \$322 calls. Let's compare the payoff diagrams of 4 \$322-\$325 call spreads to 2 \$325 calls. 
 
 <!-- Insert payoff diagram: 4 $322-$325 bull call spreads vs. 2 $322 calls -->
-```{r Payoff-SPY-2*322-vs-4*Bull-Call-Spread-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Payoff-SPY-4*Bull-Call-Spreads-vs-2*322-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost_322 <- 0.36; Call_cost_325 <- 0.16
 Call_K_322 <- 322; Call_K_325 <- 325
 x_min <- 310; x_max = 335
@@ -348,7 +348,7 @@ ggplot() +
 I should also compare the \$322-\$325 bull call spread to buying 2 \$322 calls and 2 \$325 calls. To make the comparison fair, I have to try to match the cost of entering each position. Buying 2 \$322 calls and 2 \$325 calls costs \$104. Each \$322-\$325 bull call spread costs \$20, so 5 \$322-\$325 bull call spreads costs \$100. That's as close as we can get to \$104. So how do their payoff diagrams compare? 
 
 <!-- Insert payoff diagram: 5 $322-$325 bull call spreads vs. 2 $322 calls and 2 $325 calls -->
-```{r Payoff-SPY-2*322-and-2*325-vs-3*325-Calls-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Payoff-SPY-5*322-325-Bull-Call-Spreads-vs-2*322-and-2*325-Expiry, out.width = "80%", fig.align = "center", message = FALSE}
 Call_cost_322 <- 0.36; Call_cost_325 <- 0.16
 Call_K_322 <- 322; Call_K_325 <- 325
 x_min <- 310; x_max = 335
@@ -411,6 +411,56 @@ ggplot() +
   options_theme()
 ```
 
+<!-- Insert table: Comparing the payoffs of all 5 strategies for 3% and 5% gains on the expiry date. -->
+```{r Table-Bull-Call-Spread-Comparison, out.width = "80%", fig.align = "center", message = FALSE}
+SPY_Current_Price <- 314.08
+SPY_Future_Prices <- c( SPY_Current_Price, 
+                        1.03 * SPY_Current_Price, 
+                        1.04 * SPY_Current_Price )
+SPY_Call_K_322 <- 322; SPY_Call_K_325 <- 325
+SPY_Call_Cost_322 <- 0.36; SPY_Call_Cost_325 <- 0.16
+
+SPY_Shares_vs_Calls <- tibble( "Share Price" = scales::dollar(SPY_Future_Prices, 
+                                                              negative_parens = TRUE),
+     "Buy 100 Shares" = scales::dollar(100*(SPY_Future_Prices - SPY_Current_Price), 
+                                       negative_parens = TRUE), 
+     "Buy 1 $322 Call" = scales::dollar(100*(-SPY_Call_Cost_322 + pmax(0,SPY_Future_Prices-SPY_Call_K_322)), 
+                                      negative_parens = TRUE),
+     "Buy 1 $325 Call" = scales::dollar(100*(-SPY_Call_Cost_325 + pmax(0,SPY_Future_Prices-SPY_Call_K_325)), 
+                                     negative_parens = TRUE)
+)
+
+SPY_Call_Spread_Options_Comparison <- tibble( "Share Price" = scales::dollar(
+        SPY_Future_Prices, 
+        negative_parens = TRUE),
+     "Buy 4 $325 Calls" = scales::dollar(
+       4*100*(-SPY_Call_Cost_325 + pmax(0,SPY_Future_Prices-SPY_Call_K_325)),
+       negative_parens = TRUE),
+     "Buy 3 $322-$325 Bull \n Calls Spreads" = scales::dollar(
+       3*100*(-SPY_Call_Cost_322 + pmax(0,SPY_Future_Prices-SPY_Call_K_322)
+              -(-SPY_Call_Cost_325 + pmax(0,SPY_Future_Prices-SPY_Call_K_325))), 
+       negative_parens = TRUE),
+     "Buy 2 $322 Calls and \n 2 $325 Calls" = scales::dollar(
+       2*100*(-SPY_Call_Cost_322 + pmax(0,SPY_Future_Prices-SPY_Call_K_322)
+              + -SPY_Call_Cost_325 + pmax(0,SPY_Future_Prices-SPY_Call_K_325)), 
+       negative_parens = TRUE),
+     "Buy 5 $322-$325 Bull \n Calls Spreads" = scales::dollar(
+       5*100*(-SPY_Call_Cost_322 + pmax(0,SPY_Future_Prices-SPY_Call_K_322)
+              -(-SPY_Call_Cost_325 + pmax(0,SPY_Future_Prices-SPY_Call_K_325))),
+       negative_parens = TRUE)
+)
+
+kable_styling (knitr::kable(SPY_Shares_vs_Calls, escape = FALSE,
+                            caption = "Dollar Return if Held to Expiry"),
+               bootstrap_options = c("bordered", "condensed", "responsive"),
+               full_width = FALSE )
+
+kable_styling (knitr::kable(SPY_Call_Spread_Options_Comparison, escape = FALSE,
+                            caption = "Dollar Return if Held to Expiry"),
+               bootstrap_options = c("bordered", "condensed", "responsive"),
+               full_width = FALSE )
+```
+
 If we're only expecting A new options trade I've been thinking about - the $322-$325 call spread on the SPY, both for the December expiry. 
 
 
@@ -433,7 +483,7 @@ The bull calender spread is a bull call spread where you mis-match the expiry da
 
 ## The Bullish 3-Way
 
-This is the most complicated options strategy we've seen so far. It consists of three options, which is weird to think about. To help us, we're going to draw the payoff diagram of the strategy first, and then break it down into its different pieces. 
+This options strategy involves 3 options, and its is the most complicated options strategy we've seen so far. To help us understand it we're going to draw the payoff diagram first, and then break it down into pieces. 
 
 
 ## Adjusting Market Positioning
