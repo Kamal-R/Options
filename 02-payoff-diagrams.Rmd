@@ -24,13 +24,7 @@ options_theme <- function(legend_position="left") {
   theme(plot.title = element_text(hjust = 0.5, face="bold", 
                                   margin = margin(10, 0, 10, 0),
                                   colour = plot_fg),
-        legend.justification=c(0,1), 
-        legend.position=c(ifelse(legend_position == "left",0,0.60),1), 
-        legend.title = element_blank(),
-        legend.key = element_rect(fill = plot_bg, color = plot_bg),
-        legend.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
-        legend.text = element_text(colour = plot_fg),
+        legend.position="none", 
         text = element_text(size=16), 
         panel.border = element_blank(), 
         panel.grid.major = element_blank(),
@@ -47,7 +41,7 @@ options_theme <- function(legend_position="left") {
 }
 
 
-call_payoff <- function(data, main) {
+call_payoff <- function(data, main, Call_cost, Call_K) {
   ggplot() + 
   geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
             linetype = "solid") +   
@@ -59,20 +53,19 @@ call_payoff <- function(data, main) {
                aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
                arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
                show.legend = FALSE, col = "green") + 
-  geom_hline(aes(yintercept = 0, color = "Breakeven"),
-            linetype = "dashed") +
-  geom_vline(aes(xintercept = Call_K + Call_cost, color = "Breakeven"), 
-            show.legend = FALSE, linetype = "dashed") +
+  geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
+                   y = 0, yend = 0, color = "Breakeven"), 
+               show.legend = FALSE, linetype = "solid") +
+  geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
+                   y = 0, yend = 0, color = "Breakeven"), 
+                 show.legend = FALSE, linetype = "solid") +
+  annotate(geom = "text", x = Call_K+Call_cost+5, y = 0, color = "black",
+           label = paste0("Breakeven: $",Call_K + Call_cost) ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
   labs(title = main,
        x = "Stock Price",
        y = "Profit Per Share") +
-  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green", "Loss" = "red"),
-                     labels = c(paste0("Breakeven: ", currency(Call_K + Call_cost)), "", ""),
-                     guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c(plot_fg, "white","white"),
-                                                  linetype = c("dashed","solid","solid")))) + 
   options_theme()
 }
 
@@ -148,11 +141,16 @@ Call_cost <- 5
 Call_K <- 230
 x_min <- 215; x_max = 255
 Call_Payoff_XYZ_230 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
-                       "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
-                       "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
-                                             "Profit","Loss") )
+                               "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                                "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit","Loss") )
 
-call_payoff(data = Call_Payoff_XYZ_230, main = "Buy: Company XYZ's $230 Strike Call")
+# call_payoff(data = Call_Payoff_XYZ_230, 
+#             main = "Buy: Company XYZ's $230 Strike Call")
+hide_legend(ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
+                                 main = "Buy: Company XYZ's $230 Strike Call"))) %>% 
+  style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
+                              '<br><b>Profit Per Share</b>: %{y:.2f}'))
 ```
 Reading this payoff diagram is not too bad - suppose the shares are worth `r currency(Future_price)` at expiry. If we own the call, it gives us the power to purchase 100 shares for `r currency(Call_K)` each (on the expiry date) and immediately sell them for `r currency(Future_price)`, for a gain of `r currency(Future_price)` - `r currency(Call_K)` = `r currency(Future_price-Call_K)` per share. The call cost `r currency(Call_cost)`, so we end up making `r currency(Future_price-Call_K)` - `r currency(Call_cost)` = `r currency(Future_price-Call_K-Call_cost)` per share. Looking at the payoff diagram, the per-share profit when the stock is at `r currency(Future_price)` is indeed `r currency(Future_price-Call_K-Call_cost)`. 
 
@@ -319,9 +317,9 @@ Apple_Put_Table %>%
                      "Own 1 Put" = 2, "Relative Return" = 1) )
 ```
 
-For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10\% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is <span class = "fraction" data-top="`r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)`" data-bottom="`r currency(Apple_Put_Cost)`"></span> = `r round( (Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)/Apple_Put_Cost,2 )` times his orginal investment of `r currency(Apple_Put_Cost)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
+For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is <span class = "fraction" data-top="`r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)`" data-bottom="`r currency(Apple_Put_Cost)`"></span> = `r round( (Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)/Apple_Put_Cost,2 )` times his orginal investment of `r currency(Apple_Put_Cost)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
 
-The put buyer loses `r currency(100*Apple_Put_Cost)` whenever the shares are above `r currency(Apple_Put_K)` while the shareholder makes between 3.12% to 16.82%. When the shares are below the put buyer's breakeven of `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer makes money when the shareholder loses money. When the shares are at `r currency(0.90*Apple_Current_Price)`, the put buyer captures 68.16\% of the downside of the stock. When the shares are at `r currency(Apple_Stock_Prices[2])`, the put buyer captures 74.29\%; when the shares are `r currency(Apple_Stock_Prices[1])`, the put buyer captures 88.20\%. This percentage gradually increases because the put buyer must recover the cost of buying the put before he can begin to earn profits.
+The put buyer loses `r currency(100*Apple_Put_Cost)` whenever the shares are above `r currency(Apple_Put_K)` while the shareholder makes between 3.12% to 16.82%. When the shares are below the put buyer's breakeven of `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer makes money when the shareholder loses money. When the shares are at `r currency(0.90*Apple_Current_Price)`, the put buyer captures 68.16% of the downside of the stock. When the shares are at `r currency(Apple_Stock_Prices[2])`, the put buyer captures 74.29%; when the shares are `r currency(Apple_Stock_Prices[1])`, the put buyer captures 88.20%. This percentage gradually increases because the put buyer must recover the cost of buying the put before he can begin to earn profits.
 
 Much like the call, the put gives its buyer limited downside and strong upside participation. It also gives its buyer a way to make money when prices are falling, a magical property that we will use again and again when constructing investment portfolios. 
 
