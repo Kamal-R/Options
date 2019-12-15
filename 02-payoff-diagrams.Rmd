@@ -42,7 +42,7 @@ options_theme <- function(legend_position="left") {
 }
 
 
-call_payoff <- function(data, main, Call_cost, Call_K) {
+call_payoff <- function(data, main, Call_K, Call_cost) {
   ggplot() + 
   geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
             linetype = "solid") +   
@@ -148,15 +148,15 @@ Call_K <- 230
 x_min <- 215; x_max = 255
 Call_Payoff_XYZ_230 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
                                "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
-                                "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                               "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                       "Profit","Loss") )
 
-# call_payoff(data = Call_Payoff_XYZ_230, 
-#             main = "Buy: Company XYZ's $230 Strike Call")
-hide_legend(ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
-                                 main = "Buy: Company XYZ's $230 Strike Call"))) %>% 
-  style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
-                              '<br><b>Profit Per Share</b>: %{y:.2f}'))
+call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
+            main = "Buy: Company XYZ's $230 Strike Call")
+# hide_legend(ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
+#                                  main = "Buy: Company XYZ's $230 Strike Call"))) %>% 
+#   style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
+#                               '<br><b>Profit Per Share</b>: %{y:.2f}'))
 ```
 Reading this payoff diagram is not too bad - suppose the shares are worth `r currency(Future_price)` at expiry. If we own the call, it gives us the power to purchase 100 shares for `r currency(Call_K)` each (on the expiry date) and immediately sell them for `r currency(Future_price)`, for a gain of `r currency(Future_price)` - `r currency(Call_K)` = `r currency(Future_price-Call_K)` per share. The call cost `r currency(Call_cost)`, so we end up making `r currency(Future_price-Call_K)` - `r currency(Call_cost)` = `r currency(Future_price-Call_K-Call_cost)` per share. Looking at the payoff diagram, the per-share profit when the stock is at `r currency(Future_price)` is indeed `r currency(Future_price-Call_K-Call_cost)`. 
 
@@ -218,7 +218,8 @@ Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
                               "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
                               "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                     "Profit","Loss") )
-call_payoff(data = Call_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Call")
+call_payoff(data = Call_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Call",
+            Call_K = Call_K, Call_cost = Call_cost)
 ```
 
 Here's a payoff diagram of this call option. Below `r currency(Call_K)`, the buyer loses `r currency(Call_cost)` per share, which is what he paid for the call. This is the entire cost of the call, since it expires worthless. Since he paid `r currency(Call_cost)` per share for the call, he has to make `r currency(Call_cost)` back before he becomes profitable. Therefore, his breakeven is `r currency(Call_K)` + `r currency(Call_cost)` = `r currency(Call_cost+Call_K)`. This is reflected in the payoff diagram, where his profits are negative when the stock is below `r currency(Call_cost+Call_K)` and positive when it is above `r currency(Call_cost+Call_K)`.
@@ -409,7 +410,8 @@ Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
                                  "Call_y" = -Call_cost + (Call_x > Call_K) * (Call_x - Call_K),
                                  "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                        "Profit","Loss") )
-call_payoff(data = Call_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Call")
+call_payoff(data = Call_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Call",
+            Call_K = Call_K, Call_cost = Call_cost)
 ```
 
 The `r currency(Apple_Prices_K[3])` strike call is similar. We've drawn the payoff diagram this time, and it gives the breakeven to be `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])` When shares are below `r currency(Apple_Prices_K[3])`, the call expires worthless and the buyer loses `r currency(100*Apple_Call_Costs[3])`. The call buyer still loses money when shares are at `r currency(Apple_Future_Prices[3])` because `r currency(Apple_Future_Prices[3])` is below this call's breakeven of `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`. The call cost `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`, but the buyer will have only made `r currency(Apple_Future_Prices[3])` - `r currency(Apple_Prices_K[3])` = `r currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per share (`r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per call) before paying for the call. This leaves him with a loss of `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` - `r currency(Apple_Call_Costs[3])` = `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3] - Apple_Call_Costs[3])` per share.
