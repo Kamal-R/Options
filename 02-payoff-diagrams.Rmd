@@ -4,9 +4,10 @@
 knitr::opts_chunk$set(echo = FALSE)
 
 if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
 if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
-if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
 if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
@@ -66,6 +67,11 @@ call_payoff <- function(data, main, Call_cost, Call_K) {
   labs(title = main,
        x = "Stock Price",
        y = "Profit Per Share") +
+  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green", "Loss" = "red"),
+                     labels = c("", "", ""),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
+                                                  linetype = c("dashed","solid","solid")))) + 
   options_theme()
 }
 
