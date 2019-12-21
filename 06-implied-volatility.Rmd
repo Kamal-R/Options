@@ -126,6 +126,8 @@ Let's change the scenario: say the stock had to move up 20% (from \$50 to \$60) 
 
 The call is worth \$2.50 when the stock can end up at \$45 or \$55, and is worth \$5.00 when the stock can end up at \$40 or \$60. In this cartoon world, the price of the call *doubles* when the range of values the market is expecting doubles. The *same* thing happens with at-the-money options, like the \$50 strike call on XYZ's \$50 stock. If the implied volatility doubles, the price of the option will roughly double. If the implied volatility triples, the price of the option will roughly triple. And so on. 
 
+Let's move out of the cartoon world and back into the real world, where XYZ's stock can take any price when the call expires next year. Its options, like the options you can trade, can have *any* implied volatility value.
+
 ```{r XYZ-Call-Price-vs-Sigma-50-strike, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
 Call_cost <- bscall(s = 50, k = 50, v = v_vector, r=0.00, tt=1, d=0)
@@ -163,7 +165,7 @@ XYZ's stock is *always* at \$50 in this diagram, so we get an almost straight-li
 
 When XYZ's stock moves away from \$50, we no longer have this straight-line relationship. It's a more complicated relationship. A call will pick up intrinsic value as XYZ's stock moves higher, or create a *gap* it has to cross before ending up in-the-money if XYZ's stock moves lower. Similarly, the put will pick up intrinsic value as XYZ's stock moves lower, or create a gap it has to cross before ending up in-the-money if XYZ's stock moves higher. But there's still a relationship - as the implied volatiity increases, the price of the option increases. 
 
-```{r XYZ-Call-Price-vs-Sigma-45-strike, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r XYZ-Call-Price-vs-Sigma-45-strike, out.width = "80%", fig.align = "center", message = FALSE}
 v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
 Call_cost <- bscall(s = 50, k = 45, v = v_vector, r=0.00, tt=1, d=0)
 x_min = 0.1; x_max = 25
@@ -180,29 +182,12 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                               paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
                               paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
 
-Call_Implied_No_Instrinsic <- tibble( "Call_x" = Call_x,
-                                      "Call_cost" = Call_cost-5 )
-Call_Implied_points_No_Intrinsic <- tibble( "Call_x_points" = c(5,10,20),
-                                            "Call_implied_points" = c( Call_cost[which(Call_x == 5)]-5,
-                                                          Call_cost[which(Call_x == 10)]-5,
-                                                          Call_cost[which(round(Call_x,1) == 20)]-5 ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)]-5,2),")", sep=""),
-                            paste("(10, $",round(Call_cost[which(Call_x == 10)]-5,2),")", sep=""),
-                            paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)]-5,2),")", sep="") ) )
-
-ggplot() + xlim(0,25) + ylim(-0.5,8) + 
+ggplot() + xlim(0,25) + ylim(4.5,8) + 
   geom_line(data = Call_Implied, 
             aes(Call_x, Call_cost), linetype = "solid") +
   geom_point(data = Call_Implied_points, 
              aes(Call_x_points, Call_implied_points)) +
   geom_text(data = Call_Implied_points, size = 4,
-            aes( x = Call_x_points, y = Call_implied_points, label = coords ),
-            hjust=c(0,0,0), vjust=c(1.5,1.5,1.5)) +
-  geom_line(data = Call_Implied_No_Instrinsic, colour = plot_fg_alt,
-            aes(Call_x, Call_cost), linetype = "solid") +
-  geom_point(data = Call_Implied_points_No_Intrinsic, colour = plot_fg_alt,
-             aes(Call_x_points, Call_implied_points)) +
-  geom_text(data = Call_Implied_points_No_Intrinsic, size = 4, colour = plot_fg_alt,
             aes( x = Call_x_points, y = Call_implied_points, label = coords ),
             hjust=c(0,0,0), vjust=c(1.5,1.5,1.5)) +
   labs(title = "$45 Strike Call - 12 Months from Expiry",
@@ -211,9 +196,9 @@ ggplot() + xlim(0,25) + ylim(-0.5,8) +
   options_theme()
 ```
 
-We're still looking at Company XYZ trading at \$50, but this time the diagram shows how the price of a \$45 strike call varies as we change implied volatility. Like I did before, everything else is kept the same. All of the price changes in XYZ's \$45 strike call in this diagram are coming from changes in the implied volatility. The \$55 strike call has \$5 dollars of intrinsic value, so if the market expects XYZ's shares to stay near \$55, the call should be worth around \$5. That's what we see, with the price of the call gently increasing from \$5 as the implied volatility increases from 0 to 25. 
+We're still looking at Company XYZ trading at \$50, but this time the diagram shows how the price of a \$45 strike call varies as we change implied volatility. Like I did before, everything else is kept the same. All of the price changes in XYZ's \$45 strike call in this diagram are coming from changes in the implied volatility. The \$55 strike call has \$5 dollars of intrinsic value, so if the market expects XYZ's shares to stay near \$55, the call should be worth around \$5. That's what we see, with the price of the call gently increasing from \$5 to about \$7.50 as the implied volatility increases from 0 to 25. 
 
-The grey line shows the time value of the call, which it its price minus the \$5 of intrinsic value it has. It's very easy to see that this grey line isn't increasing in a straight line. But it *is* increasing, and the price of the call *does* go up as its implied volatility increases. It just goes up slower than a \$50 strike call. The takeaway is that the price of calls with intrinsic value increase with implied volatility, but slower than at-the-money calls. 
+While the price of the call isn't increasing in a straight line, it *is* increasing. The price of the call *does* go up as its implied volatility increases. It just goes up slower than a \$50 strike call. The takeaway is that the price of calls (or puts) with intrinsic value increase with implied volatility, but slower than at-the-money calls. 
 
 ```{r XYZ-Call-Price-vs-Sigma-55-strike, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
 v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
@@ -313,7 +298,7 @@ ggplot() +
 
 That is indeed what we see when we plot the *vega* values of this call and vary implied volatility. It decreases slightly, but ranges from 0.1980 and 0.1995. Rounding that to make it easier to work with, *vega* is  approximately equal to 0.20. A *vega* of 0.20 means the price of the call increases by \$0.20 for every 1 point increase in implied volatility. For example, as the implied volatility jumps from 5 to 10, the price of the call jumps from \$1.00 to \$1.99. A 5 point increase in the implied volatility causes a \$0.99 increase in the price of the call, which is (approximately) \$0.20 per point of implied volatility. As the implied volatility jumps from 10 to 20, the price of the call jumps from \$1.99 to \$3.98, which is (appromximately) \$0.20 per point of implied volatility. 
 
-The big takeaway from this example is that no matter how much or how little the implied volatility increases by, a 1 point increase in the implied volatility will increase the price of the call by \$0.20. A 1 point decrease in the implied volatility will decrease the price of the call by \$0.20. That's, of course, when we keep everything else - the other *greeks*, the time to expiry, and the price of the stock - the same. 
+The big takeaway from this example is that no matter how much or how little the implied volatility increases by, a 1 point increase in the implied volatility will increase the price of an at-the-money call (or put) by \$0.20. A 1 point decrease in the implied volatility will decrease the price of an at-the-money call (or put) by \$0.20. That's, of course, when we keep everything else - the other *greeks*, the time to expiry, and the price of the stock - the same. 
 
 Let's bring back the diagram of the \$55 strike call on XYZ, this time drawing in its *vega* values (the slope of the curve) when the implied volatility is 5, 10 and 20. 
 
@@ -356,7 +341,11 @@ ggplot() + xlim(0,25) + ylim(-0.5,3.25) +
   options_theme()
 ```
 
-```{r XYZ-Call-Price-vs-Sigma-55-Vega-10, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+*Vega* is the slope the black line, which measures how the price of the call changes as implied volatility changes. The grey line shows the slope of the black line. It is a decent approximation for the black line when the implied volatility is between 4 and 6, but a very poor approximation any further away than that. But that's good enough - it tells us that we can use the *vega* value (the slope of that grey line) to approximate how much the price of the call will increase for a 1 point move up in implied volatility, or decrease for a 1 point move down in implied volatility. 
+
+Eyeballing the diagram, the grey line increases from somewhere between -0.1 and -0.2 when the implied volatility is 0 to around 0.03 when the implied volatility is 5. Let's split the difference between -0.1 and -0.2 and say the grey line increases from -0.15 to 0.03 (the *rise*) while the implied volatility increases from 0 to 5 (the *run*). Since slope is rise over run, we can approximate the *vega* to be 0.18/5 = 0.036. That means if the call currently has an implied volatility of 5 and it increases by 1 point to 6, the price of the call increases by 0.036, which is $0.03 to \$0.04. If the implied volatility decreases by 1 point, the price of the call decreases by 0.036, which is \$0.03 to \$0.04.
+
+```{r XYZ-Call-Price-vs-Sigma-55-Vega-10, out.width = "80%", fig.align = "center", message = FALSE}
 v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
 Call_cost <- bscall(s = 50, k = 55, v = v_vector, r=0.00, tt=1, d=0)
 x_min = 0.1; x_max = 25
@@ -375,9 +364,9 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
                                                           Call_cost[which(Call_x == 10)],
                                                           Call_cost[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
-                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
-                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(5, $",round(Call_cost[which(Call_x == 5)],2),")"),
+                                      paste0("(10, $",round(Call_cost[which(Call_x == 10)],2),")"),
+                                      paste0("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")" ))) 
 
 ggplot() + xlim(0,25) + ylim(-1,3.25) + 
   geom_line(data = Call_Implied, 
@@ -395,7 +384,9 @@ ggplot() + xlim(0,25) + ylim(-1,3.25) +
   options_theme()
 ```
 
-```{r XYZ-Call-Price-vs-Sigma-55-Vega-20, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+When the call has an implied volatility of 10, the grey line that shows its slope is a better approximation to the line. So we can definitely use it to tell us how much the price of the call changes with a 1 point move (up or down) of the call. Eyeballing the diagram, the grey line is about -0.2 when the implied volality is 5, and about 0.5 when the implied volatility is 10. So it's slope is 0.7/5 = 0.14. That means if the implied volatility of this call is 10, a 1 point decrease to 9 takes the price down by \$0.14 to \$0.34 and a 1 point increase to 11 takes the price of the call up by \$0.14 to \$0.62.  
+
+```{r XYZ-Call-Price-vs-Sigma-55-Vega-20, out.width = "80%", fig.align = "center", message = FALSE}
 v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
 Call_cost <- bscall(s = 50, k = 55, v = v_vector, r=0.00, tt=1, d=0)
 x_min = 0.1; x_max = 25
@@ -433,9 +424,9 @@ ggplot() + xlim(0,25) + ylim(-2,3.25) +
        y = "Price of Call") +
   options_theme()
 ```
+We're playing the same game again, this time with the implied volatility at 20. The slope is drawn in with a grey line, and it's an even better approximation this time. Eyeballing the diagram, the grey line is slightly above 0 (near 0.2) when the implied volatility is 10, and 2.15 when the implied volatility is 20. Using rise over run again, the slope of the grey line is 2.15/10 = 0.215. So the slope is 1.95/10 = 0.195. That means if the implied volatility of the call is 20, a 1 point change in the implied volatilty changes the price of the call by about \$0.20. A 1 point increase will increase the price of the call from \$2.15 to \$2.35, and a 1 point decrease will decrease the price of the call from \$2.15 to \$1.95. 
 
-
-```{r XYZ-Vega-vs-Sigma-55-strike, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+```{r XYZ-Vega-vs-Sigma-55-strike, out.width = "80%", fig.align = "center", message = FALSE}
 v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
 Call_vega <- greeks( bscall(s = 50, k = 55, v = v_vector, r=0.00, tt=1, d=0) )[4,]
 x_min = 0.1; x_max = 25
@@ -444,17 +435,73 @@ Call_x <- seq(from = x_min, to = x_max, by = 0.1)
 Call_Implied_Vega <- tibble( "Call_x" = Call_x,
                              "Call_vega" = Call_vega )
 
+Call_Vega_points <- tibble( "Call_x_points" = c(5, 10, 20), 
+                            "Call_vega_points" = c( Call_vega[which(Call_x == 5)],
+                                                    Call_vega[which(Call_x == 10)], 
+                                                    Call_vega[which(round(Call_x,1) == 20)] ),
+                             coords = c( paste0("(Implied Vol: 5, Vega: ", 
+                                                round(Call_vega[which(Call_x == 5)],2), ")"),
+                                         paste0("(Implied Vol: 10, Vega: ", 
+                                                round(Call_vega[which(Call_x == 10)],2), ")"),
+                                         paste0("(Implied Vol: 20, \n Vega: ", 
+                                                round(Call_vega[which(round(Call_x,1) == 20)],2), ")") ) )
+
 ggplot() +
   geom_line(data = Call_Implied_Vega, 
             aes(Call_x, Call_vega), linetype = "solid") +
+  geom_point(data = Call_Vega_points, 
+             aes(Call_x_points, Call_vega_points)) + 
+  geom_text(data = Call_Vega_points, size = 4,
+            aes( x = Call_x_points, y = Call_vega_points, label = coords ),
+            hjust=c(0,0,0), vjust=c(1.5,1.5,1.5)) + 
   labs(title = "$55 Strike Call - 12 Months from Expiry",
        x = "Implied Volatility",
        y = "Vega") +
   options_theme()
 ```
-This 
+Just like with *delta*, we could repeat this process over and over again to find out what *vega* is as implied volatility ranges from 0 to 25. But a faster way to summarize this information is by directly plotting *vega* against implied volatility, which is what this chart does. When I eyeballed the charts, I estimated *vega* to be:
 
-```{r XYZ-Vega-vs-Sigma-45-strike, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+  1. 0.036 when the implied volatility is 5.
+  2. 0.14 when the implied volatilty is 10. 
+  3. 0.195 when the implied volatility is 20. 
+
+These are all extremely close to the values shown on the chart, so my "eyeballing it" approximations turned out pretty good. The key point is that instead of drawing a bunch of price vs. implied volatility charts and eyeballing the slope of the price curve every time, we can summarize the same information with this chart. It's faster and, once you get used to it, easier to use. 
+
+That's because you don't have to compute anything - this is exactly the information your online broker gives you about *vega* when you look at an option. They don't you the whole chart. Just the point that you're on. If you were looking at this option and it had an implied volatility of 10, they'd tell you that it's *vega* is 0.13. If it had an implied volatility of 5, they'd tell you that it's *vega* is 0.03. And on and on. 
+
+```{r XYZ-Call-Price-vs-Sigma-45-strike-Replicate, out.width = "80%", fig.align = "center", message = FALSE}
+v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
+Call_cost <- bscall(s = 50, k = 45, v = v_vector, r=0.00, tt=1, d=0)
+x_min = 0.1; x_max = 25
+Call_x <- seq(from = x_min, to = x_max, by = 0.1)
+
+Call_Implied <- tibble( "Call_x" = Call_x,
+                        "Call_cost" = Call_cost )
+
+Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
+                               "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
+                                                          Call_cost[which(Call_x == 10)],
+                                                          Call_cost[which(round(Call_x,1) == 20)] ),
+                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
+                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
+                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+
+ggplot() + xlim(0,25) + ylim(4.5,8) + 
+  geom_line(data = Call_Implied, 
+            aes(Call_x, Call_cost), linetype = "solid") +
+  geom_point(data = Call_Implied_points, 
+             aes(Call_x_points, Call_implied_points)) +
+  geom_text(data = Call_Implied_points, size = 4,
+            aes( x = Call_x_points, y = Call_implied_points, label = coords ),
+            hjust=c(0,0,0), vjust=c(1.5,1.5,1.5)) +
+  labs(title = "$45 Strike Call - 12 Months from Expiry",
+       x = "Implied Volatility",
+       y = "Price of Call") +
+  options_theme()
+```
+Here's the price vs. implied volatility chart for the \$45 strike option. You've seen it before, so this is just a quick reminder before we look at its *vega* vs. implied volatility chart. Just by looking at the black curve, we can see that it has a shallow slope until the implied volatility reaches around 5, where the slope starts steepening. Once the implied volatility reaches 15 or so, the slope stops steepening so much. *Vega* is the slope of the black line, so these observations should translate directly to a chart of *vega* vs. implied volatility. 
+
+```{r XYZ-Vega-vs-Sigma-45-strike, out.width = "80%", fig.align = "center", message = FALSE}
 v_vector <- seq(from = 0.001, to = 0.25, by = 0.001)
 Call_vega <- greeks( bscall(s = 50, k = 45, v = v_vector, r=0.00, tt=1, d=0) )[4,]
 x_min = 0.1; x_max = 25
@@ -463,25 +510,187 @@ Call_x <- seq(from = x_min, to = x_max, by = 0.1)
 Call_Implied_Vega <- tibble( "Call_x" = Call_x,
                              "Call_vega" = Call_vega )
 
+Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
+                               "Call_implied_points" = c( Call_vega[which(Call_x == 5)],
+                                                          Call_vega[which(Call_x == 10)],
+                                                          Call_vega[which(round(Call_x,1) == 20)] ),
+                          coords = c( paste("(Implied Vol: 5, Vega: ",
+                                            round(Call_vega[which(Call_x == 5)],2),")", sep=""),
+                              paste("(Implied Vol: 10, Vega: ",
+                                    round(Call_vega[which(Call_x == 10)],2),")", sep=""),
+                              paste("(Implied Vol: 20, \n Vega: ",
+                                    round(Call_vega[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+
 ggplot() +
   geom_line(data = Call_Implied_Vega, 
             aes(Call_x, Call_vega), linetype = "solid") +
+  geom_point(data = Call_Implied_points, 
+             aes(Call_x_points, Call_implied_points)) +
+  geom_text(data = Call_Implied_points, size = 4,
+            aes( x = Call_x_points, y = Call_implied_points, label = coords ),
+            hjust=c(0,0,0), vjust=c(1.5,1.5,1.5)) +
   labs(title = "$45 Strike Call - 12 Months from Expiry",
        x = "Implied Volatility",
        y = "Vega") +
   options_theme()
 ```
-The *vega* diagram for the \$45 strike call is pretty different than for the \$55 strike call. 
-
+And indeed they do. This chart shows that *vega* is relatively small until the implied volatility reaches 5, that is increases quite a bit between 5 and 15, and that it starts leveling off once the implied volatility is greater than 15. Just to keep the same as the chart for the \$55 strike call, I've also drawn in the *vega* values when the implied volatility is 5, 10, and 20. 
 
 
 ## Theta {#Theta}
 
-Before its expiry date, the value of an option can be split into two components - its *intrinsic value* and its *time value*. The *instrinsic value* is how much the option holder makes if they exercise the option immediately. The *time value* is whatever is left, and as the name suggests it is related to how far away from expiry the option is. *Theta* measures the rate of time decay of an option. The value displayed by your online broker is how much the price of your option declines *every day* as it gets closer to expiry.
+Before its expiry date, the value of an option can be split into two components - its *intrinsic value* and its *time value*. The *instrinsic value* is how much the option holder makes if they exercise the option immediately. The *time value* is whatever is left, and options lose time value as they get closer to expiry. *Theta* measures the rate of time decay of an option. The value displayed by your online broker is how much the price of your option declines *per day*.
 
-Why do time value and time decay exist? It actually has to do with volatility. The longer away from expiry an option is, the wider the range of plausible values its stock can take. The 
+Why do time value and time decay exist? It's actually very connected to volatility. Even if an option has no intrinsic value, market partcipants will assign some value to it because it may have intrinsic value in the future. At-the-money options are an excellent example example of this. For example, an at-the-money call has *no* intrinsic value, but immediately gains intrinsic value as their stock moves higher. The longer away from expiry an option is, the more time it has to become profitable. So it has more more time to lose than an option close to expiry. 
+
+How is this related to volatility? The amount of time value an option has tells us how likely market participants think an option is to be profitable. If it is profitable, the time value also indicates how profitable market participants think the option will be. Let's break down what this means in the cartoon world of an at-the-money call on XYZ's \$50 stock. 
+
+When XYZ's stock is equally likely to move up to \$55 or down to \$45, a fair price for the \$50.00 strike call is \$2.50. When XYZ's stock is equally likely to move up to \$60 or down to \$40, a fair price for the \$50.00 strike call is \$5.00. The call is equally likely to make money or expire worthless in both cases, but it makes twice as much money the second time around. So it costs twice as much. 
+
+If XYZ's stock inexpicably stays exactly at \$50 the entire year and never moves, both calls will expire worthless. Neither the \$2.50 call or \$5.00 call have any intrinsic value - they are at-the-money calls and consist entirely of time value. Since the \$5.00 call is worth twice as much as the \$2.50 call, if it expires worthless it must lose *twice* as much time value as the \$2.50 call as it moves towards expiry. 
+
+That's the essence of the relationship between implied volatility and time value. Since higher levels of implied volatility *inflate* the time value of an option, options with higher implied volatility values (and everything else the same) have more time value to lose. 
+
+Let's move out of the cartoon world and back into the real world. We'll be looking at the same three calls that we considered when talking about *vega* - the \$45 strike call, the \$50 strike call, and the \$55 strike call. The first thing we want to do is see how the time value of this call decays over the course of the year, if we keep everything else - the other *greeks* and the price of the stock - the same. That means we're not varying the implied volatility. For this example, I'll show time decay for two different levels of implied volatility. The black line shows the time value of the call when implied volatility is fixed at 15, and the grey line shows it when the implied volatility is fixed at 25.
+
+```{r XYZ-Time-Value-50-strike, echo=FALSE, out.width = "80%", fig.align = "center", message = FALSE}
+t_vector <- seq(from = 1, to = 0, length.out = 366)
+Call_time_value_15 <- bscall(s = 50, k = 50, v = 0.15, r=0.00, tt=t_vector, d=0)
+Call_time_value_25 <- bscall(s = 50, k = 50, v = 0.25, r=0.00, tt=t_vector, d=0)
+x_min = 0; x_max = 365
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+
+Call_Time_Value <- tibble( "Call_x" = Call_x[-366],
+                           "Call_time_value_15" = Call_time_value_15[-366],
+                           "Call_time_value_25" = Call_time_value_25[-366] )
+
+ggplot() +
+  geom_line(data = Call_Time_Value, 
+            aes(Call_x, Call_time_value_15), linetype = "solid") +
+  geom_line(data = Call_Time_Value, colour = "grey",
+            aes(Call_x, Call_time_value_25), linetype = "solid") +
+  labs(title = "$50 Strike Call - Time Value",
+       x = "Days to Expiry",
+       y = "Time Value") +
+  options_theme()
+```
+
+This \$50 strike call expires in a one year, or 365 days. This diagram shows how its time value decays over those 365 days at two different levels of implied volatlity - 15 for the black line and 25 for the grey line. The call with an implied of 25 has more time value than the call with an implied of 15, and it loses time value faster, particularly in the last 30 days before expiry. This captures the rule of thumb for at-the-money options, which is that their time value doesn't decay in a straight line. It decays at an *exponential* rate, which means it decays faster and faster as the option gets closer to expiry. The time value of both of these calls demonstrate this *exponential* decline, with their dramatic steepening in the rate of decline in the last 30 days before expiry.
+
+In its first 6 months, the time value of the 15 implied call falls from \$3.00 to \$2.10. That means that the owner of this call only loses \$0.90/\$3.00 = 30% of the time value they paid for in the first 6 months they own it. Of course, they have to pay the remaining 70% of the time value in the last 6 months. But it gets even worse. 2 months before expiry, the call is worth \$1.25. 1 month before expiry, the call is worth $0.90. In the last 2 months, the owner of the call loses \$1.25/\$3.00 = 42% of the time of the call. In the last month, they lose \$0.87/\$3.00 = 30% of the value of the call. 
+
+The obvious lesson here is that holding at-the-money calls (or puts) to expiry is expensive, and selling them between 2-8 weeks before expiry will allow you to avoid paying a good chunk of the time decay. Although that will stop you from paying the time decay, it also has downsides. We've seen how how *delta* and *gamma* evolve as the option gets closer to expiry. In particular, the option only gets dollar-for-dollar participation to the upside on the expiry date. The *delta* of an at-the-money option is typically close to 0.50, and it gradually increases to 1 through the effect of *gamma*. But the further away from expiry the option is, the lower its *gamma* will be. That means that the further away from expiry we get, the less quickly the *delta* increases from 0.50 (50% participation to the upside) to near 100% (100% participation). 
+
+In other words, the payoff diagrams that I've drawn describing these strategies is *not* accurate. If you own a call and the market goes up or own a put and the market goes down, you can expect to get 50%-70% of the move (instead of the 100% shown in the diagrams) if you sell the option 2-8 weeks before expiry. But it gets even worse - if a call expires worthless, you lose everything you paid for the option. I've tried to convince you that the main benefit of using options is changing the risk-reward characteristics of your trades. If you believe that, then the key when executing an options trade to preserving the risk-reward setup that made the trade attractive in the first place. When trading, that translates to not letting options expire. That means that lots of options strategies are designed to be *rolled*, which means you sell your current option position and buying a similar options position that expires later on. 
+
+We've seen this already - when describing the protective put trade I made with NLY, I entered the trade with favourable risk-reward characteristics by buying a \$9.00 put that expired on January 20, 2020. By December, NLY hadn't made the move higher that I was hoping for, so I had to make a choice. I could wait until January 20 and see if NLY would make that move. If it did, the put would expire worthless and I could buy a new put then. The problem is that I would incur the full cost of the first put, and of the second one that I'd have to buy. 
+
+Remember my rationale for entering the trade - I'm expecting a 20%-30% move in NLY in the relatively near future. In case I'm wrong, I'm using the relatively high dividend to pay for puts to remove almost all of the risk from the trade. The risk-reward characteristics that drew me to the trade is that the scheduled dividends pay for the puts. NLY had gone up from \$8.90 to \$9.42 by December 9th, but it wasn't the move I wanted. So I needed more time, and I wanted to preserve the "dividends paying for puts" idea. So I chose to roll the \$9.00 put out from January to April when the cost of doing so was around \$0.25. That would net me another \$0.25, so I got the extra time I wanted *and* got the dividends to cover the cost of *rolling* the put to later expiry date.
+
+The main takeaway here is that options traders don't just have to contend with the option expiring. They have to fight against their options losing time value (*theta* decay), and the lower *delta*'s and *gamma*'s that options further away from expiry have. If you own stocks, you don't have to worry about any of these things. You just buy the stock and fully participate in its price movements. And your ownership of the stock never expires. If it goes down you can just wait for it to go back up. On the other hand, with options you have to be aware of the *greeks* and their impact on how well your option will perform in giving you the payoff diagram that I always draw - the one showing the payoff of the option at on its expiry date.
+
+```{r XYZ-Theta-50-strike, out.width = "80%", fig.align = "center", message = FALSE, warning = FALSE}
+t_vector <- seq(from = 1, to = 0, length.out = 366)
+Call_theta_15 <- greeks( bscall(s = 50, k = 50, v = 0.15, r=0.00, tt=t_vector, d=0) )[6,-366]
+Call_theta_25 <- greeks( bscall(s = 50, k = 50, v = 0.25, r=0.00, tt=t_vector, d=0) )[6,-366]
+x_min = 0; x_max = 365
+Call_x <- seq(from = x_min, to = x_max, by = 1)[-366]
+
+Call_Theta <- tibble( "Call_x" = Call_x,
+                      "Call_theta_15" = Call_theta_15,
+                      "Call_theta_25" = Call_theta_25 )
+
+ggplot() +
+  geom_line(data = Call_Theta, 
+            aes(Call_x, Call_theta_15), linetype = "solid") +
+  geom_line(data = Call_Theta, colour = "grey",
+            aes(Call_x, Call_theta_25), linetype = "solid") +
+  labs(title = "$50 Strike Call - Theta",
+       x = "Days to Expiry",
+       y = "Time Value") +
+  options_theme()
+```
+For completeness, I've added a chart of *theta*, which is rate of time decay. It's helpful to see how dramatic the increase in the rate of time decay is as the at-the-money option nears expiry, but I think all the information in this chart is in the previous one. And that the previous chart, which shows how the time value of the option falls over time, is much easier to understand.
+
+The main takeaways about *theta* are that it's very related to volatility, because options with higher implied volatility have more time value to lose. And that option traders have to not only manage the risk of their option expiring. They also have to continously fight against losing time value on their option because of *theta decay*. This means that to be able to execute an options trade, you have to be able to adjust the strike and expiration date of your option to preserve the risk-reward characteristics that drew you to the trade, while not succumbing to the relentless downward pressure on the price of your option caused by *theta decay*. 
 
 
 ## Rho 
 
-Rho measures how changes in interest rates affect the price of an option. 
+<!-- 
+Rho measures how changes in the *risk-free* interest rates affect the price of an option. The *risk-free* interest rate is the rate paid by a short-term government bond. It's December 21, 2019 and risk-free rates are extremely low all around the world. In Canada, the 1-month government bond is paying 1.66%. In the States, the 1-month government bond is paying 1.56%. These are among the highest (if not the highest) risk-free rates in the developed world. Realistically, risk-free rates can only go down 1%-2%, and they are very unlikely to go up by more than that either. 
+
+So we're looking at world where the risk-free rate is only likely to move by 1%-2% in the next few years. And over the course your ownership of a particular option, they're unlikely to move even that much. Interest rates didn't used to be this low, and they used to move around more. But in today's low rate environment, *rho* is perhaps the least consequential of the *greeks*. For short-term options (1-3 months), it has a very small impact on prices. It is more important for longer-dated options (1-2 years), which are known as LEAPS. But lots of stocks don't have LEAPS, and even if they do regular people probably won't use them. 
+
+One case where I could see regular investors using LEAPS is on long-dated puts, as a hedge against possible market declines. Rolling shorter-term puts can be quite expensive if the market keeps moving higher. If it does, the put will lose value because of the direction the market is moving in, and because of theta decay. So perhaps longer-dated puts make sense. Unless you get into much more sophisticated options strategies, I can't think of another reason a regular investor would want to buy a longer-dated option.
+
+To support these claims, let's look at a chart of *rho* vs. interest rates for XYZ's \$50 call, when the call is 3 months, 12 months, and 24 months from expiry. 
+
+```{r XYZ-Rho-vs-RfRate-50-strike-3months, out.width = "80%", fig.align = "center", message = FALSE}
+int_vector <- seq(from = 0.001, to = 0.025, by = 0.001)
+Call_rho <- greeks( bscall(s = 50, k = 50, v = 15, r=int_vector, tt=0.33, d=0) )[5,]
+x_min = 0.1; x_max = 2.5
+Call_x <- seq(from = x_min, to = x_max, by = 0.1)
+
+Call_Rho <- tibble( "Call_x" = Call_x,
+                    "Call_rho" = Call_rho )
+
+Call_Rho_points <- tibble( "Call_x_points" = c(0.5,1.0,2.0),
+                           "Call_rho_points" = c( Call_rho[which(Call_x == 0.5)],
+                                                  Call_rho[which(Call_x == 1.0)],
+                                                  Call_rho[which(round(Call_x,1) == 2.0)] ),
+                          coords = c( paste("(Interest Rate: 0.5%, Rho: ",
+                                            round(Call_rho[which(Call_x == 0.5)],2),")", sep=""),
+                              paste("(Interest Rate: 1.0%, Rho: ",
+                                    round(Call_rho[which(Call_x == 1.0)],2),")", sep=""),
+                              paste("(Interest Rate: 2.0%, \n Rho: ",
+                                    round(Call_rho[which(round(Call_x,1) == 2.0)],2),")", sep="") ) ) 
+
+ggplot() +
+  geom_line(data = Call_Rho, 
+            aes(Call_x, Call_rho), linetype = "solid") +
+  geom_point(data = Call_Rho_points, 
+             aes(Call_x_points, Call_rho_points)) +
+  geom_text(data = Call_Rho_points, size = 4,
+            aes( x = Call_x_points, y = Call_rho_points, label = coords ),
+            hjust=c(0,0,0), vjust=c(-1,-1,-0.25)) +
+  labs(title = "$50 Strike Call - 3 Months from Expiry",
+       x = "Interest Rate",
+       y = "Rho") +
+  options_theme()
+```
+
+```{r XYZ-Rho-vs-RfRate-50-strike-12months, out.width = "80%", fig.align = "center", message = FALSE}
+int_vector <- seq(from = 0.001, to = 0.025, by = 0.001)
+Call_rho <- greeks( bscall(s = 50, k = 50, v = 15, r=int_vector, tt=2, d=0) )[5,]
+x_min = 0.1; x_max = 2.5
+Call_x <- seq(from = x_min, to = x_max, by = 0.1)
+
+Call_Rho <- tibble( "Call_x" = Call_x,
+                    "Call_rho" = Call_rho )
+
+Call_Rho_points <- tibble( "Call_x_points" = c(0.5,1.0,2.0),
+                           "Call_rho_points" = c( Call_rho[which(Call_x == 0.5)],
+                                                  Call_rho[which(Call_x == 1.0)],
+                                                  Call_rho[which(round(Call_x,1) == 2.0)] ),
+                          coords = c( paste("(Interest Rate: 0.5%, Rho: ",
+                                            round(Call_rho[which(Call_x == 0.5)],2),")", sep=""),
+                              paste("(Interest Rate: 1.0%, Rho: ",
+                                    round(Call_rho[which(Call_x == 1.0)],2),")", sep=""),
+                              paste("(Interest Rate: 2.0%, \n Rho: ",
+                                    round(Call_rho[which(round(Call_x,1) == 2.0)],2),")", sep="") ) ) 
+
+ggplot() +
+  geom_line(data = Call_Rho, 
+            aes(Call_x, Call_rho), linetype = "solid") +
+  geom_point(data = Call_Rho_points, 
+             aes(Call_x_points, Call_rho_points)) +
+  geom_text(data = Call_Rho_points, size = 4,
+            aes( x = Call_x_points, y = Call_rho_points, label = coords ),
+            hjust=c(0,0,0), vjust=c(-1,-1,-0.25)) +
+  labs(title = "$50 Strike Call - 3 Months from Expiry",
+       x = "Interest Rate",
+       y = "Rho") +
+  options_theme()
+```
+-->
