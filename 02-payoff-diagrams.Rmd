@@ -60,8 +60,8 @@ call_payoff <- function(data, main, Call_K, Call_cost) {
   geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
                    y = 0, yend = 0, color = "Breakeven"), 
                  show.legend = FALSE, linetype = "solid") +
-  annotate(geom = "text", x = Call_K+Call_cost+5, y = 0, color = "black",
-           label = paste0("Breakeven: $",Call_K + Call_cost) ) + 
+  annotate(geom = "text", x = Call_K+Call_cost+1, y = 0, color = "black", hjust = 0,
+           label = paste0("Breakeven: $",Call_K + Call_cost), size = 5 ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
   labs(title = main,
@@ -153,10 +153,10 @@ Call_Payoff_XYZ_230 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.0
 
 call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
             main = "Buy: Company XYZ's $230 Strike Call")
-# hide_legend(ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
-#                                  main = "Buy: Company XYZ's $230 Strike Call"))) %>% 
-#   style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
-#                               '<br><b>Profit Per Share</b>: %{y:.2f}'))
+# ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
+#                      main = "Buy: Company XYZ's $230 Strike Call")) %>%
+#  style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
+#                              '<br><b>Profit Per Share</b>: $%{y:.2f}'))
 ```
 Reading this payoff diagram is not too bad - suppose the shares are worth `r currency(Future_price)` at expiry. If we own the call, it gives us the power to purchase 100 shares for `r currency(Call_K)` each (on the expiry date) and immediately sell them for `r currency(Future_price)`, for a gain of `r currency(Future_price)` - `r currency(Call_K)` = `r currency(Future_price-Call_K)` per share. The call cost `r currency(Call_cost)`, so we end up making `r currency(Future_price-Call_K)` - `r currency(Call_cost)` = `r currency(Future_price-Call_K-Call_cost)` per share. Looking at the payoff diagram, the per-share profit when the stock is at `r currency(Future_price)` is indeed `r currency(Future_price-Call_K-Call_cost)`. 
 

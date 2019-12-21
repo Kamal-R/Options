@@ -3,9 +3,11 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 
-if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
-if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
-if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
@@ -379,6 +381,8 @@ The breakeven of the protective put is `r currency(Apple_Current_Price)` + `r cu
 
 How do we chose the strike price of the protective put? By looking at the payoff diagram, the strike price of the put defines what the maximum loss we can take on our investment. With a strike price of `r currency(Apple_Put_K)`, we lose `r -100*currency(Apple_Puts_K[3]-Apple_Current_Price-Apple_Puts_Cost[3])` when the shares are at `r currency(Apple_Put_K)` and `r -100*currency(Apple_Puts_K[3]-Apple_Current_Price-Apple_Puts_Cost[3])` at any price below `r currency(Apple_Put_K)` By thinking through the maximum loss we're willing to tolerate, we can chose the strike price (and expiry date) of the put. 
 
+### A Real Trade - NLY 
+
 ```{r NLY-Protective-Put}
 NLY_Put_Cost <- 0.66
 NLY_Put_K <- 9
@@ -427,7 +431,137 @@ ggplot() +
 
 The black line shows the protective put. It's maximum loss is miniscule. To see why, we'll break down how the difference components of this investment contribute to the maximum loss. We receive `r 2*currency(NLY_Div)` in dividends, and pay `r currency(NLY_Put_Cost)` for the put. We bought the shares for `r currency(NLY_Current_Price)`, and the put has a strike price of `r currency(NLY_Put_K)`. This means the put has `r currency(NLY_Put_K-NLY_Current_Price)` in instrinsic value, which it contributes to the calculation. Putting these together, our maximum loss is `r 2*currency(NLY_Div)` - `r currency(NLY_Put_Cost)` + `r currency(NLY_Put_K-NLY_Current_Price)` = `r currency(2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price)`, or just <span class = "fraction" data-top="`r -currency(2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price)`" data-bottom="`r currency(NLY_Current_Price)`"></span> = `r -percent( ( 2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price ) / NLY_Current_Price )` of our original investment in NLY. The key takeway for an investor is that regardless of what happens to NLY's shares, the most we can lose on January 17, 2020 is `r currency(2*NLY_Div-NLY_Put_Cost+NLY_Put_K-NLY_Current_Price)` per share if NLY pays its two scheduled dividends. 
 
-The goal of this section on protective puts is to highlight the advantages that using them can give investors who are trying to manage the risk of their investments. Protective puts allow investors to define the maximum loss they are willing to tolerate on an investment, which has practical and psychological benefits. Depending on market pricing, protective puts can also allow investors to construct trades with attractive risk-reward characteristics, like the NLY trade. Hopefully, this section has convinced you that protective puts are a powerful risk management tool to have in your investing toolkit. 
+### Adjusting the Protective Put
+
+I made this trade in my own account because I believed that NLY had a good chance of increasing to \$10 or \$11 by December. If they did, I wanted to sell my \$9.00 January 2020 put and buy a March or April 2020 put with a strike at NLY's new higher price. Since I bought bought NLY at \$8.90, buying a put at a higher strike price would lock in my profits. Buying a put at \$10.00 gives me the right to sell my shares at \$10.00, which locks in a profit of \$1.10 per share. Buying a put at \$11.00 gives me the right to sell my shares at \$11.00, which locks in a profit of \$2.10 per share. 
+
+I bought the protective put on September 24, 2019 and I wanted to roll the put higher in December. If NLY had moved up to \$10 or \$11, selling the old put and buying the new one would cost about \$0.30 per share, less the \$0.25 dividend I get for holding the shares through April. Assuming NLY continued to pay its dividend, adjusting my trade so that I held the longer-dated put would cost around \$0.05 per share. 
+
+In the first leg of the trade I was risking \$0.06 per share to hold NLY until January 20, 2019. If selling the old put and buying the new one costs \$0.05, I'd be risking a total of \$0.11, which is 1.2% of my investment. If NLY had moved to \$10 or \$11 by December, I would guarantee a profit of $1.10 or \$2.10 by April. I bought in September, so that's a 7-month holding period. That's a 7-month return of \$1.10/\$9.06 = 12.14% or \$2.10/\$9.06 = 23.18%. To put that in perspective, those are annual returns of 21.70% and 42.96%. 
+
+If NLY had moved up to \$10, the trade would have a risk-reward of \$1.10-to\$0.11, or 10-to-1. If NLY had moved up to \$11, the trade would have a risk-reward of \$2.10-to-\$0.11, or about 19-to-1. And I'm only risking around 1%, so the upside on this trade if NLY had moved high enough fast enough was enormous. That's what attracted me to the trade. And even if it didn't, the downside was almost nothing. The most I can lose if I decide to exit the trade is 1.2%. 
+
+Alas, it was not to be. NLY had only reached \$9.42 on December 9th, 2019. It was moving higher, but not as fast as I had hoped. The \$9.00 January put was getting close to expiry and I didn't get the move higher that I was looking for. So I knew I had to sell the \$9.00 January 2020 put and buy a $9.00 April 2020 put. On December 9th, I got an opportunity to make that adjusting trade cost-free. The \$9.00 April put fell \$0.05 and the January \$9.00 had not moved. I took the opportunity to *roll* the put's expiry date out to April.
+
+It's now December 19, 2019 and I'm still in this NLY trade, and still only risking \$0.06 per share. I'll want to adjust the \$9.00 April put in March, about 3-4 weeks before its expiry. I still believe that NLY will reach \$10 or \$11, so that I can *roll* to a higher strike put and lock in some profits. For now, the the only thing to do is wait. 
+
+
+## Managing Your Emotions 
+
+Trading covered calls or protective puts is very different than only trading stocks. If you just own Apple's stock, the best thing for your account is if Apple's shares go up. If they go down, you can just wait until they go back up. As long as you don't need the money for something else and don't sour on Apple as an investment, you can wait as long as it takes for Apple to reach your price target. If Apple goes up, you'll make money and be happy. If Apple goes down, you'll lose money and wish you hadn't made the trade. 
+
+
+### The Covered Call
+
+The covered call is more complicated. It has two components - the shares you bought, and the call you sold. If you're like most investors, you're more familiar with owning shares than with selling calls. You'll probably view this position as owning shares of Apple with the call tossed on top. And you'll judge the success of writing the call on if it made money compared to just owning Apple's shares. 
+
+Let's look at Apple's $230 covered call that expires in December. Apple is trading at \$222.76, and selling the call nets you \$8.50 per share. You start losing money on the covered call when Apple falls below your breakeven of \$222.76 - \$8.50 = \$214.26. Below \$214.26, you'll always lose \$8.50 less than if you just own shares, because you made \$8.50 from selling a \$230 strike call that expires worthless. Above \$238.50, the call starts eating into gains from owning the shares. You would keep those gains if you had not sold the call. 
+
+The covered call makes money above \$214.26, and makes money compared to just owning shares below \$238.50. Below \$214.26, the covered call helps buffer losses but still loses money. If Apple ends up between \$214.26 and \$238.50 on December 20, 2019, you'll probably view the covered call as successful. Above \$238.50, you'll probably view the call as taking away potential gains you'd get to keep. If Apple is below \$214.26, you might view selling the call as mildly successful because it protected you from greater losses. But you'd proably view the trade as a failure because you still lost money. Are these emotional reactions helpful? I don't think so. 
+
+I think the breakeven (\$214.26 at expiry) and the point where the covered call makes less than owning shares (\$238.50 at expiry) are the key levels you need to know to manage this position. If you sold the covered call and saw Apple rising towards \$238.50 before expiry, you can adjust you position by buying back the call and preserve your upside partcipation in Apple. Everyone has a different view on when to do that - I would only do it when Apple is above \$230 and looking like it was heading above \$238.50. I'd expect the call to cost and extra \$2.00 or so, which I wouldn't mind. Why? Let's go back and look at why I sold the covered call to begin with. 
+
+If I sold the call at \$230, I must have thought Apple didn't have much of a chance of going above \$230 by December 20. If Apple quickly climbs above \$230 after I sell the call, I should buy it back because it means I was wrong. It also means that I've made more money on owning Apple's stock than I thought I would, which should offset the extra \$2.00 I have to pay to buy back the call. If Apple's stock heads lower, it also means I was wrong. I must have thought that the covered call would stay above its breakeven when I sold it, and that I would make money. But I have a lower breakeven than someone who just owns shares, so I have a buffer against these smaller declines. I can use that buffer to close the trade at a profit as it heads towards its breakeven. Someone who just owns shares would have to do so at a loss. 
+
+If I hold through the decline, I'm probably a long-term investor in Apple. In that case, I'm expecting Apple to rebound and I'll keep the \$8.50 I got from selling the call. I'll even sell another one in December, and keep reducing my breakeven on Apple over time. The very unlikely best-case scenario is that I reduce my breakeven to zero so that I'm basically holding the Apple shares for free. I'd still keep writing calls to generate income off of them, which would be amazing if it ever happened. It's more likely that I'd just gradually lower the breakeven over time. 
+
+```{r Apple-205-Covered-Call, out.width = "80%", fig.align = "center", message = FALSE}
+Apple_Call_Cost <- 8.50
+Apple_Call_K <- 230
+x_min <- 190; x_max = 260 
+Call_x <- seq(from = x_min, to = x_max, by = 1)
+
+Call_Payoff_Plot <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Covered_Call_y" = currency(Apple_Call_Cost + (Call_x - Apple_Current_Price) - 
+                                                  pmax(0, Call_x - Apple_Call_K)) ) 
+
+ggplot() + 
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Covered_Call_y, color = "Shares"), 
+            linetype = "solid") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, rep(0,length(Call_x)), color = "Breakeven"), 
+            linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(x = Apple_Current_Price - Apple_Call_Cost, 
+                                         y = seq(from = -4*Apple_Call_Cost, to = x_max-Apple_Call_K, 
+                                                 length=length(Call_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  geom_line(data = Call_Payoff_Plot, aes(Call_x, Call_x - Apple_Current_Price, color = "Own_Shares"), 
+            linetype = "solid") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Selling Apple's $230 Covered Call",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,
+                                'Breakeven'=plot_fg,"Own_Shares"=plot_fg_alt),
+                     labels = c("Covered Call - Profit Per Share",
+                                "Owning Shares - Profit Per Share",
+                                paste0("Breakeven Price = ", currency(Apple_Current_Price - Apple_Call_Cost))),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
+  options_theme()
+```
+
+Viewing Apple's shares and your covered call as a *single position* makes reasoning about the trade much easier. Selling the \$230 strike call skews the risk-reward proposition of the entire trade. The payoff diagram that compares the covered call to just owning shares summarizes how in one quick picture. All you have to do to manage the trade is remember why you entered it - to collect some income and reduce your volatility - and look at the payoff diagram. It clearly shows that the covered call outperforms just owning shares below \$238.50. So you should prefer the covered call to just owning shares below \$238.50, and close the call if Apple starts moving towards \$238.50 before expiry. It also shows that the covered call sustains losses below \$214.26. Depending on your tolerance for these declines, you might want to close the covered call (sell the shares and buy back the call) as Apple moves towards its breakeven. Doing so while Apple is sufficiently above \$214.26 lets you exit the position at a profit. 
+
+There are many ways to risk-mange a covered call. This discussion only highlights two key levels on the payoff diagram - buying back the call as Apple moves towards \$238.50 to avoid losing upside partcipation in Apple, and closing the entire position (the shares and the call) as Apple moves towards \$214.26. Apple was trading at \$222.76 when you sold the call, so you have roughly \$8.50 to the downside and \$15.74 to the upside before having to make an adjusting trade. We'll discuss the payoff diagrams of options before their expiry date in detail later, but the key thing to know is that options don't respond as much to price movements in their stocks as they further away from their expiry date. That means your breakeven will likely be higher than \$214.26 before expiry, as the call will not have lost all its value as Apple's shares go down. The \$238.50 will be higher, as the call will not have gone up as fast as Apple's shares head higher.
+
+<!-- Turn this into a diagram: the window is about \$25 because it uses the \$8.50 you get from selling the call, as well as the *deductible* of \$230 - \$222.76 = \$7.24 before the upside protection from the call kicks in. -->
+In addition to providing income and reducing your volatility, the covered call gives you more *flexibility* than just owning shares. This flexibility lets you adjust the trade in ways that who just owns shares can't. By viewing the covered call as a *single* position with different risk-rewards characteristics than just owning shares and exploiting this *fliexibility* lets you take your emotions out of the trade. For my risk preferences, I would close the entire position before it reaches its breakeven and buy back the call as Apple approaches \$238.50. If you have different risk preferences - if you're okay with losing a few percent on the trade or don't mind losing the upside in Apple - then you'll have different levels. But you'll still have more flexibility to manage the position than someone who just owns shares. And you'll be able to keep your emotions from interfering with profitably executing the covered call. 
+
+
+### The Protective Put 
+
+People tend to think about the protective put in the same way, as two separate positions. The primary position is the stock, and the put is an add-on that protects them from potential downside risks. But the put costs money, so if the stock doesn't fall below its strike price, you might think you wasted money buying the put. Because it will expire worthless and not do anything useful. 
+
+Just like with the covered call, I'm going to argue that the protective put should be viewed as a *single* position with different risk-reward characteristics than just owning shares. Using the payoff diagram will guide us towards the levels we need to make adjusting trades to preserve the risk-reward characteristics that can make the protective put such an attractive trade. This time, I'll demonstrate with the NLY trade. 
+
+```{r NLY-Protective-Put-Manage, out.width = "80%", fig.align = "center", message = FALSE}
+x_min <- 7; x_max <- 11
+Put_x <- seq(from = x_min, to = x_max, by = 0.1)
+Put_Payoff_Plot <- tibble( "Put_x" = currency(seq(from = x_min, to = x_max, by = 1)),
+                            "Protective_Put_y" = currency(-NLY_Put_Cost + 2*NLY_Div +
+                                                            ( Put_x - NLY_Current_Price ) + 
+                                                            pmax(0, NLY_Put_K - Put_x)) ) 
+
+ggplot() + 
+  geom_line(data = Put_Payoff_Plot, aes(Put_x, Protective_Put_y, 
+                                        color = "Shares"), linetype = "solid") +
+  geom_line(data = Put_Payoff_Plot, aes(Put_x, rep(0,length(Put_x)), 
+                                        color = "Breakeven"), linetype = "dashed") +
+  geom_line(data = Put_Payoff_Plot, aes(x = NLY_Current_Price + NLY_Put_Cost - 2*NLY_Div, 
+                                         y = seq(from = -4*NLY_Put_Cost, 
+                                                 to = 3*(x_max-NLY_Put_K), 
+                                                 length=length(Put_x)), 
+                                         color = "Breakeven"),
+                                         linetype = "dashed") +
+  geom_line(data = Put_Payoff_Plot, aes(Put_x, Put_x - NLY_Current_Price, 
+                                        color = "Own_Shares"), linetype = "solid") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = "Buying NLY's $9 Protective Put",
+       x = "Stock Price",
+       y = "Profit Per Share") +
+  scale_color_manual(values = c('Shares'=plot_fg,'Breakeven'=plot_fg,
+                                'Breakeven'=plot_fg,"Own_Shares"=plot_fg_alt),
+                     labels = c("Protective Put - Profit Per Share (with dividends)",
+                                "Owning Shares - Profit Per Share (with dividends)",
+                                paste0("Breakeven Price = ", 
+                                       currency(NLY_Current_Price + NLY_Put_Cost - 2*NLY_Div)) ),
+                     guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed")))) + 
+  options_theme()
+```
+
+Assuming NLY continues to pay its dividend, I entered the NLY trade only risking \$0.06 per share, which is 0.67% of my investment. The most I can lose on the expiry date of my put is 0.67%. If NLY reaches \$10, the trade will have a risk reward of 10-to-1 and if NLY reaches \$11, the trade will have a risk-reward of about 19-to-1. This is *dramatically* different than if I just owned shares of NLY. In that case, I could lose everything I invested into NLY. 
+
+In this example, the protective put changes the risk-reward characteristics from potentially losing everything to *knowing* that you can only lose less than 1% over the lifetime of the trade. This example is especially convincing because NLY is paying a 10% dividend, which essentially pays for the put. I'm using the put to remove the downside risk of owning NLY shares, and then using the dividend to pay for almost all of the put. 
+
+Even when the put is more expensive, it limits your losses to 0.67% (as long as NLY pays their dividend). Psychologically, this removes the stress that comes with investing in an otherwise risky stock. It completely changes how you think about being invested in NLY. Instead of worrying about how much money you could lose if NLY goes down, you have an essentially stress-free position in a stock with lots of potential upside. All you have to do is sit and wait to see if NLY goes higher. 
+
+Just like the covered call, viewing the protective put as a *single* position gives you more *flexibility*. The flexibility is simpler to see with the protective put - if NLY goes down, you don't lose money. You can close the position and wait for NLY to stop falling, and then buy back into it when it does. Or just buy back into it right away, at the lower price. You'll still be ahead of someone who just owned the stock. 
+
+I think most people are more concerned with what could happen if they lose lots of money in the stock market than they are with missing out on thes few percent they could get by selling a call. I hope this NLY example demonstrates how amazing protective puts can be. They allow you to define the maximum loss you are willing to tolerate on an investment, which has significant practical and psychological benefits. Protective puts also allow your to construct trades with superior risk-reward characteristics compared to just owning stocks. If you find your investment portfolio is causing you too much stress, you might want to discuss if protective puts can help take some of the stress out of investing with an investment advisor. 
 
 
 <!--

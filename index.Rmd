@@ -13,9 +13,21 @@ description: ""
 
 # Introduction {-}
 
-## Preface {-}
+Who is book for? Anyone who wants to understand options and how to *think* through options trades. If you've never seen options before and don't remember the last time you took a math class, this is the book for you. If there's something you don't understand, it probably means I didn't do a good enough job. If you let me know, I'll try to make that part of the book better. 
 
-To be written later.
+If you want it to be, trading with options can get complicated. But it doesn't have to be. The core idea behind options is that they allow you to change the risk-reward characteristics of owning stocks. They cost money and they have a time limit (they *expire*). It takes some time to know the types trades with risk-reward characteristics you like, and how to adjust options positions as they approach expiry as market conditions change. That comes with understanding with how options work, and building experience so that you have the confidence you need to make those adjusting trades. 
+
+I start by introducing options and the tool you need to understand them - the payoff diagram. I then walk through two simple options strategies - the covered call and the protective put. These first three chapters are the most important ones in the book, because they teach you how to *think* about options. After that, I get into the option *greeks*. The *greeks* help us understand how an option's price will change. Knowing them will give you the tools you need to construct options trades that suit your style of investing, and to manage your options trades once you've put them on. I close by looking at options strategies you can use to trade momentum stocks, like the FAANG stocks. This last section shows you how to use the greeks to adjust your options trades, and how to construct more speculative options trades. 
+
+A few words on what this book is not. It's not a recipe book that goes over 100s of options strategies. There are already many excellent books for that. [The Options Playbook](https://www.optionsplaybook.com/) is my favorite one, and I use their site as a reference myself. It's also not a record of options trades I've made, alhtough I've included some of my trades to show how the tools you're building are useful in real trading.
+
+Most importantly, it's not a book about modeling or math. Mathematical or statistical modeling is very popular right now, and people often think if they understand their model, they will understand options. I think this is a very dangerous way of thinking. Saying you understand something because you have a model is like saying you can see in the dark after turning on a dim flashlight. You'll see more with the flashlight, just like you'll see more with the model. But how much will you actually see? Blindly trusting a model can be very dangerous. 
+
+I believe true understanding comes from stepping away from the math and looking at the real world. I've tried to imbue that spirit into this book by focusing on what options can do for you. 
+
+And finally, a disclaimer: This book tries to increase your knowledge and understanding of options, so that you become comfortable with them, and understand how they can help you reach your investing goals. It is not investing advice. You should consult an investment professional that can help you determine how options fit in your portfolio and which strategies suit your risk preferences before trading options with your own money.
+
+
 
 ## Acknowledgments {-}
 

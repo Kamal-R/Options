@@ -3,10 +3,12 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
-if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
-if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
-if ( !require("derivmkts") ) { install.packages("derivmkts") };  require(derivmkts)
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
+if ( !require("derivmkts") )     { install.packages("derivmkts") };       require(derivmkts)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
@@ -63,7 +65,7 @@ What impacts the price of an option? Payoff diagrams tell us that the price of t
 
 The first two - the stock price and strike price - influence *delta* and *gamma*, the two greeks we'll be talking about in this chapter. The time value of an option decays at a rate of *theta*. The risk-free rate is the interetst rate of a short-term government bond. like the 1-month Treasury bill. The risk-free rate is associated with *rho*, which tells us how changes in the risk-free rate affect the price of an option. 
 
-The only component from that list that we can't read off a market price is the implied volatility. Implied volatility is the most complicated idea in option pricing, and *vega* measures how changes in implied volatility affect the price of an option. Before getting to *vega*, we're going to spend a lot of time on implied volatility. It's the most important idea in all of options pricing, but it's not that complicated. The idea behind it is simple, and we want to make it as clear as can be. 
+The only component from that list that we can't read off a market price is the implied volatility. Implied volatility is perhaps the most complicated idea in option pricing, and *vega* measures how changes in implied volatility affect the price of an option. Before getting to *vega*, we're going to spend a lot of time on implied volatility. It's the most important idea in all of options pricing, but it's not that complicated. The idea behind it is simple, and we want to make it as clear as can be. 
 
 Those are the 5 greeks. It's essential that you learn them, because knowing them allows you to: 
 
@@ -425,7 +427,7 @@ ggplot() +
   geom_point(data = Call_Delta_points, 
              aes(Call_x_points, Call_delta_points)) +
   geom_text(data = Call_Delta_points, size = 4,
-            aes( x = c(90,100,110), y = Call_delta_points, label = coords ),
+            aes( x = Call_x_points, y = Call_delta_points, label = coords ),
             hjust=c(0,0,0), vjust=c(1.5,1.5,1.5)) + 
   labs(title = "$100 Strike Call - 6 Months from Expiry",
        x = "Stock Price",
@@ -707,7 +709,7 @@ ggplot() +
                      guide = "legend") + 
   guides(color = guide_legend(override.aes = list(linetype = c("solid", "dashed")))) + 
   theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5, face="bold", 
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", 
                                   margin = margin(10, 0, 10, 0),
                                   colour = plot_fg),
         legend.justification=c(0,1), 
@@ -717,7 +719,7 @@ ggplot() +
         legend.background = element_rect(fill = plot_bg, color = plot_bg),
         legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
         legend.text = element_text(colour = plot_fg),
-        text = element_text(size=16), 
+        text = element_text(size = 16), 
         panel.border = element_blank(), 
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), 
@@ -738,4 +740,3 @@ There's also a broader risk-reward story here. The payoff of XYZ's call goes up 
 But we might use our knowledge of *delta* and *gamma* to construct favorable trades, and to effectively risk-manage them. We're going to do just that after we go through the three remaining greeks. Once we've finished explaining the greeks, we'll exploit our new knowledge to understand the construction and risk management of two more complicated option strategies - the straddle and the put spread. 
 
 Before we move on to *vega*, I want to emphasis that this call's payoff diagram (before expiry) is still *asymmetric*. It's not the all-or-nothing setup we saw in the first two chapters, and we don't quite get dollar-for-dollar participation to the upside. It took an almost \$15 move to the upside in XYZ's stock to get close to that. But there's still asymmetry: we make more and more money as the stock goes up, and lose less and less money as the stock goes down. In one way or another, all options strategies boil down to trying to exploit that asymmetry. 
-

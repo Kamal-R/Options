@@ -3,9 +3,11 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-if ( !require("tidyverse") )   { install.packages("tidyverse") };    require(tidyverse)
-if ( !require("kableExtra") )  { install.packages("kableExtra") };   require(kableExtra)
-if ( !require("formattable") ) { install.packages("formattable") };  require(formattable)
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
@@ -19,17 +21,7 @@ plot_fg_alt <- "#969696" # ??
 
 # What is an Option? 
 
-You might have heard stories about people who made \$100,000 in a week or \$1,000,000 in a year trading stock options, after starting out with $5,000 (or less) in the bank. You might have wondered - what are stock options and how did they do that? 
-
-This book is designed to answer those two questions. It will give you the knowledge you need to understand options and how people trade them. My goal is to explain options in a way that everyone can understand. The best way I've found to do that is use lots of diagrams and a few tables, and almost no math. 
-
-Every chapter is designed to give you tools you can use to understand options, or to use those tools as we walk through particular options strategies. By the time you reach the end of the book, you'll be able to construct your own options trades and understand the risk-reward tradeoffs of those trades. 
-
-A few words on what this book is not. It's not a recipe book that goes over 100 different options strategies. There are already many excellent books for that. [The Options Playbook](https://www.optionsplaybook.com/) is my favorite one, and I use their site as a reference myself. It's not a record of options trades that I've made, alhtough I've included some of my trades to show how the tools you're building are useful in real trading.
-
-Most importantly, it's not a book about modeling or math. Mathematical or statistical modeling is very popular right now, and people often think if they understand their model, they will understand options. I think this is a very dangerous way of thinking. Saying you understand something because you have a model is like saying you can see in the dark after turning on a dying flashlight. You'll see better with the flashlight, just like the model will improve your understanding, but you won't really know where you're going. 
-
-This book tries to be an underpowered floodlight. You'll be able to see where you're going, but nothing will be overly sharp. The big advantage is that it will give you the tools you need to safely explore options strategies, so that you can find the ones that work for you. Continuing the lit room metaphor, once you've walked around long enough, you'll know where everything is. 
+You might have heard stories about people who made \$100,000 in a week or \$1,000,000 in a year trading stock options, after starting out with $5,000 (or less) in the bank. You might have wondered - what are stock options and how did they do that? This book is designed to answer those questions. By the time you reach the end, you'll be able to construct your own options trades and understand the risk-reward tradeoffs of those trades. 
 
 
 ## Forward Contracts 
