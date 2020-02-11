@@ -1,0 +1,139 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("grDevices") )     { install.packages("grDevices") };       require(grDevices)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
+if ( !require("derivmkts") )     { install.packages("derivmkts") };       require(derivmkts)
+
+options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
+```
+
+```{r Set-Global-Chapter-Variables, echo = FALSE}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # "#929292"
+plot_fg_alt <- "#969696" # ??
+label_font_size <- 7.5
+
+options_theme <- function() {
+  theme_classic() + 
+    theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                    margin = margin(10, 0, 10, 0),
+                                    colour = plot_fg),
+          legend.justification=c(0,1), 
+          legend.position=c(0,1), 
+          legend.title = element_blank(),
+          legend.key = element_rect(fill = plot_bg, color = plot_bg),
+          legend.background = element_rect(fill = plot_bg, color = plot_bg),
+          legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+          legend.text = element_text(colour = plot_fg),
+          text = element_text(size=16), 
+          panel.border = element_blank(), 
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), 
+          panel.background = element_rect(fill = plot_bg, color = plot_bg),
+          plot.background = element_rect(fill = plot_bg, color = plot_bg),
+          axis.line = element_line(colour = plot_bg),
+          axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                      colour = "black"),
+          axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                      angle = 90, colour = "black"),
+          axis.text.x = element_text(colour = "black"), 
+          axis.text.y = element_text(colour = "black") ) 
+}
+
+no_axis_ticks <- function() {
+  theme( axis.title.x = element_blank(), 
+         axis.text.x = element_blank(), 
+         axis.ticks.x = element_blank(),
+         axis.title.y = element_blank(), 
+         axis.text.y = element_blank(), 
+         axis.ticks.y = element_blank() )
+}
+```
+
+# Using the Greeks {#Using-the-Greeks}
+
+The *greeks* are the risk factors of an options position. If you ever take a position in options, they are what will cause you to gain or lose money. So you should understand the exposure to the *greeks* that any options trade you make has. We've covered 5 *greeks* so far. Here's a quick recap of all 5:  
+
+  1. *Delta* - how much the option's price changes when the stock goes up by \$1. *Delta* is positive for calls and negative for puts. 
+  2. *Gamma* - how much *delta* changes with the next \$1 move in the stock. *Delta* will increase if the \$1 move causes the option to gain intrinsic value and decrease if it causes the option to lose intrinsic value. 
+  3. *Vega* - how much the option's value changes with a 1 point change in implied volatility. 
+  4. *Theta* - how much *time value* the option will lose the next calender day. 
+  5. *Rho* - how much the option's value changes with a 1 point change in the risk-free interest rate. 
+
+There are more *greeks*. I've only ever used three other *greeks* when trying to construct trades. I've never actually executed trades that used these three *greeks*, since the strategies that I know that use them are quite complex. In case you're wondering, those three *greeks* are: 
+
+  1. *Vanna* - how much the *delta* of an option changes with a 1 point change in implied volatility. 
+  2. *Volga* - how much the *vega* of an option changes with a 1 point change in implied volatility. 
+  3. *Speed* - how much *gamma* changes with a \$1 move in the stock. Also called the *gamma of gamma*.  
+
+It's almost hard to fathom that we could need even more *greeks*, but I'll point out where these three could come in handy while walking through options strategies that use the 5 *greeks* that I've already covered. 
+
+Once you know how various options give you different exposures to those 5 *greeks*, you can construct options trades that *hedge* out one or more of the *greeks*. For example, if I didn't want have risk exposure to *delta*, I could construct an options trade that is *delta* hedged. Similarly, I could construct options trades that are *vega* hedged, *gamma* hedged, *delta* hedged and *gamma* hedged, and so on. I'll walk through examples of options strategies that hedge out various *greeks*, and make sure to discuss what types of market environments they perform well in and how some things to keep in mind while managing the trade. 
+
+But first, let's summarize how the *greeks* affect calls and puts. These lists are good references to look back at if you're 
+
+## Recapping the Greeks {#Recap-the-greeks}
+
+If you buy a call, you are: 
+
+  1. Long *delta* - if the stock goes up by \$1, the price of the call goes up by *delta*.  
+  2. Long *gamma* - if the stock goes up by \$1, the *delta* of the call goes up by *gamma*.
+  3. Long *vega* - if the implied volatlity of the call goes up by 1, the price of the call goes up by *vega*. 
+  4. Short *theta* - if you own the call, you pay time decay. 
+  5. *Rho* - if the , the price of the call goes up by  . 
+
+If you buy a put, you are:  
+
+  1. Short *delta* - if the stock goes up by \$1, the price of the put goes down by *delta*.  
+  2. Long *gamma* - if the stock goes up by $1, the *delta* of the call goes down by *gamma*. 
+  3. Long *vega* - if the implied volatlity of the call goes up by 1, the price of the call goes up by *vega*. 
+  4. Short *theta* - if you own the put, you pay time decay. 
+  5. *Rho* - if the , the price of the put goes up by . 
+
+If you sell a call, you are:
+
+  1. Short *delta* - if the stock goes up by \$1, the call you sold goes up. For you, that leads to a loss. 
+  2. Long *gamma* - . 
+  3. Short *vega* - . 
+  4. Long *theta* - if you sell the call, you benefit from time decay. 
+  5. *Rho* - . 
+
+If you sell a put, you are: 
+
+  1. Long *delta* - if the stock goes up by \$1, the put you sold goes down. For you, that leads to a gain. 
+  2. Long *gamma* - . 
+  3. Short *vega* - . 
+  4. Long *theta* - if you sell the put, you benefit from time decay. 
+  5. *Rho* - . 
+
+
+## The Straddle 
+
+The straddle is a *delta* hedged strategy. It consists of buying 1 put and buying 1 call, both with the same expiry date and are at-the-money. It's payoff diagram looks like this: 
+
+<!-- Insert payoff diagram: The straddle --> 
+
+Let's take a look at a straddle trade I've done in the past:
+
+
+## The Collar 
+
+The collar is a ... . It consists of buying 100 shares, buying 1 put, and selling 1 one call. It' s
+
+
+## The Calender Spread
+
+
+
+
+## The Conversion / Reversal
+
+The conversion is a ..., while the reversal is ... . 

@@ -1,0 +1,71 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("grDevices") )     { install.packages("grDevices") };       require(grDevices)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
+if ( !require("derivmkts") )     { install.packages("derivmkts") };       require(derivmkts)
+
+options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
+```
+
+```{r Set-Global-Chapter-Variables, echo = FALSE}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # "#929292"
+plot_fg_alt <- "#969696" # ??
+label_font_size <- 7.5
+
+options_theme <- function() {
+  theme_classic() + 
+    theme(plot.title = element_text(hjust = 0.5, face="bold", 
+                                    margin = margin(10, 0, 10, 0),
+                                    colour = plot_fg),
+          legend.justification=c(0,1), 
+          legend.position=c(0,1), 
+          legend.title = element_blank(),
+          legend.key = element_rect(fill = plot_bg, color = plot_bg),
+          legend.background = element_rect(fill = plot_bg, color = plot_bg),
+          legend.box.background = element_rect(fill = plot_bg, color = plot_bg),
+          legend.text = element_text(colour = plot_fg),
+          text = element_text(size=16), 
+          panel.border = element_blank(), 
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), 
+          panel.background = element_rect(fill = plot_bg, color = plot_bg),
+          plot.background = element_rect(fill = plot_bg, color = plot_bg),
+          axis.line = element_line(colour = plot_bg),
+          axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                      colour = "black"),
+          axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                      angle = 90, colour = "black"),
+          axis.text.x = element_text(colour = "black"), 
+          axis.text.y = element_text(colour = "black") ) 
+}
+
+no_axis_ticks <- function() {
+  theme( axis.title.x = element_blank(), 
+         axis.text.x = element_blank(), 
+         axis.ticks.x = element_blank(),
+         axis.title.y = element_blank(), 
+         axis.text.y = element_blank(), 
+         axis.ticks.y = element_blank() )
+}
+```
+
+# Trading Momentum Stocks
+
+## The Bull Call Spread
+
+
+
+
+## The Bullish 3-Way
+
+
+## The Calender Spread

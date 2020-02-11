@@ -21,7 +21,7 @@ plot_fg_alt <- "#969696" # ??
 ```
 
 
-# The Greeks (Part 1) {#First-Greeks}
+# Thinking in Greeks (Part 1) {#First-Greeks}
 
 <!-- 
 If you've ever had the pleasure (or is it misfortune?) of taking a rigorous mathemtical course on pricing options, you would have learned about the Black-Scholes-Merton pricing model. This model is no slouch - it won Merton and Scholes the 1997 Nobel Prize in Economics - but it has some limitations.^[Black, sadly, passed away in 1995 and was not eligible for the award.] For those who are interested in learning more about it, we'll discuss the derivation of the Black-Scholes-Merton model and its limitations in an appendix. In this chapter, our goal is to explain the insights of the Black-Scholes-Merton model using only high school math. 

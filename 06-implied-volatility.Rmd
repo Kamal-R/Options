@@ -58,13 +58,13 @@ no_axis_ticks <- function() {
 }
 ```
 
-# The Greeks (Part 2) {#Second-Greeks}
+# Thinking In Greeks (Part 2) {#Second-Greeks}
 
 For our second deep dive into the *greeks*, we're going to look at the implied volatility (*sigma*). It's perhaps the most complicated option greek, but it's also the most important. This section is still a work in progress, and I'm still looking for simpler ways to explain implied volatility. If there's anything here that doesn't make sense, let me know and I'll try to make it clearer. 
 
 ## Implied Volatility {#Implied-Vol}
 
-<!-- TAKE 3: A Success? -->
+<!-- TAKE 3: A (Mild) Success? -->
 
 Implied volatility is a forward-looking measure of how volatile market participants think a stock will. Implied volatility is strange because it is *unobservable*. You have to use a statistical model to infer its value, and different models can give different values. Even the details of how to interpret implied volatility can depend on the model you use. Luckily, most models that people use give similar results most of the time. They can give different values in very volatile markets (particularly during "market crashes"), which is one of the challenges of using implied volatilty.
 
@@ -141,9 +141,9 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
                                                           Call_cost[which(Call_x == 10)],
                                                           Call_cost[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
-                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
-                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(5, $",round(Call_cost[which(Call_x == 5)],2),")"),
+                              paste0("(10, $",round(Call_cost[which(Call_x == 10)],2),")"),
+                              paste0("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")" ) ) ) 
 
 ggplot() + xlim(0,25) + ylim(0,5) + 
   geom_line(data = Call_Implied, 
@@ -178,9 +178,9 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
                                                           Call_cost[which(Call_x == 10)],
                                                           Call_cost[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
-                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
-                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(5, $",round(Call_cost[which(Call_x == 5)],2),")"),
+                              paste0("(10, $",round(Call_cost[which(Call_x == 10)],2),")"),
+                              paste0("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")") ) ) 
 
 ggplot() + xlim(0,25) + ylim(4.5,8) + 
   geom_line(data = Call_Implied, 
@@ -213,9 +213,9 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
                                                           Call_cost[which(Call_x == 10)],
                                                           Call_cost[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
-                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
-                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(5, $",round(Call_cost[which(Call_x == 5)],2),")"),
+                              paste0("(10, $",round(Call_cost[which(Call_x == 10)],2),")"),
+                              paste0("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")") ) ) 
 
 ggplot() + xlim(0,25) + ylim(-0.4,3.25) + 
   geom_line(data = Call_Implied, 
@@ -321,9 +321,9 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
                                                           Call_cost[which(Call_x == 10)],
                                                           Call_cost[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
-                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
-                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(5, $",round(Call_cost[which(Call_x == 5)],2),")"),
+                              paste0("(10, $",round(Call_cost[which(Call_x == 10)],2),")"),
+                              paste0("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")") ) ) 
 
 ggplot() + xlim(0,25) + ylim(-0.5,3.25) + 
   geom_line(data = Call_Implied, 
@@ -405,9 +405,9 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
                                                           Call_cost[which(Call_x == 10)],
                                                           Call_cost[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
-                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
-                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(5, $",round(Call_cost[which(Call_x == 5)],2),")"),
+                              paste0("(10, $",round(Call_cost[which(Call_x == 10)],2),")"),
+                              paste0("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")") ) ) 
 
 ggplot() + xlim(0,25) + ylim(-2,3.25) + 
   geom_line(data = Call_Implied, 
@@ -482,9 +482,9 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_cost[which(Call_x == 5)],
                                                           Call_cost[which(Call_x == 10)],
                                                           Call_cost[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(5, $",round(Call_cost[which(Call_x == 5)],2),")", sep=""),
-                              paste("(10, $",round(Call_cost[which(Call_x == 10)],2),")", sep=""),
-                              paste("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(5, $",round(Call_cost[which(Call_x == 5)],2),")"),
+                              paste0("(10, $",round(Call_cost[which(Call_x == 10)],2),")"),
+                              paste0("(20, $",round(Call_cost[which(round(Call_x,1) == 20)],2),")") ) ) 
 
 ggplot() + xlim(0,25) + ylim(4.5,8) + 
   geom_line(data = Call_Implied, 
@@ -514,12 +514,12 @@ Call_Implied_points <- tibble( "Call_x_points" = c(5,10,20),
                                "Call_implied_points" = c( Call_vega[which(Call_x == 5)],
                                                           Call_vega[which(Call_x == 10)],
                                                           Call_vega[which(round(Call_x,1) == 20)] ),
-                          coords = c( paste("(Implied Vol: 5, Vega: ",
-                                            round(Call_vega[which(Call_x == 5)],2),")", sep=""),
-                              paste("(Implied Vol: 10, Vega: ",
-                                    round(Call_vega[which(Call_x == 10)],2),")", sep=""),
-                              paste("(Implied Vol: 20, \n Vega: ",
-                                    round(Call_vega[which(round(Call_x,1) == 20)],2),")", sep="") ) ) 
+                          coords = c( paste0("(Implied Vol: 5, Vega: ",
+                                            round(Call_vega[which(Call_x == 5)],2),")"),
+                              paste0("(Implied Vol: 10, Vega: ",
+                                    round(Call_vega[which(Call_x == 10)],2),")"),
+                              paste0("(Implied Vol: 20, \n Vega: ",
+                                    round(Call_vega[which(round(Call_x,1) == 20)],2),")") ) ) 
 
 ggplot() +
   geom_line(data = Call_Implied_Vega, 

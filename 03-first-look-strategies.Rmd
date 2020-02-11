@@ -564,6 +564,49 @@ Just like the covered call, viewing the protective put as a *single* position gi
 I think most people are more concerned with what could happen if they lose lots of money in the stock market than they are with missing out on thes few percent they could get by selling a call. I hope this NLY example demonstrates how amazing protective puts can be. They allow you to define the maximum loss you are willing to tolerate on an investment, which has significant practical and psychological benefits. Protective puts also allow your to construct trades with superior risk-reward characteristics compared to just owning stocks. If you find your investment portfolio is causing you too much stress, you might want to discuss if protective puts can help take some of the stress out of investing with an investment advisor. 
 
 
+## Synthetic Positions {#Synthetics}
+
+Understanding synthetics is one of the most important things you can do to understand the risks of an option position. You can find what the synthetic of any position is on Google, so I'm not going to create an encyclopedia of them here. But I'm going to go through a few examples of using synthetics to better understand the risks of an options position, so that you can see how synthetics can help you understand these risks. 
+
+### The Combination 
+
+Buying a stock consists of buying 100 shares. But it has the *same* payoff diagram as buying a call and selling a put, where they have the same strike price and expiry date. First, let's combine buying a call and selling a put to see what that payoff diagram looks like. 
+
+<!-- Insert two payoff diagrams (at expiry) on the same graph: a long call and short put (same strike) --> 
+
+This position is called a *combination* or *combo*. Let's compare the payoff diagram of owning shares to owning the combination. They are, in fact, the same. 
+
+<!-- Insert two payoff diagrams (at expiry) side-by-side: a combination and long stock --> 
+
+There are three pieces at work here: the shares, the call, and the put. And in fact, any position taken using some of those three pieces can be *replicated* using the other pieces. If you replicate a position using options, you've created a *synthetic* of the original position. For example, buying a call and selling a put is a *synthetic* of buying shares. 
+
+Bu even though the payoff diagrams of owning stock and owning a combination look the same, the positions are *not* identical. The most important difference is that the options expire, while the shares do not. I've shown the payoff of the combination at expiry, when it matches the payoff of the shares. It does *not* match the payoff of the shares before expiry or after expiry. So in this case, the payoff diagrams *only* match on the expiry date of the combination.
+
+The combination says that owning shares is like owning a call and selling a put. How can this help us understand the risks of owning shares? 
+
+
+### The Covered Call
+
+What about the covered call? The covered call consists of buying 100 shares and selling a call. But it has the *same* payoff diagram as selling a put (with the same strike as the call). Take a look: 
+
+<!-- Insert two payoff diagrams side-by-side: The $230 Apple covered call and the $230 Apple short put. -->
+
+That means the risks (and rewards) of the covered call are the same as selling a put. Let's forget everything I said about the covered call being a viable income-production strategy that mildly reduces volatility, and start over by selling a put at the same strike. That's the December 20, 2019 put on Apple with a \$230 strike, which costs \$15.30. If I sell this \$230 strike put, my payoff diagram looks like this:
+
+<!-- Insert payoff diagram: short put of Apple's $230 strike (cost: $15.30) --> 
+
+If I sell this put and Apple's shares are below \$230 on December 20, the person I sold them to can make money by exercising the put and forcing me to buy them for \$230. Just like selling a *naked* call could force me into a mad scramble for cash, selling a *naked* put can do the same thing. If I just sell the put and it gets exercised, I have to come up with the cash to buy the shares. If I don't have the cash, this can be completely disasterous. 
+
+There are two ways I can protect myself. I can write a covered put, where I short the stock and sell the put. The payoff diagram of the covered put makes this clear: if Apple's stock goes down, any losses I sustain from having sold the put will be covered by the gains I make by being short the stock. In other words, being short the stock *covers* losses I would otherwise take by selling the put. 
+
+<!-- Insert diagram: covered put -->
+
+The other way I could protect myself is by writing a cash-secured put. This is where I keep enough cash in my account to buy the shares if I needed to. For this \$230 strike put, I would need to leave \$230 * 100 = \$23,000 in my account to cover the worst-case scenario of the put being exercised at \$229.99. If Apple's shares fall below \$230, the put can be exercised early so I should have that cash in my account the entire time. Cash secured puts may have a place in other people's investing strategies, but locking up that much cash until the put expires doesn't appeal to me very much. 
+
+Moving back to the covered call: I said the covered call has a number of desirable properties. It reduces the volatility of your investments, and it is a reasonable income-enhancing strategy. You can collect income by writing calls against investments you already own, which has a certain appeal. This makes the covered call sound like a safe strategy, but it's payoff diagram is the *same* as a naked put. Is the naked put (or even the cash secured put) safe? 
+
+
+
 <!--
 ## The Straddle
 The straddle is an options strategy where an investor buys a call and a put, where both have same expiry and same strike price. Let's begin by looking at the payoff diagram of a \$220 strike straddle on Apple's shares. This time, we bought the shares at $219.84 on September 26, 2019. The put costs \$11.10, the call costs \$11.25, and they both expire on December 20, 2019. 
