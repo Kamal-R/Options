@@ -18,6 +18,11 @@ plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # "#929292"
 plot_fg_alt <- "#969696" # ??
 
+save_tables_as_pictures <- FALSE 
+load_table_pictures <- TRUE
+out_width_plot <- "80%"
+out_width_table <- "90%"
+
 options_theme <- function() {
   theme_classic() + 
   theme(plot.title = element_text(hjust = 0.5, face="bold", 
@@ -64,7 +69,7 @@ There are two components to a covered call. The first is that we sell a call. Si
 
 The `r currency(Apple_Call_K)` strike call costs `r currency(Apple_Call_Cost)`, so we can sell the `r currency(Apple_Call_K)` call that expires on December 20, 2019 for `r currency(Apple_Call_Cost)`. The payoff diagram (on  December 20, 2019) for someone who has sold this call is:  
 
-```{r Apple-Sell-Call-Option-Payoff, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Sell-Call-Option-Payoff, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Apple_Call_Cost <- 8.50
 Apple_Call_K <- 230
 x_min <- 210; x_max = 260
@@ -104,7 +109,7 @@ We're only considering the payoff of the call on its expiry date in this section
 
 Luckily, we can fix this problem by selling covered calls. A covered call is when we sell 1 call but already own 100 shares of the stock. If we have the 100 shares that we may have to give the buyer, we'll never be forced to frantically scramble for cash. Let's look at a payoff diagram of a covered call - buying 100 shares of Apple at `r currency(Apple_Current_Price)` each and selling 1 call for `r currency(Apple_Call_Cost)` x 100 = `r currency(100*Apple_Call_Cost)`.
 
-```{r Apple-Covered-Call-Payoff-Diagram, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Covered-Call-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Apple_Call_Cost <- 8.50
 Apple_Call_K <- 230
 x_min <- 190; x_max = 260 
@@ -161,7 +166,7 @@ Apple_Puts_Cost <- c(0.32, 1.69, 5.45, 15.30)
 3. 1 1 `r currency(Apple_Calls_K[3])` strike call costs `r currency(Apple_Calls_Cost[3])` x 100 = `r 100*currency(Apple_Calls_Cost[3])`.
 4. 1 1 `r currency(Apple_Calls_K[4])` strike call costs `r currency(Apple_Calls_Cost[4])` x 100 = `r 100*currency(Apple_Calls_Cost[4])`.
 
-```{r Apple-Covered-Call-Different-Strikes, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Covered-Call-Different-Strikes-Table, out.width = out_width_table, fig.align = "center", message = FALSE}
 Apple_Future_Prices <- c(100, 150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 
@@ -185,15 +190,21 @@ Apple_Covered_Call <- tibble( "Share Price" = scales::dollar(Apple_Future_Prices
                                   pmax( 0, Apple_Future_Prices - Apple_Calls_K[4] ) ),
                         negative_parens = TRUE ) )
 
-kable_styling( knitr::kable(Apple_Covered_Call, 
-                            caption = "Dollar Return if Held to Expiry"), 
-               bootstrap_options = c("bordered", "condensed", "responsive"),
-               full_width = FALSE )
+Apple_Covered_Call <- knitr::kable(Apple_Covered_Call, 
+                                   caption = "Dollar Return if Held to Expiry") %>%
+  kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
+                 full_width = FALSE )
 ```
+
+```{r Apple-Covered-Call-Different-Strikes-Table-Format, out.width = out_width_table, fig.align = "center"}
+if (save_tables_as_pictures) { save_kable(Apple_Protective_Put, file="img/03_Apple_Covered_Call.png") }
+if (load_table_pictures) { knitr::include_graphics(path="img/03_Apple_Covered_Call.png") }
+```
+
 
 The first thing to notice is that the gains (or losses) of every covered call position is lower than just owning shares. Covered call compress the range of possible gains or losses, which reduces our *volatility*. Next, we'll examine the risk-reward tradeoff of selling covered calls at different strike prices. As always, the best way to do this is by drawing a diagram. I'm only showing the covered call with a `r currency(Apple_Calls_K[1])` strike. I'd strongly encourage drawing the the remaining diagrams, so that the next few paragraphs don't turn into an incomprehensible blur of numbers.
 
-```{r Apple-145-Covered-Call-Payoff-Diagram, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-145-Covered-Call-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Apple_Call_Cost <- 78.45
 Apple_Call_K <- 145
 Apple_Current_Price <- 222.76
@@ -242,7 +253,7 @@ Let's look at a `r currency(Apple_Calls_K[2])` strike covered call. It has a bre
 
 That is more than we can make in a savings account or Treasury bond, and our breakeven is reasonably low. Apple would have to fall by slightly over `r percent(20/100)` in 3 months to fall below breakeven. While Apple could fall by `r percent(20/100)`, it's pretty unlikely. We have already considered the payoff diagram of the `r currency(Apple_Calls_K[4])` covered call - it had a breakeven of `r currency(Apple_Current_Price - Apple_Calls_Cost[4])` and can reasonably be expected to yield over `r percent(10/100)` per year. This is much higher than the `r percent( ( ( Apple_Calls_Cost[1] ) + ( Apple_Future_Prices - Apple_Current_Price ) - pmax( 0, Apple_Future_Prices - Apple_Calls_K[1] ) )[2] / Apple_Current_Price)` yield of the `r currency(Apple_Calls_K[1])` covered call or the `r percent( ( ( Apple_Calls_Cost[2] ) + ( Apple_Future_Prices - Apple_Current_Price ) - pmax( 0, Apple_Future_Prices - Apple_Calls_K[2] ) )[3] / Apple_Current_Price)` yield of the `r currency(Apple_Calls_K[2])` covered call, it comes at the cost of having a much higher breakeven price. The key takeaway is that we can achieve covered calls at the  higher yields  more yield comes at the cost of having a higher breakeven prices. 
 
-```{r Apple-Covered-Call-Different-Strikes-Relative, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Covered-Call-Different-Strikes-Relative-Table, out.width = out_width_table, fig.align = "center", message = FALSE}
 Apple_Future_Prices <- c(100, 150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 Apple_Future_Returns <-  Apple_Future_Prices - Apple_Current_Price
@@ -268,10 +279,15 @@ Apple_Covered_Call_Relative <- tibble( "Share Price" = Apple_Future_Prices,
                      pmax( 0, Apple_Future_Prices - Apple_Calls_K[4] ) ) / 
                    ( Apple_Future_Prices - Apple_Current_Price ) ) )
 
-kable_styling( knitr::kable(Apple_Covered_Call_Relative, 
-                            caption = "Relative Return if Held to Expiry"), 
-               bootstrap_options = c("bordered", "condensed", "responsive"),
-               full_width = FALSE )
+Apple_Covered_Call_Relative <- knitr::kable(Apple_Covered_Call_Relative, 
+                                            caption = "Relative Return if Held to Expiry") %>%
+  kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
+                 full_width = FALSE )
+```
+
+```{r Apple-Covered-Call-Different-Strikes-Relative-Table-Format, out.width = out_width_table, fig.align = "center"}
+if (save_tables_as_pictures) { save_kable(Apple_Protective_Put, file="img/03_Apple_Covered_Call_Relative.png") }
+if (load_table_pictures) { knitr::include_graphics(path="img/03_Apple_Covered_Call_Relative.png") }
 ```
 
 As before, the percentage returns when shares are at `r currency(Apple_Future_Prices[3])` is somewhat misleading, since someone who bought 100 shares of Apple's stock at `r currency(Apple_Current_Price)` has only lost `r 100*currency( Apple_Future_Prices[4] - Apple_Current_Price )`. The relative returns are large and positive when the shares are at `r currency(Apple_Future_Prices[3])` because the income from selling the call is more than the losses incurred from holding shares originally purchased at `r currency(Apple_Current_Price)`. More generally, the table of relative returns shows smaller losses *and* less upside when we sell covered calls with lower strike prices. 
@@ -354,7 +370,7 @@ The second reason is psychological. While stocks tend to go up other the long ru
 
 And remember, we don't have to buy puts all the time. Just when we think the benefits they provide are worth their costs.
 
-```{r Apple-Protective-Put-205-Strike-Table, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Protective-Put-205-Strike-Table, out.width = out_width_table, fig.align = "center", message = FALSE}
 Apple_Future_Prices <- c(100, 150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 Apple_Put_K <- 205
@@ -369,10 +385,15 @@ Apple_Protective_Put <- tibble( "Share Price" = scales::dollar(Apple_Future_Pric
                 pmax(0, Apple_Put_K - Apple_Future_Prices)), 
        negative_parens = TRUE) )
 
-kable_styling (knitr::kable(Apple_Protective_Put, escape = FALSE,
-                            caption = "Dollar Return if Held to Expiry"),
-               bootstrap_options = c("bordered", "condensed", "responsive"),
-               full_width = FALSE )
+Apple_Protective_Put <- knitr::kable( Apple_Protective_Put, escape = FALSE,
+                                      caption = "Dollar Return if Held to Expiry" ) %>%
+  kable_styling ( bootstrap_options = c("bordered", "condensed", "responsive"),
+                  full_width = FALSE )
+```
+
+```{r Apple-Call-Apple-Protective-Put-205-Strike-Table-Format, out.width = out_width_table, fig.align = "center"}
+if (save_tables_as_pictures) { save_kable(Apple_Protective_Put, file="img/03_Apple_Protective_Put.png") }
+if (load_table_pictures) { knitr::include_graphics(path="img/03_Apple_Protective_Put.png") }
 ```
 
 This table emphasizes the idea that using protective puts lets us define the maximum loss we can take on an investment, while maintaining almost all of our upside participation. This protective put defines our maximum loss at `r -100*currency(Apple_Puts_K[3]-Apple_Current_Price-Apple_Puts_Cost[3])`. If we own 100 shares of Apple, we'd be down that much when the shares fall by about `r percent(10/100)` to `r currency(200)`. If we own 50 shares, shares have to fall by about `r percent(20/100)` to `r currency(180)`. But if we cut our shares from 100 to 50, we make half as much money when Apple's shares are at `r currency(Apple_Future_Prices[5])` or `r currency(Apple_Future_Prices[6])` on December 20, 2019. This shows that if we want to keep more upside, selling shares is not a good option. 

@@ -1,0 +1,56 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("grDevices") )     { install.packages("grDevices") };       require(grDevices)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
+if ( !require("derivmkts") )     { install.packages("derivmkts") };       require(derivmkts)
+
+options(kableExtra.html.bsTable = T)
+options(kableExtra.auto_format = FALSE)
+```
+
+This is a trading journal. I hope to have much of the trades being tracked here work their way into a revised book that follows the "story" of each trade, where I offload most of the techinical details about the Greeks into appendices and (hopefully) YouTube videos. 
+
+# The NLY trade
+
+This trade is a protective put. It is detailed in the current version of the book in a few places. Perhaps I'll keep them scattered about to illustrate points, but maybe I'll collect them into the "NLY Trade" chapter. 
+
+It's February 12, 2020. NLY closed at \$10.05. I bought it near \$9.00, so I'm up more than 10% in about 6 months. The trade has worked, but it has exposed a limitation in my protective put strategy. NLY was at \$9.42 when I sold the January 2020 put and bought the April 17 2020 put, so I bought the \$9.00 April 17 2020 put. I did that to protect the risk-reward profile that I set up up when I entered the trade. 
+
+If I hold the April 17 2020 put to expiry, it's almost impossible to lose money from what I *originally* invested. The \$9.00 put does not protect the money I make (on paper) as NLY moves above \$9.00. To do that, I have to sell the \$9.00 put, and buy a put with a higher strike. The problem is that I *already* sold the January 2020 put, and bought the April 2020. I bought the April 2020 put for \$0.30 per share (\$30.00 per contract), and it's currently trading at \$0.03 (\$3.00 per contract). That drop eats up the \$0.25 dividend payment I'm going to receive if I hold my shares of NLY until April 2020. 
+
+<!-- Insert two payoff diagrams?? : NLY when I rolled the put, and NLY while I hold the \$9.00 put with NLY -->
+
+If I want to protect the gains I have in the NLY position, I have to sell the \$9.00 April 17 2020 put and buy the \$10.00 April 2020 put. But the dividend won't pay the \$0.30 per share (\$30 per contract) that the \$10.00 put costs, because the dividend is covering the losses in the \$9.00 April 2020 put. Could I have avoided this? Perhaps - if I had originally bought the \$9.00 February 21 2020 put and didn't roll it out to April until NLY got closer to \$10.00, I would have bought the \$10.00 April 17 2020 put instead of the \$9.00 April 17 2020 put. Or, I could have let the January 2020 put expire while NLY was trending higher, in the hopes that NLY would go up to \$10.00 before it went back down to \$9.00. If that happened, I would then buy the \$10.00 put that extended the protection out beyond another dividend payment. 
+
+But none of these things happened, and I bought the \$9.00 April 17 2020 put. At \$10.00, I have a decision to make. I originally bought NLY at \$9.06, and with the dividends covering most of what I'm spending on puts, I've made about 10% of profits on the position. Double-digit gains in 6 months in a risk-managed trade is nothing to sneeze at, and I want to protect my gains, too. But I have decide *when* NLY has gone up enough to justify spending some of the gains rolling my put higher. 
+
+I entered the NLY postion looking to make 20%-30%, and I've made 10%. That's a third to a half of what I looking for. Buying the \$10.00 put would cost \$0.30 per share, taking my gains down from 10% to about 7%. So I *could* buy the $10.00 put and lock in some gains. But I'm looking to make 20%-30%, and giving up a tenth of that to lock in 7% gains doesn't that appealing to me. NLY is still trending higher - it's gone up in almost a straight line for the last few months - and my view is that I can ride that trend higher until it breaks. As long as it doesn't break too violently, I should still have a chance to buy a \$10.00 put and lock in my gains. 
+
+NLY has it's earnings annoucement in a few minutes (February 12 2020, after the close), and I've chosen *not* to roll the put higher. I could be in for an earnings surprise, but I've chosen to *not* spend 3% to protect 7% of gains. If NLY was at \$11.00 and I could lock in about 20% of gains, I would do that in a heartbeat. That's the low end of my target for the trade, so being able to lock in those gains and participate in any additional upside in NLY risk-free is what trading dreams are made of. Unfortunately, NLY is still near \$10.00 so I'll have to wait and see if the market gods will smile upon me next month when I expect to be rolling the April 17 2020 put past the next dividend date, perhaps to July 2020. 
+
+To sum it up, the protective put position on NLY helps me *not lose* the money I originally invested in. However, it does *not* protect gains I make in NLY as NLY's shares go higher. To do that, I have to buy a put with a higher strike. Since I already rolled my January 2020 put to April 2020 and kept the strike at \$9.00, it would cost me 3% of the postion to move that $9.00 strike up to \$10.00 (and keep the same expiry of April 2020). I'm spending 3% out 10% of gains, to lock in 7%. That just doesn't appeal to me, especially while NLY has been trending higher for months. I'm hoping that NLY goes up to \$11.00, so that I can lock in gains of about 20%. 
+
+Depending on how exciting you think locking in gains of 7% is, you might have decided to roll up to \$10.00. But remember - you'd have to make this decision every time NLY goes up by $1.00. When it gets to \$11.00, are you going to spend 3% to lock in 7%? What about \$12.00 or \$13.00? Will you spend 3% to lock in 7% of gains *every* time? If you do, you'll be spending 30% of your gains to protect your gains. You can - it's a perfectly reasonably thing to do. But it's expensive. So having a plan, or at least some idea of how you'd like to manage the protective put as the stock goes higher will help you navigate the trade. 
+
+My bias is that NLY is going higher and I don't like paying for puts. So I'm *not* spending the 3%, and waiting to see if it keeps running higher. I was looking to make 20%-30% on the position, so I'm not rolling the put up until I see 20%. Or until I'm just naturally the put out past another dividend date, and I can roll it higher for "free". By free, I mean I want the dividend to cover most or all of the cost of the new put. By doing this, I'm (perhaps stubbornly) sticking the original view of my trade - I want a very low-risk way to participate in the upside of NLY, where NLY's dividends pay for the puts I use to get that low-risk participation. And I'm hoping to make at least 20%, so I don't want to spend out of my profits until I'm up about 20% on my NLY stock position. 
+
+Here's the beauty of the NLY trade - even though I'm describing it for 100 shares and 1 put, using puts for protection mean I'm only risking 1% of what I invested in the position, no matter what happens. That means that if I wanted to risk \$5,000 on this NLY trade, I would invest 100 times that. That's \$500,000, and 10% of \$500,000 is \$50,000. The 7% I could have locked would be \$35,000. Those are big numbers for risking a maximum of \$5,000 for 6 months. If I had made \$35,000 instead of a couple hundred bucks, maybe I'd have locked that in. The percentages are the same, but it's more money. So maybe that would be worth it to me. But that's beauty of the risk-managed trades - they give a low-risk, low-stress environment where you can make these kinds of decisions without being afraid of losing lots of money. 
+
+
+
+# The S&P 500 Calls 
+
+It's the morning of February 12th, and I bought 10 $339.00 SPY calls that expire on February 21, 2020. That's next Friday, which is just 9 days away. SPY was trading at \$337.22 when I bought these calls. The call expires very soon, so this an *all-or-nothing* type of trade. It's not hedged like the protective put trade on NLY or the straddles on SPY. It's just a bet that SPY is heading higher in the next days. Hopefully, SPY is heading above \$339.00 so that this trade works out for me. 
+
+If it doesn't, it's not the end of the world. The idea here is that with *all-or-nothing* trades, I'm going to be wrong and basically lose the entire amount of the trade some of the time. To make these *all-or-nothing* trades more profitable for me, I have to be *right* often enough. If I'm *wrong* and get wiped out too much, I'll lose money in the end. The idea is that I have to use some type of systematic strategy to identify conditions where a particular style of *all-or-nothing* trade is more likely to work, and only take positions in that style in those favorable conditions. My strategy uses (near-term) implied volatility of a stock as a leading indicator of it's price, and I believed that the implied volatility of SPY was heading lower over the next 10 days. So I bought the calls. 
+
+I bought a \$339.00 SPY February 21 2020 call when SPY was at \$337.22, so all of the value of this call is *time value*. It has no *intrinsic value*. It's also less than 2 weeks away from expiring, so it is losing time value very quickly. Speaking in *greeks*, my calls are burning lots of *theta*. This *theta* cost is what I pay to get exposure to *gamma*. That's the ability to exploit the *convexity* of an option's payoff function. If I'm right, I'll make lots of money relatively quickly. If I'm wrong, I'll lose my entire investment, also relatively quickly. 
+
+<!-- TODO: Add a section on how theta is the cost of gamma? Or perhaps do it here? -->
+
+It's after the market close on February 12, 2020. The call closed at my cost basis of $1.40, and SPY went up slightly to \$337.42. That's a gain of only \$0.20 (or 0.06%), but it was enough to offset my first day of *theta* burn. The VIX index is a good proxy for the implied volatility of SPY, and it fell from 14.55 to 13.74 since I bought these calls. If my strategy is correct, this is likely (but not certain) to lead SPY higher, and my short-term \$339.00 SPY calls will work out for me. I'm not sure, and I've never done an *all-or-nothing* trade before. So I guess I'll have to wait and see. 

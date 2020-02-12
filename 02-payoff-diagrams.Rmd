@@ -22,8 +22,11 @@ options(kableExtra.auto_format = FALSE)
 plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # #929292"
 plot_fg_alt <- "#969696" # ??
+
 save_tables_as_pictures <- FALSE
 load_table_pictures <- TRUE
+out_width_plot <- "80%"
+out_width_table <- "90%"
 ```
 
 ```{r Plotting-Helper-Functions}
@@ -149,7 +152,7 @@ This call option empowers its buyer to purchase shares of Company XYZ for `r cur
 ## Call Options
 Let's take our first look at a payoff diagram. It's on the call we saw for Company XYZ. 
 
-```{r Call-Option-Payoff-Plot, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Call-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Call_cost <- 5
 Call_K <- 230
 x_min <- 215; x_max = 255
@@ -187,7 +190,7 @@ Puts are a little strange if you haven't seen them before. Instead of giving us 
 We're looking at a put with a `r currency(Put_K)` strike that costs `r currency(Put_cost)`. This put gives us the option to sell shares of Company XYZ for `r currency(Put_K)`, and we'll make money if the stock is below `r currency(Put_K)`. If the shares are trading at `r currency(Future_price)`, then we can purchase 100 shares for `r currency(Future_price)` (each) and sell them for `r currency(Put_K)` (each), for an instant gain of `r currency(Put_K-Future_price)` per share. Remembering that the put cost us `r currency(Put_cost)`, we'll be left with a profit of `r currency(Put_K-Future_price-Put_cost)`. Looking at the payoff diagram, buyers of this put do indeed profit by `r currency(Put_K-Future_price-Put_cost)` per share when the shares are at `r currency(Future_price)`. 
 
 
-```{r Put-Option-Payoff-Plot, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Put-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Put_cost <- 5
 Put_K <- 180
 x_min <- 150; x_max = 200
@@ -216,7 +219,7 @@ Put_cost <- 6.10
 
 Moving on to the example, Apple is trading at `r currency(Current_price)`. The September 20, 2019 call with a `r currency(Call_K)` strike us buy 100 shares of Apple for `r currency(Call_K)` (each) on September 20, 2019. It is trading for `r currency(100*Call_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Call_cost)`" data-bottom="100"></span> = `r currency(Call_cost)` per share for this call. The September 20, 2019 put lets its buyer sell 100 shares of Apple for `r currency(Current_price)` each on September 20, 2019. It is trading for `r currency(100*Put_cost)` - the buyer is paying <span class = "fraction" data-top="`r currency(100*Put_cost)`" data-bottom="100"></span> = `r currency(Put_cost)` per share. 
 
-```{r Apple-Call-Payoff, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Call-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Call_cost <- 6.84; Call_K <- 205
 Current_price <- 205.44
 x_min = 185; x_max = 235
@@ -270,7 +273,7 @@ Apple_Call_Table <- Apple_Call_Table %>%
                      "Own 1 Call" = 2, "Relative Return" = 1) ) 
 ```
 
-```{r Apple-Call-Table-Format, out.width="80%", fig.align = "center"}
+```{r Apple-Call-Table-Format, out.width = out_width_table, fig.align = "center"}
 if (save_tables_as_pictures) { save_kable(Apple_Call_Table, file="img/02_Apple_Call_Table.png") }
 if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
 ```
@@ -283,7 +286,7 @@ The takeaway here is that the call gives dollar-for-dollar participation to the 
 
 Even with these two drawbacks, a call still limits an investor's downside compared to owning shares and gives good participation to the upside. This is the picture painted by the payoff diagram - the most we can lose is the cost of the call, and we participate dollar for dollar in the upside of the stock (after reclaiming the cost of the call). This payoff profle comes at a cost - the call expires, but the shares do not. If we own shares that are down, we can continue holding them and hope for a rebound at the risk of potentially losing more money. With the call, the most we can lose is its cost but we have to contend with expiry dates. When we start discussing options investing strategies, we'll see how this means we will have to think about which expiry date we want, how to adjust to an earlier or later expiry date if our opinion changes during the trade, and so on. 
 
-```{r Apple-Put-Option-Payoff, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-Put-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Put_Cost <- 6.10; Put_K <- 205
 Apple_Put_Cost <- Put_Cost; Apple_Put_K <- Put_K
 x_min = 180; x_max = 230
@@ -295,7 +298,8 @@ Put_Payoff_Apple_205 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.0
                                 "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
                                                       "Profit", "Loss") )
 put_payoff(data = Put_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Put")
-```     
+
+```
 
 This put give its buyer the option to sell shares of Apple at `r currency(Apple_Put_K)` on September 20, 2019. That means if Apple's shares are below `r currency(Apple_Put_K)` on that day, the put buyer makes money. When the shares are above `r currency(Apple_Put_K)`, the put buyer has lost the entire \$6.10 per share that he spent buying the put. If the shares are below `r currency(Apple_Put_K)`, the buyer must recover the cost of his put (done at `r currency(Apple_Put_K)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-Apple_Put_Cost)`). Once Apple's shares are below `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer partcipates dollar for dollar in the downside of the stock, which is the upside of the put.
 
@@ -326,7 +330,7 @@ Apple_Put_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
                              percent(remove_negative_zeros ( Apple_Puts_Dollar_Return /
                                                                Apple_Shares_Dollar_Return ) ) )
 
-Apple_Put_Table %>% 
+Apple_Put_Table <- Apple_Put_Table %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Put_Table)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr::kable(booktabs = TRUE, escape = FALSE,
@@ -335,6 +339,11 @@ Apple_Put_Table %>%
                 full_width = FALSE ) %>%
   add_header_above(c("Stock" = 1, "Own 100 Shares" = 2, 
                      "Own 1 Put" = 2, "Relative Return" = 1) )
+```
+
+```{r Apple-Put-Table-Format, out.width = out_width_table, fig.align = "center"}
+if (save_tables_as_pictures) { save_kable(Apple_Put_Table, file="img/02_Apple_Put_Table.png") }
+if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Put_Table.png") }
 ```
 
 For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is <span class = "fraction" data-top="`r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)`" data-bottom="`r currency(Apple_Put_Cost)`"></span> = `r round( (Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)/Apple_Put_Cost,2 )` times his orginal investment of `r currency(Apple_Put_Cost)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
@@ -362,10 +371,15 @@ Apple_Different_Strikes <- tibble( "Strike Prices" = currency(Apple_Prices_K),
                                    "1 Call" = currency(Apple_Call_Costs),
                                    "1 Put" = currency(Apple_Put_Costs) ) 
 
-kable_styling( knitr::kable(Apple_Different_Strikes, 
-                            caption = "Cost on Sept. 11, 2019"), 
-               bootstrap_options = c("bordered", "condensed", "responsive"),
+Apple_Different_Strikes <- knitr::kable(Apple_Different_Strikes, 
+             caption = "Cost on Sept. 11, 2019") %>%
+kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
                full_width = FALSE )
+```
+
+```{r Apple-Different-Strikes-Table-Format, out.width = out_width_table, fig.align = "center"}
+if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes, file="img/02_Apple_Different_Strikes.png") }
+if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
 ```
 
 To keep the discussion simple, we’ll continue to focus on the price of the option on its expiry date. Remember, one call lets its buyer purchase 100 shares of Apple at its strike price, and one put lets its buyer sell 100 shares at its strike price. Let’s compare the dollar return of each call option to owning 100 shares if, on December 20, 2019, Apple's shares:
@@ -376,8 +390,8 @@ To keep the discussion simple, we’ll continue to focus on the price of the opt
 4. Increase a little to `r currency(Apple_Future_Prices[4])`.
 5. Increase a lot to `r currency(Apple_Future_Prices[5])`.
 
-```{r Apple-Different-Strikes-Call-Payoff}
-Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = Apple_Future_Prices,
+```{r Apple-Different-Strikes-Call-Payoff-Table}
+Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = scales::dollar(Apple_Future_Prices),
       "100 Shares" = scales::dollar(100 * (Apple_Future_Prices - Apple_Current_Price),
                                     negative_parens = TRUE), 
       "1 $145 Strike Call" = scales::dollar( 100 * ( 
@@ -393,13 +407,19 @@ Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = Apple_Future_Pric
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[4] ) - Apple_Call_Costs[4] ), 
         negative_parens = TRUE ) )
 
-Apple_Different_Strikes_Call_Payoff %>% 
+Apple_Different_Strikes_Call_Payoff <- Apple_Different_Strikes_Call_Payoff %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Different_Strikes_Call_Payoff)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr::kable(booktabs = TRUE, escape = FALSE,
                caption = "Dollar Return if Held to Expiry") %>% 
   kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"),
                 full_width = FALSE ) 
+```
+
+```{r Apple-Different-Strikes-Call-Payoff-Table-Format, out.width = out_width_table, fig.align = "center"}
+if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Payoff,
+                                          file="img/02_Apple_Different_Strikes_Call_Payoff_Table.png") }
+if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Payoff_Table.png")}
 ```
 
 To give these dollar returns some context, buying
@@ -414,7 +434,7 @@ The first thing to do when trying to make sense of option profit and loss number
 
 The `r currency(Apple_Prices_K[4])` strike call (the right-most column in the table) has the simplest profit and loss numbers. Even without a payoff diagram, just having the breakeven price in mind can help make sense of its column in the table below. The breakeven of this call is `r currency(Apple_Prices_K[4])` + `r currency(Apple_Call_Costs[4])` = `r currency(Apple_Prices_K[4]+Apple_Call_Costs[4])`. It costs `r currency(100*Apple_Call_Costs[4])` and expires worthless if Apple's shares are less than `r currency(Apple_Prices_K[4])` on December 20, 2019. If Apple's shares are at `r currency(Apple_Future_Prices[4])`, the call buyer makes `r currency(Apple_Future_Prices[4])` - `r currency(Apple_Prices_K[4])` - `r currency(Apple_Call_Costs[4])` = `r currency(Apple_Future_Prices[4] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per share, or `r 100 * currency(Apple_Future_Prices[4] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per call. If Apple's shares are at `r currency(Apple_Future_Prices[5])`, the call buyer makes `r currency(Apple_Future_Prices[5])`  - `r currency(Apple_Prices_K[4])` - `r currency(Apple_Call_Costs[4])` = `r currency(Apple_Future_Prices[5] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per share, or `r 100 * currency(Apple_Future_Prices[5] - Apple_Prices_K[4] - Apple_Call_Costs[4])` per call. Those are indeed the profit and loss numbers in the table up above. 
 
-```{r Apple_205_Strike, out.width = "80%", fig.align = "center", message = FALSE}
+```{r Apple-205-Strike-Call-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Call_cost <- Apple_Call_Costs[3]
 Call_K <- Apple_Prices_K[3]
 x_min <- 180; x_max = 280
@@ -459,13 +479,19 @@ Apple_Different_Strikes_Call_Relative_Payoff <- tibble( "Share Price" = currency
       "1 $230 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
                                         ( pmax( 0, (Apple_Future_Prices - 230 ) ) - 8.50 ) ) )
 
-Apple_Different_Strikes_Call_Relative_Payoff %>%
+Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Relative_Payoff %>%
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Different_Strikes_Call_Relative_Payoff)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr::kable(booktabs = TRUE, escape = FALSE,
                caption = "Relative Return if Held to Expiry") %>% 
   kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"),
                 full_width = FALSE ) 
+```
+
+```{r Apple-Different-Strikes-Call-Relative-Payoff-Table-Format, out.width=out_width_table, fig.align = "center"}
+if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
+                                          file="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") }
+if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png")}
 ```
 
 The relative return table does an excellent job of capturing how much participation we get when there are extreme price movements (up or down). As we move across the `r currency(Apple_Future_Prices[1])` row, the cheaper calls limit our downside. And in the `r currency(Apple_Future_Prices[4])` and `r currency(Apple_Future_Prices[5])` rows, they give good upside participation relative to owning 100 shares. The `r currency(Apple_Future_Prices[2])` and `r currency(Apple_Future_Prices[3])` rows are harder to interpret. The percentages are large, but we know from earlier that their dollar losses are small - they are still limited to the cost of the option. So while relative return tables are helpful, they can be difficult to understand without some sense of the magnitude of the dollar amounts. 

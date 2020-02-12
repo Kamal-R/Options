@@ -68,4 +68,5 @@ no_axis_ticks <- function() {
 ## The Bullish 3-Way
 
 
-## The Calender Spread
+
+## The Ratio Call Spread
