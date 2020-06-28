@@ -10,6 +10,6 @@ Imports:
   formattable, 
   kableExtra,
 Remotes: 
-  rstudio/bookdown
+  rstudio/bookdown,
   ropensci/magick
 
