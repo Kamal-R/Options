@@ -9,6 +9,7 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 
 if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
 if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
 if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
 if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
@@ -23,7 +24,7 @@ plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # #929292"
 plot_fg_alt <- "#969696" # ??
 
-save_tables_as_pictures <- FALSE
+save_tables_as_pictures <- TRUE
 load_table_pictures <- TRUE
 out_width_plot <- "80%"
 out_width_table <- "90%"
@@ -46,13 +47,13 @@ options_theme <- function(legend_position="left") {
         axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
                                     colour = plot_fg),
         axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
-                                    angle = 90, colour = plot_fg),
+                                    angle = 90),
         axis.text.x = element_text(colour = "black"), 
-        axis.text.y = element_text(colour = "black") )
+        axis.ticks = element_blank() )
 }
 
 
-call_payoff <- function(data, main, Call_K, Call_cost) {
+call_payoff <- function(data, main, Call_K, Call_cost, breakeven_offset = 2) {
   ggplot() + 
   geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
             linetype = "solid") +   
@@ -63,29 +64,26 @@ call_payoff <- function(data, main, Call_K, Call_cost) {
   geom_segment(data = data,
                aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
                arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-               show.legend = FALSE, col = "green") + 
+               show.legend = FALSE, col = "green3") + 
   geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
                    y = 0, yend = 0, color = "Breakeven"), 
                show.legend = FALSE, linetype = "solid") +
   geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
                    y = 0, yend = 0, color = "Breakeven"), 
                  show.legend = FALSE, linetype = "solid") +
-  annotate(geom = "text", x = Call_K+Call_cost+1, y = 0, color = "black", hjust = 0,
-           label = paste0("Breakeven: $",Call_K + Call_cost), size = 5 ) + 
+  annotate(geom = "text", x = Call_K+Call_cost+breakeven_offset, y = 0, color = "black", hjust = 0,
+           label = paste0("Breakeven: ",scales::dollar(Call_K + Call_cost)), size = 5 ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = main,
-       x = "Stock Price",
-       y = "Profit Per Share") +
-  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green", "Loss" = "red"),
-                     labels = c("", "", ""),
-                     guide = "legend") + 
+  labs(title = main, x = "Stock Price", y = "Profit") +
+  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green3", "Loss" = "red"),
+                     labels = c("", "", ""), guide = "legend") + 
   guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
                                                   linetype = c("dashed","solid","solid")))) + 
   options_theme()
 }
 
-put_payoff <- function(data, main) {
+put_payoff <- function(data, main, breakeven_offset = 15) {
   ggplot() + 
   geom_line(data = data, aes(Put_x, Put_y, color = Profitable), 
             linetype = "solid") +
@@ -97,19 +95,16 @@ put_payoff <- function(data, main) {
                aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
                arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
                show.legend = FALSE, col = "red") + 
-  geom_hline(aes(yintercept = 0, color = "Breakeven"),
-            linetype = "dashed") +
-  geom_vline(aes(xintercept = Put_K - Put_cost, color = "Breakeven"), 
-            show.legend = FALSE, linetype = "dashed") +
+  annotate(geom = "text", x = Put_K-Put_cost-breakeven_offset, y = 0, color = "black", hjust = 0,
+           label = paste0("Breakeven: ",scales::dollar(Put_K-Put_cost)), size = 5 ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
   labs(title = main,
        x = "Stock Price",
-       y = "Profit Per Share") +
-  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green", "Loss" = "red"),
-                     labels = c(paste0("Breakeven: ", currency(Put_K - Put_cost)), "", ""),
-                     guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c(plot_fg, "white","white"),
+       y = "Profit") +
+  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green3", "Loss" = "red"),
+                     labels = c("", "", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
                                                   linetype = c("dashed","solid","solid")))) + 
   options_theme(legend_position="right")
 }
@@ -156,13 +151,18 @@ Let's take our first look at a payoff diagram. It's on the call we saw for Compa
 Call_cost <- 5
 Call_K <- 230
 x_min <- 215; x_max = 255
+
 Call_Payoff_XYZ_230 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
                                "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
                                "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                       "Profit","Loss") )
 
-call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
-            main = "Buy: Company XYZ's $230 Strike Call")
+temp <- call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
+                    main = "Buy: XYZ's $230 Strike Call")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
 # ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
 #                      main = "Buy: Company XYZ's $230 Strike Call")) %>%
 #  style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
@@ -199,7 +199,12 @@ Put_Payoff_XYZ_180 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01)
                            "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
                            "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
                                                  "Profit", "Loss") )
-put_payoff(data = Put_Payoff_XYZ_180, main = "Buy: Company XYZ's $180 Put")
+
+temp <- put_payoff(data = Put_Payoff_XYZ_180, main = "Buy: XYZ's $180 Put")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
 ```     
 
 The breakeven of the put is `r currency(Put_K-Put_cost)`, because we need the shares to fall by `r currency(Put_cost)` to recover the cost of buying the put. Similar to calls, we can't lose more than we paid for the put. Unlike calls, the dollar-for-dollar "upside" participation we get happens when the stock goes down. This is the big idea behind puts - they make money when prices go down. This is a magical property because it opens up so many new investing strategies. Some are simple and some are very complex. But they're all built the same way - by mixing and matching different combinations of puts, calls, and shares to control how much an investment portfolio goes up (or down) when market prices go up. We'll come back to this idea every time we use options to construct risk-managed investments, which we'll do many times in this book.
@@ -228,8 +233,14 @@ Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
                               "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
                               "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                     "Profit","Loss") )
-call_payoff(data = Call_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Call",
-            Call_K = Call_K, Call_cost = Call_cost)
+
+temp <- call_payoff(data = Call_Payoff_Apple_205, Call_K = Call_K, Call_cost = Call_cost,
+                    main = "Buy: Apple's $205 Strike Call")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
+
 ```
 
 Here's a payoff diagram of this call option. Below `r currency(Call_K)`, the buyer loses `r currency(Call_cost)` per share, which is what he paid for the call. This is the entire cost of the call, since it expires worthless. Since he paid `r currency(Call_cost)` per share for the call, he has to make `r currency(Call_cost)` back before he becomes profitable. Therefore, his breakeven is `r currency(Call_K)` + `r currency(Call_cost)` = `r currency(Call_cost+Call_K)`. This is reflected in the payoff diagram, where his profits are negative when the stock is below `r currency(Call_cost+Call_K)` and positive when it is above `r currency(Call_cost+Call_K)`.
@@ -274,7 +285,8 @@ Apple_Call_Table <- Apple_Call_Table %>%
 ```
 
 ```{r Apple-Call-Table-Format, out.width = out_width_table, fig.align = "center"}
-if (save_tables_as_pictures) { save_kable(Apple_Call_Table, file="img/02_Apple_Call_Table.png") }
+if (save_tables_as_pictures) { save_kable(Apple_Call_Table, zoom = 2.5,
+                                          file="img/02_Apple_Call_Table.png") }
 if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
 ```
 
@@ -297,8 +309,12 @@ Put_Payoff_Apple_205 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.0
                                 "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
                                 "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
                                                       "Profit", "Loss") )
-put_payoff(data = Put_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Put")
 
+temp <- put_payoff(data = Put_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Put")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
 ```
 
 This put give its buyer the option to sell shares of Apple at `r currency(Apple_Put_K)` on September 20, 2019. That means if Apple's shares are below `r currency(Apple_Put_K)` on that day, the put buyer makes money. When the shares are above `r currency(Apple_Put_K)`, the put buyer has lost the entire \$6.10 per share that he spent buying the put. If the shares are below `r currency(Apple_Put_K)`, the buyer must recover the cost of his put (done at `r currency(Apple_Put_K)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-Apple_Put_Cost)`). Once Apple's shares are below `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer partcipates dollar for dollar in the downside of the stock, which is the upside of the put.
@@ -342,7 +358,8 @@ Apple_Put_Table <- Apple_Put_Table %>%
 ```
 
 ```{r Apple-Put-Table-Format, out.width = out_width_table, fig.align = "center"}
-if (save_tables_as_pictures) { save_kable(Apple_Put_Table, file="img/02_Apple_Put_Table.png") }
+if (save_tables_as_pictures) { save_kable(Apple_Put_Table, zoom = 2.5,
+                                          file = "img/02_Apple_Put_Table.png") }
 if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Put_Table.png") }
 ```
 
@@ -378,7 +395,8 @@ kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
 ```
 
 ```{r Apple-Different-Strikes-Table-Format, out.width = out_width_table, fig.align = "center"}
-if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes, file="img/02_Apple_Different_Strikes.png") }
+if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes, zoom = 2.5,
+                                          file = "img/02_Apple_Different_Strikes.png") }
 if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
 ```
 
@@ -417,8 +435,8 @@ Apple_Different_Strikes_Call_Payoff <- Apple_Different_Strikes_Call_Payoff %>%
 ```
 
 ```{r Apple-Different-Strikes-Call-Payoff-Table-Format, out.width = out_width_table, fig.align = "center"}
-if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Payoff,
-                                          file="img/02_Apple_Different_Strikes_Call_Payoff_Table.png") }
+if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 2.5,
+                                          file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png") }
 if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Payoff_Table.png")}
 ```
 
@@ -443,8 +461,13 @@ Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
                                  "Call_y" = -Call_cost + (Call_x > Call_K) * (Call_x - Call_K),
                                  "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                        "Profit","Loss") )
-call_payoff(data = Call_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Call",
-            Call_K = Call_K, Call_cost = Call_cost)
+
+temp <- call_payoff(data = Call_Payoff_Apple_205, Call_K = Call_K, Call_cost = Call_cost,
+                    main = "Buy: Apple's $205 Strike Call")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
 ```
 
 The `r currency(Apple_Prices_K[3])` strike call is similar. We've drawn the payoff diagram this time, and it gives the breakeven to be `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])` When shares are below `r currency(Apple_Prices_K[3])`, the call expires worthless and the buyer loses `r currency(100*Apple_Call_Costs[3])`. The call buyer still loses money when shares are at `r currency(Apple_Future_Prices[3])` because `r currency(Apple_Future_Prices[3])` is below this call's breakeven of `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`. The call cost `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`, but the buyer will have only made `r currency(Apple_Future_Prices[3])` - `r currency(Apple_Prices_K[3])` = `r currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per share (`r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per call) before paying for the call. This leaves him with a loss of `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` - `r currency(Apple_Call_Costs[3])` = `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3] - Apple_Call_Costs[3])` per share.
@@ -489,7 +512,7 @@ Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Rel
 ```
 
 ```{r Apple-Different-Strikes-Call-Relative-Payoff-Table-Format, out.width=out_width_table, fig.align = "center"}
-if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
+if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Relative_Payoff, zoom = 2.5,
                                           file="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") }
 if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png")}
 ```
