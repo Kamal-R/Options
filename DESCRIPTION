@@ -8,6 +8,7 @@ Imports:
   htmlwidgets, 
   plotly, 
   formattable, 
-  kableExtra
+  kableExtra,
+  magick
 Remotes: 
   rstudio/bookdown
