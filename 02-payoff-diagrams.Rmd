@@ -24,7 +24,7 @@ plot_bg <- "#FFFFFF" # "#191919"
 plot_fg <- "#000000" # #929292"
 plot_fg_alt <- "#969696" # ??
 
-save_tables_as_pictures <- TRUE
+save_tables_as_pictures <- FALSE
 load_table_pictures <- TRUE
 out_width_plot <- "80%"
 out_width_table <- "90%"
