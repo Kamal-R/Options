@@ -36,7 +36,7 @@ addons:
   apt:
     sources:
     - sourceline: 'ppa:opencpu/imagemagick'
-    - sourceline: 'ppa:opencpu/poppler'
+    - sourceline: 'ppa:opencpu/opencpu-2.2'
     packages:
     - libmagick++-dev
     - libpoppler-cpp-dev
