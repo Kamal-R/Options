@@ -53,6 +53,32 @@ options_theme <- function(legend_position="left") {
 }
 
 
+stock_payoff <- function(data, main, stock_cost, breakeven_offset = 2) {
+  ggplot() + 
+  geom_line(data = data, aes(stock_price_x, stock_profit_y, color = Profitable), linetype = "solid") +   
+  geom_segment(data = data,
+               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
+                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+               show.legend = FALSE, col = "red") + 
+  geom_segment(data = data,
+               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
+                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  annotate(geom = "text", x = stock_cost+breakeven_offset, y = 0, color = "black", hjust = 0,
+           label = paste0("Breakeven: ",scales::dollar(stock_cost)), size = 5 ) + 
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = main, x = "Stock Price", y = "Profit") +
+  scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
+                     labels = c("", "", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
+                                                  linetype = c("dashed","solid","solid")))) + 
+  options_theme()
+}
+
+
 call_payoff <- function(data, main, Call_K, Call_cost, breakeven_offset = 2) {
   ggplot() + 
   geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
@@ -131,11 +157,21 @@ In our first few chapters, we'll be looking at how options perform on their expi
 ## Payoff Diagrams for Stocks
 
 ```{r Stock-Demo}
-Current_price <- 200
-Future_price <- 240
-```
+Stock_cost <- 200
+x_min = 160; x_max = 240
 
-ADD
+Stock_Payoff_XYZ <- tibble( "stock_price_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "stock_profit_y" = -Stock_cost + seq(from = x_min, to = x_max, by = 0.01),
+                            "Profitable" = ifelse(-Stock_cost + seq(from = x_min, to = x_max, by = 0.01) > 0, 
+                                                  "Profit","Loss") )
+
+
+temp <- stock_payoff(Stock_Payoff_XYZ, "Buy: XYZ's Shares at $200", Stock_cost, 5)
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
+```
 
 ## Options on Expiry Day
 ```{r Call-Demo}
