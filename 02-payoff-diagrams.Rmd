@@ -15,7 +15,7 @@ if ( !require("plotly") )        { install.packages("plotly") };          requir
 if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
 if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
 
-options(kableExtra.html.bsTable = T)
+options(kableExtra.html.bsTable = TRUE)
 options(kableExtra.auto_format = FALSE)
 ```
 
@@ -127,6 +127,15 @@ Our second goal is to understand how options perform compared to owning shares. 
 
 In our first few chapters, we'll be looking at how options perform on their expiry date. Later on, we'll look at options are priced before their expiry date, the option greeks, how to risk-manage an options position, and how to build investment portfolios using options. But before we get there, we need to know when and why to use different options strategies. The payoff diagram and these tables give us the tools we need to figure that out.
 
+
+## Payoff Diagrams for Stocks
+
+```{r Stock-Demo}
+Current_price <- 200
+Future_price <- 240
+```
+
+ADD
 
 ## Options on Expiry Day
 ```{r Call-Demo}
@@ -284,7 +293,7 @@ Apple_Call_Table <- Apple_Call_Table %>%
                      "Own 1 Call" = 2, "Relative Return" = 1) ) 
 ```
 
-```{r Apple-Call-Table-Format, out.width = out_width_table, fig.align = "center"}
+```{r Apple-Call-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
 if (save_tables_as_pictures) { save_kable(Apple_Call_Table, zoom = 2.5,
                                           file="img/02_Apple_Call_Table.png") }
 if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
@@ -357,7 +366,7 @@ Apple_Put_Table <- Apple_Put_Table %>%
                      "Own 1 Put" = 2, "Relative Return" = 1) )
 ```
 
-```{r Apple-Put-Table-Format, out.width = out_width_table, fig.align = "center"}
+```{r Apple-Put-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
 if (save_tables_as_pictures) { save_kable(Apple_Put_Table, zoom = 2.5,
                                           file = "img/02_Apple_Put_Table.png") }
 if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Put_Table.png") }
@@ -394,7 +403,7 @@ kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
                full_width = FALSE )
 ```
 
-```{r Apple-Different-Strikes-Table-Format, out.width = out_width_table, fig.align = "center"}
+```{r Apple-Different-Strikes-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
 if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes, zoom = 2.5,
                                           file = "img/02_Apple_Different_Strikes.png") }
 if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
@@ -434,7 +443,7 @@ Apple_Different_Strikes_Call_Payoff <- Apple_Different_Strikes_Call_Payoff %>%
                 full_width = FALSE ) 
 ```
 
-```{r Apple-Different-Strikes-Call-Payoff-Table-Format, out.width = out_width_table, fig.align = "center"}
+```{r Apple-Different-Strikes-Call-Payoff-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
 if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 2.5,
                                           file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png") }
 if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Payoff_Table.png")}
@@ -511,7 +520,7 @@ Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Rel
                 full_width = FALSE ) 
 ```
 
-```{r Apple-Different-Strikes-Call-Relative-Payoff-Table-Format, out.width=out_width_table, fig.align = "center"}
+```{r Apple-Different-Strikes-Call-Relative-Payoff-Table-Format, out.width=out_width_table, fig.align = "center", tab = NULL}
 if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Relative_Payoff, zoom = 2.5,
                                           file="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") }
 if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png")}
