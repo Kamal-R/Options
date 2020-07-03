@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
 if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
+if ( !require("pBrackets") )     { install.packages("pBrackets") };       require(pBrackets)
 if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
 if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
 if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
@@ -28,9 +29,21 @@ save_tables_as_pictures <- FALSE
 load_table_pictures <- TRUE
 out_width_plot <- "80%"
 out_width_table <- "90%"
+
+grid::grid.locator(unit="npc") 
 ```
 
 ```{r Plotting-Helper-Functions}
+### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
 options_theme <- function(legend_position="left") {
   theme_classic() + 
   theme(plot.title = element_text(hjust = 0.5, face="bold", 
@@ -66,11 +79,9 @@ stock_payoff <- function(data, main, stock_cost, breakeven_offset = 2) {
                    y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
                arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
                show.legend = FALSE, col = "green3") + 
-  annotate(geom = "text", x = stock_cost+breakeven_offset, y = 0, color = "black", hjust = 0,
-           label = paste0("Breakeven: ",scales::dollar(stock_cost)), size = 5 ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = main, x = "Stock Price", y = "Profit") +
+  labs(title = main, x = "", y = "") +
   scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
                      labels = c("", "", ""), guide = "legend") + 
   guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
@@ -97,8 +108,6 @@ call_payoff <- function(data, main, Call_K, Call_cost, breakeven_offset = 2) {
   geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
                    y = 0, yend = 0, color = "Breakeven"), 
                  show.legend = FALSE, linetype = "solid") +
-  annotate(geom = "text", x = Call_K+Call_cost+breakeven_offset, y = 0, color = "black", hjust = 0,
-           label = paste0("Breakeven: ",scales::dollar(Call_K + Call_cost)), size = 5 ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
   labs(title = main, x = "Stock Price", y = "Profit") +
@@ -165,12 +174,25 @@ Stock_Payoff_XYZ <- tibble( "stock_price_x" = seq(from = x_min, to = x_max, by =
                             "Profitable" = ifelse(-Stock_cost + seq(from = x_min, to = x_max, by = 0.01) > 0, 
                                                   "Profit","Loss") )
 
+b1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
+b2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
 
+### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
 temp <- stock_payoff(Stock_Payoff_XYZ, "Buy: XYZ's Shares at $200", Stock_cost, 5)
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
-tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
-                      "red", "green3" )
-temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 160, y = -12, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotate( geom = "text", x = 231, y = 12, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotate( geom = "text", x = Stock_cost-7.5, y = min(y_axis_labels), color = "green3", hjust = 0,
+               label = paste0("Breakeven: ", scales::dollar(Stock_cost)), size = 4 ) + 
+     annotate( geom = "text", x = Stock_cost-7.5, y = min(y_axis_labels), color = "red", hjust = 0,
+               label = "Breakev", size = 4 ) +
+     annotation_custom( b1 ) + annotation_custom( b2 ) 
+temp; rm(temp)
 ```
 
 ## Options on Expiry Day

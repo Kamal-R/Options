@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.16)  28 JUN 2020 19:56
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.16)  2 JUL 2020 22:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1156,17 +1156,26 @@ Chapter 1.
 
 ] [8] [9] [10]
 Chapter 2.
+File: 02-payoff-diagrams_files/figure-latex/Stock-Demo-1.pdf Graphic file (type
+ pdf)
+<use 02-payoff-diagrams_files/figure-latex/Stock-Demo-1.pdf>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 [11
 
-]
+] [12]
 File: 02-payoff-diagrams_files/figure-latex/Call-Option-Payoff-Plot-1.pdf Graph
 ic file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Call-Option-Payoff-Plot-1.pdf>
-[12] [13]
+[13]
 File: 02-payoff-diagrams_files/figure-latex/Put-Option-Payoff-Plot-1.pdf Graphi
 c file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Put-Option-Payoff-Plot-1.pdf>
-[14]
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[14] [15]
 File: 02-payoff-diagrams_files/figure-latex/Apple-Call-Payoff-Plot-1.pdf Graphi
 c file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Apple-Call-Payoff-Plot-1.pdf>
@@ -1175,7 +1184,7 @@ File: img/02_Apple_Call_Table.png Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[15] [16]
+[16] [17]
 File: 02-payoff-diagrams_files/figure-latex/Apple-Put-Option-Payoff-Plot-1.pdf 
 Graphic file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Apple-Put-Option-Payoff-Plot-1.pdf>
@@ -1184,31 +1193,33 @@ File: img/02_Apple_Put_Table.png Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[17] [18]
+[18] [19]
 File: img/02_Apple_Call_Table.png Graphic file (type bmp)
 <img/02_Apple_Call_Table.png>
 File: img/02_Apple_Different_Strikes_Call_Payoff_Table.png Graphic file (type b
 mp)
 <img/02_Apple_Different_Strikes_Call_Payoff_Table.png>
-[19]
+[20]
 File: 02-payoff-diagrams_files/figure-latex/Apple-205-Strike-Call-Payoff-Plot-1
 .pdf Graphic file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Apple-205-Strike-Call-Payoff-Plot-1.
 pdf>
-[20]
-Underfull \hbox (badness 10000) in paragraph at lines 381--383
+[21]
+Underfull \hbox (badness 10000) in paragraph at lines 386--388
 
  []
 
 File: img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png Graphic fil
 e (type bmp)
 <img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png>
-[21]
-
-LaTeX Warning: Reference `tab:Apple-Different-Strikes-Table' on page 22 undefin
-ed on input line 398.
-
 [22]
+
+LaTeX Warning: Reference `tab:Apple-Different-Strikes-Table' on page 23 undefin
+ed on input line 403.
+
+[23] [24
+
+]
 Chapter 3.
 File: 03-first-look-strategies_files/figure-latex/Apple-Sell-Call-Option-Payoff
 -1.pdf Graphic file (type pdf)
@@ -1217,27 +1228,25 @@ File: 03-first-look-strategies_files/figure-latex/Apple-Sell-Call-Option-Payoff
 
 Underfull \vbox (badness 5119) has occurred while \output is active []
 
-[23
-
-]
+[25]
 File: 03-first-look-strategies_files/figure-latex/Apple-Covered-Call-Payoff-Plo
 t-1.pdf Graphic file (type pdf)
 <use 03-first-look-strategies_files/figure-latex/Apple-Covered-Call-Payoff-Plot
 -1.pdf>
-[24] [25]
+[26] [27]
 File: img/03_Apple_Covered_Call.png Graphic file (type bmp)
 <img/03_Apple_Covered_Call.png>
 File: 03-first-look-strategies_files/figure-latex/Apple-145-Covered-Call-Payoff
 -Plot-1.pdf Graphic file (type pdf)
 <use 03-first-look-strategies_files/figure-latex/Apple-145-Covered-Call-Payoff-
 Plot-1.pdf>
-[26]
+[28]
 File: img/03_Apple_Covered_Call_Relative.png Graphic file (type bmp)
 <img/03_Apple_Covered_Call_Relative.png>
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[27] [28]
+[29] [30]
 File: 03-first-look-strategies_files/figure-latex/Apple-Protective-Put-205-Stri
 ke-Payoff-Diagram-1.pdf Graphic file (type pdf)
 <use 03-first-look-strategies_files/figure-latex/Apple-Protective-Put-205-Strik
@@ -1245,32 +1254,32 @@ e-Payoff-Diagram-1.pdf>
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[29] [30]
+[31] [32]
 File: img/03_Apple_Protective_Put.png Graphic file (type bmp)
 <img/03_Apple_Protective_Put.png>
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[31] [32]
+[33] [34]
 File: 03-first-look-strategies_files/figure-latex/NLY-Protective-Put-Plot-1.pdf
  Graphic file (type pdf)
 <use 03-first-look-strategies_files/figure-latex/NLY-Protective-Put-Plot-1.pdf>
 
-[33] [34] [35]
+[35] [36] [37]
 File: 03-first-look-strategies_files/figure-latex/Apple-205-Covered-Call-1.pdf 
 Graphic file (type pdf)
 <use 03-first-look-strategies_files/figure-latex/Apple-205-Covered-Call-1.pdf>
-[36]
+[38]
 File: 03-first-look-strategies_files/figure-latex/NLY-Protective-Put-Manage-1.p
 df Graphic file (type pdf)
 <use 03-first-look-strategies_files/figure-latex/NLY-Protective-Put-Manage-1.pd
 f>
-[37]
+[39]
 Underfull \vbox (badness 1062) has occurred while \output is active []
 
-[38] [39] [40]
+[40] [41] [42]
 Chapter 4.
-[41
+[43
 
 ]
 File: 05-the-greeks_files/figure-latex/Apple-Call-Option-Payoff-1.pdf Graphic f
@@ -1279,11 +1288,11 @@ ile (type pdf)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[42]
+[44]
 File: 05-the-greeks_files/figure-latex/XYZ-Delta-Before-Expiry-100-1.pdf Graphi
 c file (type pdf)
 <use 05-the-greeks_files/figure-latex/XYZ-Delta-Before-Expiry-100-1.pdf>
-[43] [44]
+[45] [46]
 File: 05-the-greeks_files/figure-latex/XYZ-Before-Expiry-90-1.pdf Graphic file 
 (type pdf)
 <use 05-the-greeks_files/figure-latex/XYZ-Before-Expiry-90-1.pdf>
@@ -1293,20 +1302,20 @@ File: 05-the-greeks_files/figure-latex/XYZ-Before-Expiry-110-1.pdf Graphic file
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[45]
+[47]
 File: 05-the-greeks_files/figure-latex/XYZ-Delta-1.pdf Graphic file (type pdf)
 <use 05-the-greeks_files/figure-latex/XYZ-Delta-1.pdf>
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[46]
+[48]
 File: 05-the-greeks_files/figure-latex/XYZ-Gamma-Before-Expiry-100-1.pdf Graphi
 c file (type pdf)
 <use 05-the-greeks_files/figure-latex/XYZ-Gamma-Before-Expiry-100-1.pdf>
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[47] [48]
+[49] [50]
 File: 05-the-greeks_files/figure-latex/XYZ-Gamma-Before-Expiry-90-1.pdf Graphic
  file (type pdf)
 <use 05-the-greeks_files/figure-latex/XYZ-Gamma-Before-Expiry-90-1.pdf>
@@ -1316,16 +1325,16 @@ c file (type pdf)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[49]
+[51]
 File: 05-the-greeks_files/figure-latex/XYZ-Payoff-Diagram-1.pdf Graphic file (t
 ype pdf)
 <use 05-the-greeks_files/figure-latex/XYZ-Payoff-Diagram-1.pdf>
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[50] [51] [52]
+[52] [53] [54]
 Chapter 5.
-[53
+[55
 
 ]
 File: 06-implied-volatility_files/figure-latex/Binomial-Lattice-Example-Stock-1
@@ -1343,7 +1352,7 @@ File: 06-implied-volatility_files/figure-latex/Binomial-Lattice-Example-20-Call
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[54]
+[56]
 File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-50-strik
 e-1.pdf Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-50-strike
@@ -1351,7 +1360,7 @@ e-1.pdf Graphic file (type pdf)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[55]
+[57]
 File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-45-strik
 e-1.pdf Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-45-strike
@@ -1359,7 +1368,7 @@ e-1.pdf Graphic file (type pdf)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[56]
+[58]
 File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-strik
 e-1.pdf Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-strike
@@ -1367,7 +1376,7 @@ e-1.pdf Graphic file (type pdf)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[57]
+[59]
 File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-50-strik
 e-Vega-1.pdf Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-50-strike
@@ -1375,7 +1384,7 @@ e-Vega-1.pdf Graphic file (type pdf)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[58]
+[60]
 File: 06-implied-volatility_files/figure-latex/XYZ-Vega-vs-Sigma-50-strike-1.pd
 f Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Vega-vs-Sigma-50-strike-1.pdf
@@ -1383,7 +1392,7 @@ f Graphic file (type pdf)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[59]
+[61]
 File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-
 5-1.pdf Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-5
@@ -1391,7 +1400,7 @@ File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[60]
+[62]
 File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-
 10-1.pdf Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-1
@@ -1399,12 +1408,12 @@ File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[61]
+[63]
 File: 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-
 20-1.pdf Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Call-Price-vs-Sigma-55-Vega-2
 0-1.pdf>
-[62]
+[64]
 File: 06-implied-volatility_files/figure-latex/XYZ-Vega-vs-Sigma-55-strike-1.pd
 f Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Vega-vs-Sigma-55-strike-1.pdf
@@ -1416,55 +1425,55 @@ e-Replicate-1.pdf Graphic file (type pdf)
 
 Underfull \vbox (badness 7558) has occurred while \output is active []
 
-[63]
+[65]
 File: 06-implied-volatility_files/figure-latex/XYZ-Vega-vs-Sigma-45-strike-1.pd
 f Graphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Vega-vs-Sigma-45-strike-1.pdf
 >
-[64] [65]
+[66] [67]
 File: 06-implied-volatility_files/figure-latex/XYZ-Time-Value-50-strike-1.pdf G
 raphic file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Time-Value-50-strike-1.pdf>
-[66]
+[68]
 File: 06-implied-volatility_files/figure-latex/XYZ-Theta-50-strike-1.pdf Graphi
 c file (type pdf)
 <use 06-implied-volatility_files/figure-latex/XYZ-Theta-50-strike-1.pdf>
-[67] [68]
+[69] [70]
 Chapter 6.
-[69
+[71
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 971--973
+Underfull \hbox (badness 10000) in paragraph at lines 976--978
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 988--990
+Underfull \hbox (badness 10000) in paragraph at lines 993--995
 
  []
 
-[70]
+[72]
 No file Understanding-Options.bbl.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1055.
-[71]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1055.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1060.
+[73]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1060.
 (./Understanding-Options.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1055.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1055.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1060.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1060.
 
 Package rerunfilecheck Info: File `Understanding-Options.out' has not changed.
-(rerunfilecheck)             Checksum: A102BEDC168E88094504ECD03A2C0976;4909.
+(rerunfilecheck)             Checksum: 5792EA65C016CD1565C67004E1CE22D5;5103.
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 31874 strings out of 492472
- 589305 string characters out of 6129298
- 781797 words of memory out of 5000000
- 35958 multiletter control sequences out of 15000+600000
+ 31881 strings out of 492472
+ 589647 string characters out of 6129298
+ 782056 words of memory out of 5000000
+ 35964 multiletter control sequences out of 15000+600000
  538895 words of font info for 78 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  58i,7n,115p,1241b,2146s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Understanding-Options.pdf (71 pages).
+Output written on Understanding-Options.pdf (73 pages).
