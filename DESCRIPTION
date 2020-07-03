@@ -9,6 +9,7 @@ Imports:
   plotly, 
   formattable, 
   kableExtra,
+  pBrackets
 Remotes: 
   rstudio/bookdown,
   ropensci/magick
