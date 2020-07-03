@@ -102,21 +102,53 @@ call_payoff <- function(data, main, Call_K, Call_cost, breakeven_offset = 2) {
                aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
                arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
                show.legend = FALSE, col = "green3") + 
-  geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
-                   y = 0, yend = 0, color = "Breakeven"), 
-               show.legend = FALSE, linetype = "solid") +
-  geom_segment(aes(x = Call_K+Call_cost, xend = Call_K+Call_cost, 
-                   y = 0, yend = 0, color = "Breakeven"), 
-                 show.legend = FALSE, linetype = "solid") +
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = main, x = "Stock Price", y = "Profit") +
-  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green3", "Loss" = "red"),
-                     labels = c("", "", ""), guide = "legend") + 
+  labs(title = main, x = "", y = "") +
+  scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
+                     labels = c("", ""), guide = "legend") + 
   guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
                                                   linetype = c("dashed","solid","solid")))) + 
   options_theme()
 }
+
+
+stock_and_call_payoff <- function(data_stock, data_call, main, stock_cost, Call_K, Call_cost) { 
+  ggplot() + 
+  geom_line(data = data_stock, aes(stock_price_x, stock_profit_y, color = Profitable), 
+            linetype = "dotdash") +   
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
+                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+               show.legend = FALSE, col = adjustcolor("red", alpha.f = 0.5)) + 
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
+                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+  geom_line(data = data_call, aes(Call_x, Call_y, color = Profitable),
+            linetype = "solid") +   
+  geom_segment(data = data_call,
+               aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+               show.legend = FALSE, col = "red") + 
+  geom_segment(data = data_call,
+               aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  labs(title = main, x = "", y = "") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
+                             "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
+                             "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
+                 labels = c("", "", "", "", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
+                                                  linetype = c("dashed","solid","solid")))) + 
+  options_theme()
+}
+
 
 put_payoff <- function(data, main, breakeven_offset = 15) {
   ggplot() + 
@@ -134,9 +166,7 @@ put_payoff <- function(data, main, breakeven_offset = 15) {
            label = paste0("Breakeven: ",scales::dollar(Put_K-Put_cost)), size = 5 ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = main,
-       x = "Stock Price",
-       y = "Profit") +
+  labs(title = main, x = "Stock Price", y = "Profit") +
   scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green3", "Loss" = "red"),
                      labels = c("", "", ""), guide = "legend") + 
   guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
@@ -182,6 +212,7 @@ temp <- stock_payoff(Stock_Payoff_XYZ, "Buy: XYZ's Shares at $200", Stock_cost, 
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
+
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
      annotate( geom = "text", x = 160, y = -12, color = "red", hjust = 0, 
                label = paste0("Losses"), size = 5 ) + 
@@ -197,8 +228,8 @@ temp; rm(temp)
 
 ## Options on Expiry Day
 ```{r Call-Demo}
-Call_cost <- 5; Put_cost <- 5
-Call_K <- 230; Put_K <- 180
+Call_cost <- 15; Put_cost <- 5
+Call_K <- 200; Put_K <- 180
 Current_price <- 200
 Future_price <- 240
 ```
@@ -212,24 +243,40 @@ Our first look at options will be with a fictious company, Company XYZ. Company 
 This call option empowers its buyer to purchase shares of Company XYZ for `r currency(Call_K)` any time the markets are open in the next 60 days. This put empowers its buyer to sell shares of Company XYZ for `r currency(Put_K)` any time the markets are open in the next 60 days. After the 60th day, the option will expire and become worthless (worth `r currency(0)`). 
 
 ## Call Options
-Let's take our first look at a payoff diagram. It's on the call we saw for Company XYZ. 
+Here's the payoff diagram for this call on XYZ. 
 
 ```{r Call-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
-Call_cost <- 5
-Call_K <- 230
-x_min <- 215; x_max = 255
+Call_cost <- 15
+Call_K <- 200
+x_min <- 140; x_max = 280
 
-Call_Payoff_XYZ_230 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
                                "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
                                "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                       "Profit","Loss") )
 
-temp <- call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
-                    main = "Buy: XYZ's $230 Strike Call")
+b1 <- bracketsGrob(0.25, 0.075, 0.25, 0.24, lwd=2, col="red")
+b2 <- bracketsGrob(0.80, 0.69, 0.80, 0.24, lwd=2, col="green3")
+
+temp <- call_payoff(data = Call_Payoff_XYZ_200, Call_K = Call_K, Call_cost = Call_cost,
+                    main = "Buy: XYZ's $200 Strike Call")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
-temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 145, y = -7, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotate( geom = "text", x = 270, y = 20.5, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-17.5, color = "green3", hjust = 0,
+               label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost)), size = 4 ) + 
+     annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-17.5, color = "red", hjust = 0,
+               label = "Breakev", size = 4 ) +
+     annotation_custom( b1 ) + annotation_custom( b2 ) 
+temp; rm(temp)
+
 # ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
 #                      main = "Buy: Company XYZ's $230 Strike Call")) %>%
 #  style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
@@ -242,6 +289,50 @@ There are a couple more things to make note of. The first is that even though th
 This combination of limited downside and full participation to the upside is what make options such a powerful investing tool. But we don't get this power for free. Options put our investments on the clock - prices must move in our favor before the option expires or we lose money. For us to succesfully trade options, we'll want to develop strategies that to help manage the risk of running out of time. We'll discuss the later on, but for now we want to focus on three big ideas: having limited downside, having full participation to the upside, and being time-limited.
 
 Let's go through the decisions that we can make at different prices of Company XYZ's stock. If the stock is below the strike price of `r currency(Call_K)` on the call's expiry date, we will not exercise it. If we did, we would be buying the shares for more than they are worth on the market, and we wouldn't make any profit by selling them. If the stock is above `r currency(Call_K)` on expiry, we will exercise the call. We would be buying shares for less than they are worth on the market, and can immediately sell them at the market price. However, we only make profits after recovering the `r currency(Call_cost)` cost of the call. If the shares are between `r currency(Call_K)` and `r currency(Call_K+Call_cost)`, we will recover some of the cost of the call, but will still lose money. If the shares are above `r currency(Call_K+Call_cost)`, we will profit from the call. 
+
+### Call Options vs. Stocks
+
+```{r Stock-vs-Call-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
+Stock_cost <- 200
+Call_cost <- 15; Call_K <- 200
+x_min <- 140; x_max = 280
+
+Stock_Payoff_XYZ <- tibble( "stock_price_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "stock_profit_y" = -Stock_cost + seq(from = x_min, to = x_max, by = 0.01),
+                            "Profitable" = ifelse(-Stock_cost + seq(from = x_min, to = x_max, by = 0.01) > 0, 
+                                                  "Profit_stock","Loss_stock") )
+
+Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                               "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                               "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+s1 <- bracketsGrob(0.20, 0.20, 0.20, 0.46, lwd=1, lty = "dotdash", 
+                   col=adjustcolor("red", alpha.f = 0.5))
+s2 <- bracketsGrob(0.85, 0.85, 0.85, 0.44, lwd=1, lty = "dotdash",
+                   col=adjustcolor("green3", alpha.f = 0.5))
+  
+c1 <- bracketsGrob(0.25, 0.34, 0.25, 0.45, lwd=2, col="red", lty = "solid")
+c2 <- bracketsGrob(0.80, 0.70, 0.80, 0.45, lwd=2, col="green3", lty = "solid")
+
+
+temp <- stock_and_call_payoff( data_stock = Stock_Payoff_XYZ, data_call = Call_Payoff_XYZ_200, 
+                               main = "XYZ's Shares vs. $200 Strike Calls", 
+                               stock_cost = Stock_cost, Call_K = Call_K, Call_cost = Call_cost ) 
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 140, y = -5, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotate( geom = "text", x = 270, y = 20, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotation_custom( c1 ) + annotation_custom( c2 ) + 
+     annotation_custom( s1 ) + annotation_custom( s2 ) 
+temp; rm(temp)
+```
 
 The payoff diagram summarizes all of this information, and helps us see the price levels that go along with these decisions very quickly. Drawing payoff diagrams is one of the easiest and most effective ways to understand the potential profit or loss of an option.
 

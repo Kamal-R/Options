@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.16)  2 JUL 2020 22:41
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2020.1.16)  3 JUL 2020 12:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1169,13 +1169,14 @@ File: 02-payoff-diagrams_files/figure-latex/Call-Option-Payoff-Plot-1.pdf Graph
 ic file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Call-Option-Payoff-Plot-1.pdf>
 [13]
+File: 02-payoff-diagrams_files/figure-latex/Stock-vs-Call-Payoff-Plot-1.pdf Gra
+phic file (type pdf)
+<use 02-payoff-diagrams_files/figure-latex/Stock-vs-Call-Payoff-Plot-1.pdf>
+[14]
 File: 02-payoff-diagrams_files/figure-latex/Put-Option-Payoff-Plot-1.pdf Graphi
 c file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Put-Option-Payoff-Plot-1.pdf>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[14] [15]
+[15]
 File: 02-payoff-diagrams_files/figure-latex/Apple-Call-Payoff-Plot-1.pdf Graphi
 c file (type pdf)
 <use 02-payoff-diagrams_files/figure-latex/Apple-Call-Payoff-Plot-1.pdf>
@@ -1205,7 +1206,7 @@ File: 02-payoff-diagrams_files/figure-latex/Apple-205-Strike-Call-Payoff-Plot-1
 <use 02-payoff-diagrams_files/figure-latex/Apple-205-Strike-Call-Payoff-Plot-1.
 pdf>
 [21]
-Underfull \hbox (badness 10000) in paragraph at lines 386--388
+Underfull \hbox (badness 10000) in paragraph at lines 391--393
 
  []
 
@@ -1215,7 +1216,7 @@ e (type bmp)
 [22]
 
 LaTeX Warning: Reference `tab:Apple-Different-Strikes-Table' on page 23 undefin
-ed on input line 403.
+ed on input line 408.
 
 [23] [24
 
@@ -1443,23 +1444,23 @@ Chapter 6.
 [71
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 976--978
+Underfull \hbox (badness 10000) in paragraph at lines 981--983
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 993--995
+Underfull \hbox (badness 10000) in paragraph at lines 998--1000
 
  []
 
 [72]
 No file Understanding-Options.bbl.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1060.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1065.
 [73]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1060.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1065.
 (./Understanding-Options.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1060.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1060.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1065.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1065.
 
 Package rerunfilecheck Info: File `Understanding-Options.out' has not changed.
 (rerunfilecheck)             Checksum: 5792EA65C016CD1565C67004E1CE22D5;5103.
@@ -1468,10 +1469,10 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 31881 strings out of 492472
- 589647 string characters out of 6129298
- 782056 words of memory out of 5000000
- 35964 multiletter control sequences out of 15000+600000
+ 31889 strings out of 492472
+ 590140 string characters out of 6129298
+ 782114 words of memory out of 5000000
+ 35971 multiletter control sequences out of 15000+600000
  538895 words of font info for 78 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  58i,7n,115p,1241b,2146s stack positions out of 5000i,500n,10000p,200000b,80000s
