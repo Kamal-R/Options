@@ -7,6 +7,7 @@ CRAN_repo = getOption("repos")
 CRAN_repo["CRAN"] = "http://cran.us.r-project.org"
 options(repos = CRAN_repo)
 
+if ( !require("here") )          { install.packages("here") };            require(here)
 if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
 if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
 if ( !require("pBrackets") )     { install.packages("pBrackets") };       require(pBrackets)
@@ -538,7 +539,7 @@ kableExtra:::save_kable(Apple_Call_Table, zoom = 2.5, file="img/02_Apple_Call_Ta
     <font size="3" color = "grey">
     <figcaption> Comparing the returns from owning 100 shares vs. 1 call. </figcaption>
     </font>
-    <p> <img src='img/02_Apple_Call_Table.png' 
+    <p> <img src="img/02_Apple_Call_Table.png"
          style='height:auto; max-width:90%; border:none; display:block;' /> </p>
 </figure>
 
@@ -615,7 +616,7 @@ kableExtra:::save_kable(Apple_Put_Table, zoom = 2.5, file = "img/02_Apple_Put_Ta
     <font size="3" color = "grey">
     <figcaption> Comparing the returns from owning 100 shares vs. 1 put. </figcaption>
     </font>
-    <p> <img src='img/02_Apple_Put_Table.png' 
+    <p> <img src="img/02_Apple_Put_Table.png"
          style='height:auto; max-width:90%; border:none; display:block;' /> </p>
 </figure>
 
@@ -657,7 +658,7 @@ kableExtra:::save_kable(Apple_Different_Strikes, zoom = 2.5,
     <font size="3" color = "grey">
     <figcaption> Cost on Sept. 11, 2019. </figcaption>
     </font>
-    <p> <img src='img/02_Apple_Different_Strikes.png' 
+    <p> <img src="img/02_Apple_Different_Strikes.png" 
          style='height:auto; max-width:40%; border:none; display:block;' /> </p>
 </figure>
 
@@ -702,7 +703,7 @@ kableExtra:::save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 2.5,
     <font size="3" color = "grey">
     <figcaption> Dollar return if held to expiry. </figcaption>
     </font>
-    <p> <img src='img/02_Apple_Different_Strikes_Call_Payoff_Table.png' 
+    <p> <img src="img/02_Apple_Different_Strikes_Call_Payoff_Table.png" 
          style='height:auto; max-width:90%; border:none; display:block;' /> </p>
 </figure>
 
@@ -794,17 +795,12 @@ kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
 zoom = 2.5, file = "02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
 ```
 
-```{r Check-Working-Directory, echo = TRUE}
-getwd()
-list.files()
-```
-
 <figure style='margin-left:5%;'>
     <font size="3" color = "grey">
     <figcaption> Relative return if held to expiry. </figcaption>
     </font>
-    <img src='02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png' 
-         style='height:auto; max-width:90%; border:none; display:block;' /> 
+    <p> <img src="02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png" 
+         style='height:auto; max-width:90%; border:none; display:block;' /> </p>
 </figure>
 
 The relative return table does an excellent job of capturing how much participation we get when there are extreme price movements (up or down). As we move across the `r currency(Apple_Future_Prices[1])` row, the cheaper calls limit our downside. And in the `r currency(Apple_Future_Prices[4])` and `r currency(Apple_Future_Prices[5])` rows, they give good upside participation relative to owning 100 shares. The `r currency(Apple_Future_Prices[2])` and `r currency(Apple_Future_Prices[3])` rows are harder to interpret. The percentages are large, but we know from earlier that their dollar losses are small - they are still limited to the cost of the option. So while relative return tables are helpful, they can be difficult to understand without some sense of the magnitude of the dollar amounts. 
