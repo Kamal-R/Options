@@ -627,7 +627,7 @@ Apple_Future_Prices <- c(150, 200, 220, 245, 300)
 
 In the first example, we considered possible profits or losses when holding `r currency(Apple_Call_K)` strike options to their expiry date of September 20, 2019. There is nothing special about `r currency(Apple_Call_K)` or September 20, 2019. Many other strike prices and expiry dates are available. For the next example, we'll choose an expiry date of December 20, 2019 and consider the profit or loss for calls with strike prices of `r currency(Apple_Prices_K[1])`, `r currency(Apple_Prices_K[2])`, `r currency(Apple_Prices_K[3])`, and `r currency(Apple_Prices_K[4])`. On September 11, 2019, one share of Apple was trading at `r currency(Apple_Current_Price)` and its options prices are listed below.
 
-```{r Apple-Different-Strikes-Table, fig.align = "center", out.width = "20%", fig.caption = "Cost on Sept. 11, 2019."}
+```{r Apple-Different-Strikes-Table, fig.align = "center", out.width = "30%", fig.caption = "Cost on Sept. 11, 2019."}
 Apple_Different_Strikes <- tibble( "Strike Prices" = currency(Apple_Prices_K),
                                    "1 Call" = currency(Apple_Call_Costs),
                                    "1 Put" = currency(Apple_Put_Costs) ) 
