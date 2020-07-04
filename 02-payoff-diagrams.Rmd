@@ -792,8 +792,11 @@ Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Rel
 
 kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
 zoom = 2.5, file = "02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
+```
 
+```{r Check-Working-Directory, echo = TRUE}
 getwd()
+list.files()
 ```
 
 <figure style='margin-left:5%;'>
