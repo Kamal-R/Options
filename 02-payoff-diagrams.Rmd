@@ -31,7 +31,6 @@ out_width_plot <- "80%"
 out_width_table <- "90%"
 
 grid::grid.locator(unit="npc") 
-
 output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
 ```
 
@@ -240,7 +239,7 @@ s1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
 s2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
 
 ### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
-temp <- stock_payoff(Stock_Payoff_XYZ, main = "Buy XYZ's Shares at $200.")
+temp <- stock_payoff(Stock_Payoff_XYZ, main = "Buy XYZ's shares at $200.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
@@ -291,7 +290,7 @@ Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.0
 c1 <- bracketsGrob(0.25, 0.10, 0.25, 0.255, lwd=2, col="red")
 c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.255, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_XYZ_200, main = "Buy 1 XYZ Call at the $200 Strike.")
+temp <- call_payoff(data = Call_Payoff_XYZ_200, main = "Buy 1 XYZ call at the $200 Strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -686,7 +685,7 @@ kableExtra:::save_kable(Apple_Different_Strikes, zoom = 2.5,
     <figcaption> Cost on Sept. 11, 2019. </figcaption>
     </font>
     <p> <img src="img/02_Apple_Different_Strikes.png" 
-         style='height:40%; max-width:40%; border:none; display:block;' /> </p>
+         style='height:30%; max-width:40%; border:none; display:block;' /> </p>
 </figure>
 
 
