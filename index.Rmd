@@ -34,10 +34,3 @@ if(knitr:::pandoc_to() == "html") {
 if(knitr:::pandoc_to() == "html") { 
   cat('<script async data-uid="244f107410"src="https://hustling-trailblazer-1491.ck.page/244f107410/index.js"></script>') }
 ```
-
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
-```

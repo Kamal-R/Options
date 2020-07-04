@@ -31,6 +31,8 @@ out_width_plot <- "80%"
 out_width_table <- "90%"
 
 grid::grid.locator(unit="npc") 
+
+output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
 ```
 
 ```{r Plotting-Helper-Functions}
@@ -253,7 +255,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotate( geom = "text", x = Stock_cost-7.5, y = min(y_axis_labels), color = "red", hjust = 0,
                label = "Breakev", size = 4 ) +
      annotation_custom( s1 ) + annotation_custom( s2 ) 
-temp; rm(temp)
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Stock-Demo-1.png")}
 ```
 
 ## Options on Expiry Day
@@ -303,7 +307,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-20, color = "red", hjust = 0,
                label = "Breakev", size = 4 ) +
      annotation_custom( c1 ) + annotation_custom( c2 ) 
-temp; rm(temp)
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Call-Option-Payoff-Plot-1.png") }
 
 # ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
 #                      main = "Buy: Company XYZ's $230 Strike Call")) %>%
@@ -356,7 +362,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = paste0("Profits"), size = 5 ) + 
      annotation_custom( c1 ) + annotation_custom( c2 ) + 
      annotation_custom( s1 ) + annotation_custom( s2 ) 
-temp; rm(temp)
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Stock-vs-Call-Payoff-Plot-1.png") }
 ```
 
 The payoff diagram summarizes all of this information, and helps us see the price levels that go along with these decisions very quickly. Drawing payoff diagrams is one of the easiest and most effective ways to understand the potential profit or loss of an option.
@@ -401,7 +409,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotate( geom = "text", x = Put_K-Put_cost-15, y = min(y_axis_labels)-17.5, color = "green3", 
                hjust = 0, label = "Breakev", size = 4 ) +
      annotation_custom( p1 ) + annotation_custom( p2 ) 
-temp; rm(temp)
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Put-Option-Payoff-Plot-1.png") }
 ```     
 
 The breakeven of the put is `r currency(Put_K-Put_cost)`, because we need the shares to fall by `r currency(Put_cost)` to recover the cost of buying the put. Similar to calls, we can't lose more than we paid for the put. Unlike calls, the dollar-for-dollar "upside" participation we get happens when the stock goes down. This is the big idea behind puts - they make money when prices go down. This is a magical property because it opens up so many new investing strategies. Some are simple and some are very complex. But they're all built the same way - by mixing and matching different combinations of puts, calls, and shares to control how much an investment portfolio goes up (or down) when market prices go up. We'll come back to this idea every time we use options to construct risk-managed investments, which we'll do many times in this book.
@@ -444,7 +454,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = paste0("Losses"), size = 5 ) + 
      annotation_custom( p1 ) + annotation_custom( p2 ) + 
      annotation_custom( s1 ) + annotation_custom( s2 ) 
-temp; rm(temp)
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Stock-vs-Put-Payoff-Plot-1.png") }
 ```
 
 ## Apple: Calls and Puts
@@ -490,7 +502,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotate( geom = "text", x = Call_K+Call_cost-5, y = min(y_axis_labels)-8, color = "red", 
                hjust = 0, label = "Breakev", size = 4 ) +
      annotation_custom( c1 ) + annotation_custom( c2 ) 
-temp; rm(temp)
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Apple-Call-Payoff-Plot-1.png") }
 ```
 
 Here's a payoff diagram of this call option. Below `r currency(Call_K)`, the buyer loses `r currency(Call_cost)` per share, which is what he paid for the call. This is the entire cost of the call, since it expires worthless. Since he paid `r currency(Call_cost)` per share for the call, he has to make `r currency(Call_cost)` back before he becomes profitable. Therefore, his breakeven is `r currency(Call_K)` + `r currency(Call_cost)` = `r currency(Call_cost+Call_K)`. This is reflected in the payoff diagram, where his profits are negative when the stock is below `r currency(Call_cost+Call_K)` and positive when it is above `r currency(Call_cost+Call_K)`.
@@ -564,14 +578,27 @@ Put_Payoff_Apple_205 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.0
                                 "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
                                                       "Profit", "Loss") )
 
+p1 <- bracketsGrob(0.25, 0.265, 0.25, 0.55, lwd=2, col="green3")
+p2 <- bracketsGrob(0.60, 0.265, 0.60, 0.05, lwd=2, col="red")
+
 temp <- put_payoff(data = Put_Payoff_Apple_205, main = "Buy 1 Apple $205 strike put.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
-temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 180, y = 4.5, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotate( geom = "text", x = 215, y = -3, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotation_custom( p1 ) + annotation_custom( p2 ) 
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Apple-Put-Option-Payoff-Plot-1.png") }
 ```
 
-This put give its buyer the option to sell shares of Apple at `r currency(Apple_Put_K)` on September 20, 2019. That means if Apple's shares are below `r currency(Apple_Put_K)` on that day, the put buyer makes money. When the shares are above `r currency(Apple_Put_K)`, the put buyer has lost the entire \$6.10 per share that he spent buying the put. If the shares are below `r currency(Apple_Put_K)`, the buyer must recover the cost of his put (done at `r currency(Apple_Put_K)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-Apple_Put_Cost)`). Once Apple's shares are below `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer partcipates dollar for dollar in the downside of the stock, which is the upside of the put.
+This put gives its buyer the option to sell shares of Apple at `r currency(Apple_Put_K)` on September 20, 2019. That means if Apple's shares are below `r currency(Apple_Put_K)` on that day, the put buyer makes money. When the shares are above `r currency(Apple_Put_K)`, the put buyer has lost the entire \$6.10 per share that he spent buying the put. If the shares are below `r currency(Apple_Put_K)`, the buyer must recover the cost of his put (done at `r currency(Apple_Put_K)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-Apple_Put_Cost)`). Once Apple's shares are below `r currency(Apple_Put_K-Apple_Put_Cost)`, the put buyer partcipates dollar for dollar in the downside of the stock, which is the upside of the put.
 
 The put has the same, or potentially even better, characteristics as the call. It gives limited downside to the buyer of the put, as their maximum loss is limited to the price they paid for the put. It also provides dollar for dollar participation to the downside of the stock. This corresponds to the upside of the put. We'll use this ability to make money when prices are going down many times when discussing different ways to use options to construct investment portfolios.
 
@@ -749,7 +776,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotate( geom = "text", x = Call_K+Call_cost-10, y = min(y_axis_labels)-8, color = "red", 
                hjust = 0, label = "Breakev", size = 4 ) +
      annotation_custom( c1 ) + annotation_custom( c2 ) 
-temp; rm(temp)
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Apple-205-Strike-Call-Payoff-Plot-1.png") }
 ```
 
 The `r currency(Apple_Prices_K[3])` strike call is similar. We've drawn the payoff diagram this time, and it gives the breakeven to be `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])` When shares are below `r currency(Apple_Prices_K[3])`, the call expires worthless and the buyer loses `r currency(100*Apple_Call_Costs[3])`. The call buyer still loses money when shares are at `r currency(Apple_Future_Prices[3])` because `r currency(Apple_Future_Prices[3])` is below this call's breakeven of `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`. The call cost `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`, but the buyer will have only made `r currency(Apple_Future_Prices[3])` - `r currency(Apple_Prices_K[3])` = `r currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per share (`r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per call) before paying for the call. This leaves him with a loss of `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` - `r currency(Apple_Call_Costs[3])` = `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3] - Apple_Call_Costs[3])` per share.
