@@ -33,6 +33,7 @@ out_width_table <- "90%"
 grid::grid.locator(unit="npc") 
 
 output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
+local = FALSE
 ```
 
 ```{r Plotting-Helper-Functions}
