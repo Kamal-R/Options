@@ -5,25 +5,18 @@ Sources:
 */
 
 .fraction {
-  display: inline-block;
-  position: relative;
-  text-align: center;    
-  vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle; 
+    margin: 0 0.2em 0.4ex;
+    text-align: center;
+}
+.fraction > span {
+    display: block;
+    padding-top: 0.15em;
 }
 
-.fraction:before {
-  content: attr(data-top);
-  font-size: 0.8em;
-  border-bottom-color: currentColor;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-}
-
-.fraction:after {
-  content: attr(data-bottom);
-  display: block;
-  font-size: 0.8em;
-}
+.fraction span.fdn {border-top: thin solid black;}
+.fraction span.bar {display: none;}
 
 /*! Source: https://github.com/haozhu233/kableExtra/blob/master/inst/bootstrapTable-3.3.7/bootstrapTable.min.css
  * Bootstrap v3.3.7 (http://getbootstrap.com)
