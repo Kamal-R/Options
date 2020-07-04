@@ -803,8 +803,8 @@ list.files()
     <font size="3" color = "grey">
     <figcaption> Relative return if held to expiry. </figcaption>
     </font>
-    <p> <img src='02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png' 
-         style='height:auto; max-width:90%; border:none; display:block;' /> </p>
+    <img src='02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png' 
+         style='height:auto; max-width:90%; border:none; display:block;' /> 
 </figure>
 
 The relative return table does an excellent job of capturing how much participation we get when there are extreme price movements (up or down). As we move across the `r currency(Apple_Future_Prices[1])` row, the cheaper calls limit our downside. And in the `r currency(Apple_Future_Prices[4])` and `r currency(Apple_Future_Prices[5])` rows, they give good upside participation relative to owning 100 shares. The `r currency(Apple_Future_Prices[2])` and `r currency(Apple_Future_Prices[3])` rows are harder to interpret. The percentages are large, but we know from earlier that their dollar losses are small - they are still limited to the cost of the option. So while relative return tables are helpful, they can be difficult to understand without some sense of the magnitude of the dollar amounts. 
