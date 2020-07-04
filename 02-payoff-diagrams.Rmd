@@ -311,7 +311,8 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 if ( !output_epub ) { print(temp); rm(temp) }
 if ( output_epub ) { 
   if ( local ) { knitr::include_graphics("https://understanding-options.netlify.app/02-payoff-diagrams_files/figure-html/Call-Option-Payoff-Plot-1.png") }
-  else { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Call-Option-Payoff-Plot-1.png") }
+  if ( !local ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Call-Option-Payoff-Plot-1.png") }
+}
 
 # ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
 #                      main = "Buy: Company XYZ's $230 Strike Call")) %>%
