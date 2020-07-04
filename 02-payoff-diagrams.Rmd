@@ -791,14 +791,14 @@ Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Rel
                 full_width = FALSE) 
 
 kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
-zoom = 2.5, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
+zoom = 2.5, file = "_book/img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
 ```
 
 <figure style='margin-left:5%;'>
     <font size="3" color = "grey">
     <figcaption> Relative return if held to expiry. </figcaption>
     </font>
-    <p> <img src='img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png' 
+    <p> <img src='_book/img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png' 
          style='height:auto; max-width:90%; border:none; display:block;' /> </p>
 </figure>
 
