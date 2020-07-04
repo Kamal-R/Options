@@ -1,12 +1,11 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
 <!-- Each chapter is set to compile separately - include "global" set-up -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+
+CRAN_repo = getOption("repos")
+CRAN_repo["CRAN"] = "http://cran.us.r-project.org"
+options(repos = CRAN_repo)
 
 if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
 if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
@@ -44,12 +43,12 @@ e$l <- l
   }, e)
 }
 
-options_theme <- function(legend_position="left") {
+options_theme <- function() {
   theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5, face="bold", 
-                                  margin = margin(10, 0, 10, 0),
-                                  colour = plot_fg),
-        legend.position="none", 
+  theme(plot.title = element_text(hjust = 0.03, face = "plain", size = 13, 
+                                  colour = "grey33", lineheight = 1.2,
+                                  margin = margin(5, 0, 10, 0)),
+        legend.position = "none", 
         text = element_text(size=16), 
         panel.border = element_blank(), 
         panel.grid.major = element_blank(),
@@ -66,7 +65,7 @@ options_theme <- function(legend_position="left") {
 }
 
 
-stock_payoff <- function(data, main, stock_cost, breakeven_offset = 2) {
+stock_payoff <- function(data, main) {
   ggplot() + 
   geom_line(data = data, aes(stock_price_x, stock_profit_y, color = Profitable), linetype = "solid") +   
   geom_segment(data = data,
@@ -90,7 +89,7 @@ stock_payoff <- function(data, main, stock_cost, breakeven_offset = 2) {
 }
 
 
-call_payoff <- function(data, main, Call_K, Call_cost, breakeven_offset = 2) {
+call_payoff <- function(data, main) {
   ggplot() + 
   geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
             linetype = "solid") +   
@@ -107,13 +106,13 @@ call_payoff <- function(data, main, Call_K, Call_cost, breakeven_offset = 2) {
   labs(title = main, x = "", y = "") +
   scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
                      labels = c("", ""), guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
-                                                  linetype = c("dashed","solid","solid")))) + 
+  guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                  linetype = c("solid","solid")))) + 
   options_theme()
 }
 
 
-stock_and_call_payoff <- function(data_stock, data_call, main, stock_cost, Call_K, Call_cost) { 
+stock_and_call_payoff <- function(data_stock, data_call, main) { 
   ggplot() + 
   geom_line(data = data_stock, aes(stock_price_x, stock_profit_y, color = Profitable), 
             linetype = "dotdash") +   
@@ -127,8 +126,7 @@ stock_and_call_payoff <- function(data_stock, data_call, main, stock_cost, Call_
                    y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
                arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
                show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
-  geom_line(data = data_call, aes(Call_x, Call_y, color = Profitable),
-            linetype = "solid") +   
+  geom_line(data = data_call, aes(Call_x, Call_y, color = Profitable), linetype = "solid") +   
   geom_segment(data = data_call,
                aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
                arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
@@ -144,34 +142,65 @@ stock_and_call_payoff <- function(data_stock, data_call, main, stock_cost, Call_
                              "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
                              "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
                  labels = c("", "", "", "", ""), guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
-                                                  linetype = c("dashed","solid","solid")))) + 
+  guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                  linetype = c("solid","solid")))) + 
   options_theme()
 }
 
 
-put_payoff <- function(data, main, breakeven_offset = 15) {
+put_payoff <- function(data, main) {
   ggplot() + 
-  geom_line(data = data, aes(Put_x, Put_y, color = Profitable), 
-            linetype = "solid") +
+  geom_line(data = data, aes(Put_x, Put_y, color = Profitable), linetype = "solid") +
   geom_segment(data = data,
                aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
                arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-               show.legend = FALSE, col = "green") + 
+               show.legend = FALSE, col = "green3") + 
   geom_segment(data = data,
                aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
                arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
                show.legend = FALSE, col = "red") + 
-  annotate(geom = "text", x = Put_K-Put_cost-breakeven_offset, y = 0, color = "black", hjust = 0,
-           label = paste0("Breakeven: ",scales::dollar(Put_K-Put_cost)), size = 5 ) + 
   scale_y_continuous(label = scales::dollar) +
   scale_x_continuous(label = scales::dollar) + 
-  labs(title = main, x = "Stock Price", y = "Profit") +
-  scale_color_manual(values = c("Breakeven" = plot_fg, "Profit" = "green3", "Loss" = "red"),
-                     labels = c("", "", ""), guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
-                                                  linetype = c("dashed","solid","solid")))) + 
-  options_theme(legend_position="right")
+  labs(title = main, x = "", y = "") +
+  scale_color_manual(values = c( "Profit" = "green3", "Loss" = "red"),
+                 labels = c("", ""), guide = "legend") + 
+  options_theme()
+}
+
+
+stock_and_put_payoff <- function(data_stock, data_put, main) { 
+  ggplot() + 
+  geom_line(data = data_stock, aes(stock_price_x, stock_profit_y, color = Profitable), 
+            linetype = "dotdash") +   
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
+                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+               show.legend = FALSE, col = adjustcolor("red", alpha.f = 0.5)) + 
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
+                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+  geom_line(data = data_put, aes(Put_x, Put_y, color = Profitable), linetype = "solid") +
+  geom_segment(data = data_put,
+               aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  geom_segment(data = data_put,
+               aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
+               show.legend = FALSE, col = "red") + 
+  labs(title = main, x = "", y = "") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  scale_color_manual(values = c( "Profit_put" = "green3", "Loss_put" = "red",
+                             "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
+                             "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
+                 labels = c("", "", "", "", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                  linetype = c("solid","solid")))) + 
+  options_theme()
 }
 ```
 
@@ -195,7 +224,7 @@ In our first few chapters, we'll be looking at how options perform on their expi
 
 ## Payoff Diagrams for Stocks
 
-```{r Stock-Demo}
+```{r Stock-Demo, fig.align = "center"}
 Stock_cost <- 200
 x_min = 160; x_max = 240
 
@@ -204,11 +233,11 @@ Stock_Payoff_XYZ <- tibble( "stock_price_x" = seq(from = x_min, to = x_max, by =
                             "Profitable" = ifelse(-Stock_cost + seq(from = x_min, to = x_max, by = 0.01) > 0, 
                                                   "Profit","Loss") )
 
-b1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
-b2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
+s1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
+s2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
 
 ### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
-temp <- stock_payoff(Stock_Payoff_XYZ, "Buy: XYZ's Shares at $200", Stock_cost, 5)
+temp <- stock_payoff(Stock_Payoff_XYZ, main = "Buy XYZ's Shares at $200.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
@@ -222,7 +251,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = paste0("Breakeven: ", scales::dollar(Stock_cost)), size = 4 ) + 
      annotate( geom = "text", x = Stock_cost-7.5, y = min(y_axis_labels), color = "red", hjust = 0,
                label = "Breakev", size = 4 ) +
-     annotation_custom( b1 ) + annotation_custom( b2 ) 
+     annotation_custom( s1 ) + annotation_custom( s2 ) 
 temp; rm(temp)
 ```
 
@@ -246,8 +275,7 @@ This call option empowers its buyer to purchase shares of Company XYZ for `r cur
 Here's the payoff diagram for this call on XYZ. 
 
 ```{r Call-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
-Call_cost <- 15
-Call_K <- 200
+Call_cost <- 15; Call_K <- 200
 x_min <- 140; x_max = 280
 
 Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
@@ -255,11 +283,10 @@ Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.0
                                "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                       "Profit","Loss") )
 
-b1 <- bracketsGrob(0.25, 0.075, 0.25, 0.24, lwd=2, col="red")
-b2 <- bracketsGrob(0.80, 0.69, 0.80, 0.24, lwd=2, col="green3")
+c1 <- bracketsGrob(0.25, 0.10, 0.25, 0.255, lwd=2, col="red")
+c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.255, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_XYZ_200, Call_K = Call_K, Call_cost = Call_cost,
-                    main = "Buy: XYZ's $200 Strike Call")
+temp <- call_payoff(data = Call_Payoff_XYZ_200, main = "Buy 1 XYZ Call at the $200 Strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -270,11 +297,11 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = paste0("Losses"), size = 5 ) + 
      annotate( geom = "text", x = 270, y = 20.5, color = "green3", hjust = 0, 
                label = paste0("Profits"), size = 5 ) + 
-     annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-17.5, color = "green3", hjust = 0,
+     annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-20, color = "green3", hjust = 0,
                label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost)), size = 4 ) + 
-     annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-17.5, color = "red", hjust = 0,
+     annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-20, color = "red", hjust = 0,
                label = "Breakev", size = 4 ) +
-     annotation_custom( b1 ) + annotation_custom( b2 ) 
+     annotation_custom( c1 ) + annotation_custom( c2 ) 
 temp; rm(temp)
 
 # ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
@@ -289,8 +316,6 @@ There are a couple more things to make note of. The first is that even though th
 This combination of limited downside and full participation to the upside is what make options such a powerful investing tool. But we don't get this power for free. Options put our investments on the clock - prices must move in our favor before the option expires or we lose money. For us to succesfully trade options, we'll want to develop strategies that to help manage the risk of running out of time. We'll discuss the later on, but for now we want to focus on three big ideas: having limited downside, having full participation to the upside, and being time-limited.
 
 Let's go through the decisions that we can make at different prices of Company XYZ's stock. If the stock is below the strike price of `r currency(Call_K)` on the call's expiry date, we will not exercise it. If we did, we would be buying the shares for more than they are worth on the market, and we wouldn't make any profit by selling them. If the stock is above `r currency(Call_K)` on expiry, we will exercise the call. We would be buying shares for less than they are worth on the market, and can immediately sell them at the market price. However, we only make profits after recovering the `r currency(Call_cost)` cost of the call. If the shares are between `r currency(Call_K)` and `r currency(Call_K+Call_cost)`, we will recover some of the cost of the call, but will still lose money. If the shares are above `r currency(Call_K+Call_cost)`, we will profit from the call. 
-
-### Call Options vs. Stocks
 
 ```{r Stock-vs-Call-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Stock_cost <- 200
@@ -317,8 +342,7 @@ c2 <- bracketsGrob(0.80, 0.70, 0.80, 0.45, lwd=2, col="green3", lty = "solid")
 
 
 temp <- stock_and_call_payoff( data_stock = Stock_Payoff_XYZ, data_call = Call_Payoff_XYZ_200, 
-                               main = "XYZ's Shares vs. $200 Strike Calls", 
-                               stock_cost = Stock_cost, Call_K = Call_K, Call_cost = Call_cost ) 
+                               main = "Buying 1 XYZ call at the $200 Strike (solid line) vs. \nbuying XYZ shares at $200 (dashed line)." ) 
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -338,7 +362,7 @@ The payoff diagram summarizes all of this information, and helps us see the pric
 
 ## Put Options
 ```{r Put-Demo}
-Call_cost <- 5; Put_cost <- 5
+Call_cost <- 10; Put_cost <- 10
 Call_K <- 230; Put_K <- 180
 Future_price <- 150
 ```
@@ -349,24 +373,78 @@ We're looking at a put with a `r currency(Put_K)` strike that costs `r currency(
 
 
 ```{r Put-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
-Put_cost <- 5
-Put_K <- 180
-x_min <- 150; x_max = 200
+Put_cost <- 10; Put_K <- 180
+x_min <- 100; x_max = 240
 
 Put_Payoff_XYZ_180 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01),
-                           "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
-                           "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
-                                                 "Profit", "Loss") )
+                              "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
+                              "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
+                                                    "Profit", "Loss") )
 
-temp <- put_payoff(data = Put_Payoff_XYZ_180, main = "Buy: XYZ's $180 Put")
+p1 <- bracketsGrob(0.625, 0.225, 0.625, 0.125, lwd=2, col="red", lty = "solid")
+p2 <- bracketsGrob(0.25, 0.225, 0.25, 0.625, lwd=2, col="green3", lty = "solid")
+
+temp <- put_payoff(data = Put_Payoff_XYZ_180, main = "Buy 1 XYZ $180 strike put.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
-temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 200, y = -4.5, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotate( geom = "text", x = 105, y = 20, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotate( geom = "text", x = Put_K-Put_cost-15, y = min(y_axis_labels)-17.5, color = "red", 
+             hjust = 0, label = paste0("Breakeven: ", scales::dollar(Put_K-Put_cost)), size = 4 ) + 
+     annotate( geom = "text", x = Put_K-Put_cost-15, y = min(y_axis_labels)-17.5, color = "green3", 
+               hjust = 0, label = "Breakev", size = 4 ) +
+     annotation_custom( p1 ) + annotation_custom( p2 ) 
+temp; rm(temp)
 ```     
 
 The breakeven of the put is `r currency(Put_K-Put_cost)`, because we need the shares to fall by `r currency(Put_cost)` to recover the cost of buying the put. Similar to calls, we can't lose more than we paid for the put. Unlike calls, the dollar-for-dollar "upside" participation we get happens when the stock goes down. This is the big idea behind puts - they make money when prices go down. This is a magical property because it opens up so many new investing strategies. Some are simple and some are very complex. But they're all built the same way - by mixing and matching different combinations of puts, calls, and shares to control how much an investment portfolio goes up (or down) when market prices go up. We'll come back to this idea every time we use options to construct risk-managed investments, which we'll do many times in this book.
 
+
+```{r Stock-vs-Put-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
+Put_cost <- 10; Put_K <- 180
+x_min <- 100; x_max = 260
+Stock_cost <- 200
+
+Stock_Payoff_XYZ <- tibble( "stock_price_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "stock_profit_y" = -Stock_cost + seq(from = x_min, to = x_max, by = 0.01),
+                            "Profitable" = ifelse(-Stock_cost + seq(from = x_min, to = x_max, by = 0.01) > 0, 
+                                                  "Profit_stock","Loss_stock") )
+
+Put_Payoff_XYZ_180 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01),
+                              "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
+                              "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
+                                                    "Profit_put", "Loss_put") )
+
+s1 <- bracketsGrob(0.20, 0.18, 0.20, 0.81, lwd=1, lty = "dotdash", 
+                   col=adjustcolor("red", alpha.f = 0.5))
+s2 <- bracketsGrob(0.80, 0.75, 0.80, 0.59, lwd=1, lty = "dotdash",
+                   col=adjustcolor("green3", alpha.f = 0.5))
+  
+p1 <- bracketsGrob(0.25, 0.58, 0.25, 0.75, lwd=2, col="green3", lty = "solid")
+p2 <- bracketsGrob(0.50, 0.58, 0.50, 0.525, lwd=2, col="red", lty = "solid")
+
+temp <- stock_and_put_payoff( data_stock = Stock_Payoff_XYZ, data_put = Put_Payoff_XYZ_180, 
+                              main = "Buying 1 XYZ put at the $180 strike (solid line) vs. \nbuying XYZ's shares at $200 (dashed line)." ) 
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 105, y = 17, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotate( geom = "text", x = 210, y = -1, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotation_custom( p1 ) + annotation_custom( p2 ) + 
+     annotation_custom( s1 ) + annotation_custom( s2 ) 
+temp; rm(temp)
+```
 
 ## Apple: Calls and Puts
 
@@ -388,24 +466,37 @@ Current_price <- 205.44
 x_min = 185; x_max = 235
 
 Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
-                              "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
-                              "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
-                                                    "Profit","Loss") )
+                                 "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                                 "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                       "Profit","Loss") )
 
-temp <- call_payoff(data = Call_Payoff_Apple_205, Call_K = Call_K, Call_cost = Call_cost,
-                    main = "Buy: Apple's $205 Strike Call")
+c1 <- bracketsGrob(0.30, 0.085, 0.30, 0.265, lwd=2, col="red")
+c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.28, lwd=2, col="green3")
+
+temp <- call_payoff(data = Call_Payoff_Apple_205, main = "Buy 1 Apple $205 strike call.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
-temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
 
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 190, y = -3.5, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotate( geom = "text", x = 230, y = 6.8, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotate( geom = "text", x = Call_K+Call_cost-5, y = min(y_axis_labels)-8, color = "green3", 
+               hjust = 0, label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost)), size = 4 ) + 
+     annotate( geom = "text", x = Call_K+Call_cost-5, y = min(y_axis_labels)-8, color = "red", 
+               hjust = 0, label = "Breakev", size = 4 ) +
+     annotation_custom( c1 ) + annotation_custom( c2 ) 
+temp; rm(temp)
 ```
 
 Here's a payoff diagram of this call option. Below `r currency(Call_K)`, the buyer loses `r currency(Call_cost)` per share, which is what he paid for the call. This is the entire cost of the call, since it expires worthless. Since he paid `r currency(Call_cost)` per share for the call, he has to make `r currency(Call_cost)` back before he becomes profitable. Therefore, his breakeven is `r currency(Call_K)` + `r currency(Call_cost)` = `r currency(Call_cost+Call_K)`. This is reflected in the payoff diagram, where his profits are negative when the stock is below `r currency(Call_cost+Call_K)` and positive when it is above `r currency(Call_cost+Call_K)`.
 
 This next table compares how much money a buyer can make with 100 shares of Apple at `r currency(Current_price)` and 1 call on Apple shares at `r currency(Call_cost)` (with a strike price of `r currency(Call_K)` that expires on September 20, 2019). The relative return column tell us how much the call owner participates in the upside (or downside) experienced by the shareholder. This last column is the most important - it will help us understand how to size our option investments. To give the dollar amounts some context, 100 shares of Apple at `r currency(Current_price)` will cost `r currency(Current_price)` x 100 = `r currency(100*Current_price)` to buy, and one call that gives the buyer the option to buy 100 shares of Apple at `r currency(Call_K)` on September 20, 2019 will cost `r currency(Call_cost)` x 100 = `r currency(100*Call_cost)`.
 
-```{r Apple-Call-Table, tab = NULL, results = 'hide'}
+```{r Apple-Call-Table, out.width = out_width_table, fig.align = "center", fig.cap = "Returns: 100 Shares vs. 1 Call."}
 Apple_Current_Price <- 205.44
 Apple_Call_K <- 205
 Apple_Call_Cost <- 6.84
@@ -434,18 +525,15 @@ Apple_Call_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
 Apple_Call_Table <- Apple_Call_Table %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Call_Table)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
-  knitr::kable(booktabs = TRUE, escape = FALSE, label = NULL, 
-               caption = "Returns: 100 Shares vs. 1 Call") %>% 
+  knitr::kable(booktabs = TRUE, escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"),
                 full_width = FALSE ) %>%
   add_header_above(c("Stock" = 1, "Own 100 Shares" = 2, 
                      "Own 1 Call" = 2, "Relative Return" = 1) ) 
-```
 
-```{r Apple-Call-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
-if (save_tables_as_pictures) { save_kable(Apple_Call_Table, zoom = 2.5,
-                                          file="img/02_Apple_Call_Table.png") }
-if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
+kableExtra:::save_kable(Apple_Call_Table, zoom = 2.5,
+                        file="img/02_Apple_Call_Table.png") 
+knitr::include_graphics(path="img/02_Apple_Call_Table.png") 
 ```
 
 The buyer can make a ton of money with this call. To double his investment, he only needs to recover the `r currency(Apple_Call_Cost)` it cost to buy the call (done at the breakeven of `r currency(Apple_Call_K)` + `r currency(Apple_Call_Cost)` = `r currency(Apple_Call_K+Apple_Call_Cost)`), and have the shares go up another `r currency(Apple_Call_Cost)` to `r currency(Apple_Call_K+Apple_Call_Cost)` + `r currency(Apple_Call_Cost)` = `r currency(Apple_Call_K+2*Apple_Call_Cost)`. Remember that Apple was trading for `r currency(Apple_Current_Price)` when he bought the call. If he bought shares instead, the buyer would make <span class = "fraction" data-top="`r currency(Apple_Call_K+2*Apple_Call_Cost)` - `r currency(Apple_Current_Price)`" data-bottom = "`r currency(Apple_Current_Price)`"></span> = `r percent(2*Apple_Call_Cost/Apple_Current_Price)` on his investment. By using calls, he makes <span class = "fraction" data-top="`r currency(Apple_Call_K+2*Apple_Call_Cost)` - `r currency(Apple_Call_K)` - `r currency(Apple_Call_Cost)`" data-bottom = "`r currency(Apple_Call_Cost)`"></span> = `r percent(Apple_Call_Cost/Apple_Call_Cost)`. `r percent(Apple_Call_Cost/Apple_Call_Cost)` is so much larger than `r percent(2*Apple_Call_Cost/Apple_Current_Price)` that this seems impossible, but the way to think about this is by looking at how much of the upside in the stock the call buyer participates in. 
@@ -455,6 +543,7 @@ Calls also limit the buyer's maximum loss to the cost of the call. The most he c
 The takeaway here is that the call gives dollar-for-dollar participation to the upside if we hold the option to its expiry date. It has two drawbacks - we have to recover the cost of the call, and it puts a clock on our participation. We'll discuss ways to navigate that the time constraint later. Having to pay for the cost of the call means we lose money below the breakeven of `r currency(Apple_Call_K+Apple_Call_Cost)`, while the shareholder only loses money below `r currency(Apple_Current_Price)`. This is because the shares have to go up by enough to offset the cost of the call, or the call buyer can lose money even when the shareholder does not. 
 
 Even with these two drawbacks, a call still limits an investor's downside compared to owning shares and gives good participation to the upside. This is the picture painted by the payoff diagram - the most we can lose is the cost of the call, and we participate dollar for dollar in the upside of the stock (after reclaiming the cost of the call). This payoff profle comes at a cost - the call expires, but the shares do not. If we own shares that are down, we can continue holding them and hope for a rebound at the risk of potentially losing more money. With the call, the most we can lose is its cost but we have to contend with expiry dates. When we start discussing options investing strategies, we'll see how this means we will have to think about which expiry date we want, how to adjust to an earlier or later expiry date if our opinion changes during the trade, and so on. 
+
 
 ```{r Apple-Put-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Put_Cost <- 6.10; Put_K <- 205
@@ -468,7 +557,7 @@ Put_Payoff_Apple_205 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.0
                                 "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) > 0,
                                                       "Profit", "Loss") )
 
-temp <- put_payoff(data = Put_Payoff_Apple_205, main = "Buy: Apple's $205 Strike Put")
+temp <- put_payoff(data = Put_Payoff_Apple_205, main = "Buy 1 Apple $205 strike put.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
@@ -479,7 +568,7 @@ This put give its buyer the option to sell shares of Apple at `r currency(Apple_
 
 The put has the same, or potentially even better, characteristics as the call. It gives limited downside to the buyer of the put, as their maximum loss is limited to the price they paid for the put. It also provides dollar for dollar participation to the downside of the stock. This corresponds to the upside of the put. We'll use this ability to make money when prices are going down many times when discussing different ways to use options to construct investment portfolios.
 
-```{r Apple-Put-Table}
+```{r Apple-Put-Table, out.width = out_width_table, fig.align = "center", fig.cap = "Returns: 100 Shares vs. 1 Put."}
 Apple_Current_Price <- 205.44
 Apple_Put_K <- 205
 Apple_Put_Cost <- 6.10
@@ -507,18 +596,15 @@ Apple_Put_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
 Apple_Put_Table <- Apple_Put_Table %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Put_Table)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
-  knitr::kable(booktabs = TRUE, escape = FALSE,
-               caption = "Returns: 100 Shares vs. 1 Put") %>% 
+  knitr::kable(booktabs = TRUE, escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"),
                 full_width = FALSE ) %>%
   add_header_above(c("Stock" = 1, "Own 100 Shares" = 2, 
                      "Own 1 Put" = 2, "Relative Return" = 1) )
-```
 
-```{r Apple-Put-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
-if (save_tables_as_pictures) { save_kable(Apple_Put_Table, zoom = 2.5,
-                                          file = "img/02_Apple_Put_Table.png") }
-if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Put_Table.png") }
+kableExtra:::save_kable(Apple_Put_Table, zoom = 2.5,
+                        file = "img/02_Apple_Put_Table.png") 
+knitr::include_graphics(path="img/02_Apple_Put_Table.png")
 ```
 
 For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is <span class = "fraction" data-top="`r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)`" data-bottom="`r currency(Apple_Put_Cost)`"></span> = `r round( (Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)/Apple_Put_Cost,2 )` times his orginal investment of `r currency(Apple_Put_Cost)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
@@ -541,21 +627,19 @@ Apple_Future_Prices <- c(150, 200, 220, 245, 300)
 
 In the first example, we considered possible profits or losses when holding `r currency(Apple_Call_K)` strike options to their expiry date of September 20, 2019. There is nothing special about `r currency(Apple_Call_K)` or September 20, 2019. Many other strike prices and expiry dates are available. For the next example, we'll choose an expiry date of December 20, 2019 and consider the profit or loss for calls with strike prices of `r currency(Apple_Prices_K[1])`, `r currency(Apple_Prices_K[2])`, `r currency(Apple_Prices_K[3])`, and `r currency(Apple_Prices_K[4])`. On September 11, 2019, one share of Apple was trading at `r currency(Apple_Current_Price)` and its options prices are listed below.
 
-```{r Apple-Different-Strikes-Table}
+```{r Apple-Different-Strikes-Table, fig.align = "center", out.width = "20%", fig.caption = "Cost on Sept. 11, 2019."}
 Apple_Different_Strikes <- tibble( "Strike Prices" = currency(Apple_Prices_K),
                                    "1 Call" = currency(Apple_Call_Costs),
                                    "1 Put" = currency(Apple_Put_Costs) ) 
 
-Apple_Different_Strikes <- knitr::kable(Apple_Different_Strikes, 
-             caption = "Cost on Sept. 11, 2019") %>%
-kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
-               full_width = FALSE )
-```
+Apple_Different_Strikes <- Apple_Different_Strikes %>% 
+  knitr:::kable(booktabs = TRUE, escape = FALSE) %>% 
+  kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
+                 full_width = FALSE )
 
-```{r Apple-Different-Strikes-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
-if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes, zoom = 2.5,
-                                          file = "img/02_Apple_Different_Strikes.png") }
-if (load_table_pictures) { knitr::include_graphics(path="img/02_Apple_Call_Table.png") }
+kableExtra:::save_kable(Apple_Different_Strikes, zoom = 2.5, 
+                        file = "img/02_Apple_Different_Strikes.png") 
+knitr::include_graphics(path="img/02_Apple_Different_Strikes.png")
 ```
 
 To keep the discussion simple, we’ll continue to focus on the price of the option on its expiry date. Remember, one call lets its buyer purchase 100 shares of Apple at its strike price, and one put lets its buyer sell 100 shares at its strike price. Let’s compare the dollar return of each call option to owning 100 shares if, on December 20, 2019, Apple's shares:
@@ -566,7 +650,7 @@ To keep the discussion simple, we’ll continue to focus on the price of the opt
 4. Increase a little to `r currency(Apple_Future_Prices[4])`.
 5. Increase a lot to `r currency(Apple_Future_Prices[5])`.
 
-```{r Apple-Different-Strikes-Call-Payoff-Table}
+```{r Apple-Different-Strikes-Call-Payoff-Table, out.width = out_width_table, fig.align = "center", fig.cap = "Dollar Return if Held to Expiry"}
 Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = scales::dollar(Apple_Future_Prices),
       "100 Shares" = scales::dollar(100 * (Apple_Future_Prices - Apple_Current_Price),
                                     negative_parens = TRUE), 
@@ -586,17 +670,15 @@ Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = scales::dollar(Ap
 Apple_Different_Strikes_Call_Payoff <- Apple_Different_Strikes_Call_Payoff %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Different_Strikes_Call_Payoff)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
-  knitr::kable(booktabs = TRUE, escape = FALSE,
-               caption = "Dollar Return if Held to Expiry") %>% 
-  kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"),
-                full_width = FALSE ) 
+  knitr:::kable(booktabs = TRUE, escape = FALSE) %>% 
+  kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"), 
+                full_width = FALSE )
+
+kableExtra:::save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 2.5, 
+             file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png")
+knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Payoff_Table.png")
 ```
 
-```{r Apple-Different-Strikes-Call-Payoff-Table-Format, out.width = out_width_table, fig.align = "center", tab = NULL}
-if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 2.5,
-                                          file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png") }
-if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Payoff_Table.png")}
-```
 
 To give these dollar returns some context, buying
 
@@ -616,16 +698,30 @@ Call_K <- Apple_Prices_K[3]
 x_min <- 180; x_max = 280
 
 Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
-                                 "Call_y" = -Call_cost + (Call_x > Call_K) * (Call_x - Call_K),
+                                 "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
                                  "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                        "Profit","Loss") )
 
-temp <- call_payoff(data = Call_Payoff_Apple_205, Call_K = Call_K, Call_cost = Call_cost,
-                    main = "Buy: Apple's $205 Strike Call")
+c1 <- bracketsGrob(0.25, 0.10, 0.25, 0.36, lwd=2, col="red")
+c2 <- bracketsGrob(0.775, 0.72, 0.775, 0.36, lwd=2, col="green3")
+
+temp <- call_payoff(data = Call_Payoff_Apple_205, main = "Buy 1 Apple $205 strike call.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
-temp + theme( axis.text.y = element_markdown(colour = tick_color) ); rm(temp)
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 185, y = -11.5, color = "red", hjust = 0, 
+               label = paste0("Losses"), size = 5 ) + 
+     annotate( geom = "text", x = 270, y = 16, color = "green3", hjust = 0, 
+               label = paste0("Profits"), size = 5 ) + 
+     annotate( geom = "text", x = Call_K+Call_cost-10, y = min(y_axis_labels)-8, color = "green3", 
+               hjust = 0, label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost)), size = 4 ) + 
+     annotate( geom = "text", x = Call_K+Call_cost-10, y = min(y_axis_labels)-8, color = "red", 
+               hjust = 0, label = "Breakev", size = 4 ) +
+     annotation_custom( c1 ) + annotation_custom( c2 ) 
+temp; rm(temp)
 ```
 
 The `r currency(Apple_Prices_K[3])` strike call is similar. We've drawn the payoff diagram this time, and it gives the breakeven to be `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])` When shares are below `r currency(Apple_Prices_K[3])`, the call expires worthless and the buyer loses `r currency(100*Apple_Call_Costs[3])`. The call buyer still loses money when shares are at `r currency(Apple_Future_Prices[3])` because `r currency(Apple_Future_Prices[3])` is below this call's breakeven of `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`. The call cost `r currency(Apple_Call_Costs[3] + Apple_Prices_K[3])`, but the buyer will have only made `r currency(Apple_Future_Prices[3])` - `r currency(Apple_Prices_K[3])` = `r currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per share (`r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` per call) before paying for the call. This leaves him with a loss of `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3])` - `r currency(Apple_Call_Costs[3])` = `r 100*currency(Apple_Future_Prices[3] - Apple_Prices_K[3] - Apple_Call_Costs[3])` per share.
@@ -644,7 +740,7 @@ To summarize, here are the main ideas that we want to be thinking about when we'
 
 This is the picture we get is we look at the table column-by-column. If we switch to looking at the table row-by-row, we can see how much of the gains or losses each call participated in, relative to someone who owns the shares. To make this easier, we'll look at a table of relative returns. 
 
-```{r Apple-Different-Strikes-Relative-Payoff}
+```{r Apple-Different-Strikes-Call-Relative-Payoff-Table, fig.cap = "Relative Return if Held to Expiry.", out.width = out_width_table, fig.align = "center"}
 Apple_Future_Prices <- c(150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 Apple_Future_Returns <-  Apple_Future_Prices - Apple_Current_Price
@@ -663,16 +759,13 @@ Apple_Different_Strikes_Call_Relative_Payoff <- tibble( "Share Price" = currency
 Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Relative_Payoff %>%
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Different_Strikes_Call_Relative_Payoff)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
-  knitr::kable(booktabs = TRUE, escape = FALSE,
-               caption = "Relative Return if Held to Expiry") %>% 
-  kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"),
-                full_width = FALSE ) 
-```
+  knitr::kable(booktabs = TRUE, escape = FALSE, format = "html") %>% 
+  kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"), 
+                full_width = FALSE) 
 
-```{r Apple-Different-Strikes-Call-Relative-Payoff-Table-Format, out.width=out_width_table, fig.align = "center", tab = NULL}
-if (save_tables_as_pictures) { save_kable(Apple_Different_Strikes_Call_Relative_Payoff, zoom = 2.5,
-                                          file="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") }
-if (load_table_pictures) {knitr::include_graphics(path="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png")}
+kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
+  zoom = 2.5, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
+knitr::include_graphics("img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png")
 ```
 
 The relative return table does an excellent job of capturing how much participation we get when there are extreme price movements (up or down). As we move across the `r currency(Apple_Future_Prices[1])` row, the cheaper calls limit our downside. And in the `r currency(Apple_Future_Prices[4])` and `r currency(Apple_Future_Prices[5])` rows, they give good upside participation relative to owning 100 shares. The `r currency(Apple_Future_Prices[2])` and `r currency(Apple_Future_Prices[3])` rows are harder to interpret. The percentages are large, but we know from earlier that their dollar losses are small - they are still limited to the cost of the option. So while relative return tables are helpful, they can be difficult to understand without some sense of the magnitude of the dollar amounts. 

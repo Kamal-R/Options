@@ -1,14 +1,9 @@
 --- 
 title: "Understanding Options"
-subtitle: "" 
 author: "Kamal Rai"
 date: "`r Sys.Date()`"
+subtitle: ''
 site: bookdown::bookdown_site
-documentclass: book
-bibliography: [book.bib, packages.bib]
-biblio-style: apalike
-link-citations: yes
-description: ""
 ---
 
 # Introduction {-}
