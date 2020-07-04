@@ -34,9 +34,15 @@ deploy:
 
 addons:
   apt:
-    sources:
-    - sourceline: 'ppa:opencpu/imagemagick'
-    - sourceline: 'ppa:opencpu/opencpu-2.2'
+    update: true
     packages:
-    - libmagick++-dev
-    - libpoppler-cpp-dev
+      - libmagick++-dev
+      - librsvg2-dev
+      - libwebp-dev
+      - libpoppler-cpp-dev
+      - libtesseract-dev
+      - libleptonica-dev
+      - tesseract-ocr-eng
+      - libfftw3-dev
+      - cargo
+      - gsfonts
