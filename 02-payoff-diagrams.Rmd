@@ -527,11 +527,11 @@ Apple_Calls_Dollar_Return <- remove_negative_zeros(
   100  * ( pmax( 0, (Apple_Stock_Prices - Apple_Call_K ) ) - Apple_Call_Cost ) )
   
 Apple_Call_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
-                            "Percent Return " = percent(Apple_Shares_Percent_Return),
-                            "Dollar Return " = scales::dollar(Apple_Shares_Dollar_Return,
+                            "% Return " = percent(Apple_Shares_Percent_Return),
+                            "$ Return " = scales::dollar(Apple_Shares_Dollar_Return,
                                                               negative_parens = TRUE), 
-                            " Percent Return" = percent(Apple_Calls_Percent_Return),
-                            " Dollar Return" =  scales::dollar(Apple_Calls_Dollar_Return,
+                            " % Return" = percent(Apple_Calls_Percent_Return),
+                            " $ Return" =  scales::dollar(Apple_Calls_Dollar_Return,
                                                                negative_parens = TRUE), 
                             "Calls/Shares" = sign(Apple_Calls_Dollar_Return) * 
                                percent( Apple_Calls_Dollar_Return / Apple_Shares_Dollar_Return ) )
@@ -545,7 +545,7 @@ Apple_Call_Table <- Apple_Call_Table %>%
   add_header_above(c("Stock" = 1, "Own 100 Shares" = 2, 
                      "Own 1 Call" = 2, "Relative Return" = 1) ) 
 
-kableExtra:::save_kable(Apple_Call_Table, zoom = 2.5, file="img/02_Apple_Call_Table.png") 
+kableExtra:::save_kable(Apple_Call_Table, zoom = 3, file="img/02_Apple_Call_Table.png") 
 ```
 
 <figure style='margin-left:5%;'>
@@ -616,11 +616,11 @@ Apple_Puts_Dollar_Return <-
   remove_negative_zeros( 100 * ( pmax( 0, (Apple_Put_K - Apple_Stock_Prices ) ) - Apple_Put_Cost ) )
 
 Apple_Put_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
-                           "Percent Return " = percent(Apple_Shares_Percent_Return),
-                           "Dollar Return " = scales::dollar(Apple_Shares_Dollar_Return, 
+                           "% Return " = percent(Apple_Shares_Percent_Return),
+                           "$ Return " = scales::dollar(Apple_Shares_Dollar_Return, 
                                                              negative_parens = TRUE), 
-                           " Percent Return" = percent(Apple_Puts_Percent_Return),
-                           " Dollar Return" =  scales::dollar(Apple_Puts_Dollar_Return, 
+                           " % Return" = percent(Apple_Puts_Percent_Return),
+                           " $ Return" =  scales::dollar(Apple_Puts_Dollar_Return, 
                                                               negative_parens = TRUE), 
                            "Puts/Shares" = sign(Apple_Puts_Dollar_Return) * 
                              percent(remove_negative_zeros ( Apple_Puts_Dollar_Return /
@@ -635,7 +635,7 @@ Apple_Put_Table <- Apple_Put_Table %>%
   add_header_above(c("Stock" = 1, "Own 100 Shares" = 2, 
                      "Own 1 Put" = 2, "Relative Return" = 1) )
 
-kableExtra:::save_kable(Apple_Put_Table, zoom = 2.5, file = "img/02_Apple_Put_Table.png") 
+kableExtra:::save_kable(Apple_Put_Table, zoom = 3, file = "img/02_Apple_Put_Table.png") 
 ```
 
 <figure style='margin-left:5%;'>
@@ -676,7 +676,7 @@ Apple_Different_Strikes <- Apple_Different_Strikes %>%
   kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
                  full_width = FALSE )
 
-kableExtra:::save_kable(Apple_Different_Strikes, zoom = 2.5, 
+kableExtra:::save_kable(Apple_Different_Strikes, zoom = 3, 
                         file = "img/02_Apple_Different_Strikes.png") 
 ```
 
@@ -701,16 +701,16 @@ To keep the discussion simple, we’ll continue to focus on the price of the opt
 Apple_Different_Strikes_Call_Payoff <- tibble( "Stock Price" = scales::dollar(Apple_Future_Prices),
       "100 Shares" = scales::dollar(100 * (Apple_Future_Prices - Apple_Current_Price),
                                     negative_parens = TRUE), 
-      "$145 Strike Call" = scales::dollar( 100 * ( 
+      "$145 Strike" = scales::dollar( 100 * ( 
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[1] ) - Apple_Call_Costs[1] ), 
         negative_parens = TRUE ),
-      "$180 Strike Call" = scales::dollar( 100 * ( 
+      "$180 Strike" = scales::dollar( 100 * ( 
         pmax(0, Apple_Future_Prices - Apple_Prices_K[2] ) - Apple_Call_Costs[2] ), 
         negative_parens = TRUE ),
-      "$205 Strike Call" = scales::dollar( 100 * ( 
+      "$205 Strike" = scales::dollar( 100 * ( 
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[3] ) - Apple_Call_Costs[3] ), 
         negative_parens = TRUE ),
-      "$230 Strike Call" = scales::dollar( 100 * ( 
+      "$230 Strike" = scales::dollar( 100 * ( 
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[4] ) - Apple_Call_Costs[4] ), 
         negative_parens = TRUE ) )
 
@@ -719,9 +719,10 @@ Apple_Different_Strikes_Call_Payoff <- Apple_Different_Strikes_Call_Payoff %>%
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr:::kable(booktabs = TRUE, escape = FALSE) %>% 
   kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"), 
-                full_width = FALSE )
+                full_width = FALSE ) %>%
+  add_header_above(c("Stock" = 1, "Call" = 5))
 
-kableExtra:::save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 2.5, 
+kableExtra:::save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 3, 
              file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png")
 ```
 
@@ -804,24 +805,25 @@ Apple_Future_Returns <-  Apple_Future_Prices - Apple_Current_Price
 
 Apple_Different_Strikes_Call_Relative_Payoff <- tibble( "Share Price" = currency(Apple_Future_Prices),
       "100 Shares" = percent( sign(Apple_Future_Returns) ), 
-      "$145 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
-                                        ( pmax( 0, (Apple_Future_Prices - 145 ) ) - 78.45 ) ),
-      "$180 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
-                                        ( pmax( 0, (Apple_Future_Prices - 180 ) ) - 44.85 ) ),
-      "$205 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
-                                        ( pmax( 0, (Apple_Future_Prices - 205 ) ) - 23.63 ) ), 
-      "$230 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
-                                        ( pmax( 0, (Apple_Future_Prices - 230 ) ) - 8.50 ) ) )
+      "$145 Strike" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+                                 ( pmax( 0, (Apple_Future_Prices - 145 ) ) - 78.45 ) ),
+      "$180 Strike" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+                                 ( pmax( 0, (Apple_Future_Prices - 180 ) ) - 44.85 ) ),
+      "$205 Strike" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+                                 ( pmax( 0, (Apple_Future_Prices - 205 ) ) - 23.63 ) ), 
+      "$230 Strike" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+                                 ( pmax( 0, (Apple_Future_Prices - 230 ) ) - 8.50 ) ) )
 
 Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Relative_Payoff %>%
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Different_Strikes_Call_Relative_Payoff)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr::kable(booktabs = TRUE, escape = FALSE, format = "html") %>% 
   kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"), 
-                full_width = FALSE) 
+                full_width = FALSE) %>%
+  add_header_above(c("Stock" = 1, "Call" = 5))
 
 kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
-zoom = 2.5, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
+zoom = 3, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
 ```
 
 <figure style='margin-left:5%;'>
