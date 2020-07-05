@@ -315,6 +315,7 @@ if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-ht
 #  style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
 #                              '<br><b>Profit Per Share</b>: $%{y:.2f}'))
 ```
+
 Reading this payoff diagram is not too bad - suppose the shares are worth `r currency(Future_price)` at expiry. If we own the call, it gives us the power to purchase 100 shares for `r currency(Call_K)` each (on the expiry date) and immediately sell them for `r currency(Future_price)`, for a gain of `r currency(Future_price)` - `r currency(Call_K)` = `r currency(Future_price-Call_K)` per share. The call cost `r currency(Call_cost)`, so we end up making `r currency(Future_price-Call_K)` - `r currency(Call_cost)` = `r currency(Future_price-Call_K-Call_cost)` per share. Looking at the payoff diagram, the per-share profit when the stock is at `r currency(Future_price)` is indeed `r currency(Future_price-Call_K-Call_cost)`. 
 
 There are a couple more things to make note of. The first is that even though the call lets us purchase shares for `r currency(Call_K)`, we don't start making money until they reach `r currency(Call_K+Call_cost)` because we have to make back the `r currency(Call_cost)` we spent buying the option. `r currency(Call_K+Call_cost)` is such an important value that it has its own name - it's the breakeven price. The second is that the most we can lose is the `r currency(Call_cost)` we spent buying the call. If the shares are `r currency(Call_K-30)`, `r currency(Call_K-50)`, or even `r currency(Call_K-Call_K)`, we can just let the call expire and we'll never lose more than the `r currency(Call_cost)` we spent buying the call. This places a hard limit on the amount of money we can lose, regardless of what happens to Apple's shares. This gives us *limited downside*, an idea we'll come back to again and again. The third is that even with limited downside, we still gets dollar for dollar participation in the upside of the stock on the expiry date of the call (after recovering the `r currency(Call_cost)` it cost to buy). 
@@ -548,7 +549,7 @@ Apple_Call_Table <- Apple_Call_Table %>%
 kableExtra:::save_kable(Apple_Call_Table, zoom = 3, file="img/02_Apple_Call_Table.png") 
 ```
 
-<figure>
+<figure style='margin-left:0%;'>
     <font size="3" color = "grey">
     <figcaption> Comparing the returns from owning 100 shares vs. 1 call. </figcaption>
     </font>
@@ -638,7 +639,7 @@ Apple_Put_Table <- Apple_Put_Table %>%
 kableExtra:::save_kable(Apple_Put_Table, zoom = 3, file = "img/02_Apple_Put_Table.png") 
 ```
 
-<figure>
+<figure style='margin-left:0%;'>
     <font size="3" color = "grey">
     <figcaption> Comparing the returns from owning 100 shares vs. 1 put. </figcaption>
     </font>
@@ -726,7 +727,7 @@ kableExtra:::save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 3,
              file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png")
 ```
 
-<figure>
+<figure style='margin-left:0%;'>
     <font size="3" color = "grey">
     <figcaption> Dollar return if held to expiry. </figcaption>
     </font>
@@ -826,7 +827,7 @@ kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
 zoom = 3, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
 ```
 
-<figure>
+<figure style='margin-left:0%;'>
     <font size="3" color = "grey">
     <figcaption> Relative return if held to expiry. </figcaption>
     </font>
