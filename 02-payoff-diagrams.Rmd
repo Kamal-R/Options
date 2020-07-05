@@ -549,7 +549,7 @@ Apple_Call_Table <- Apple_Call_Table %>%
 kableExtra:::save_kable(Apple_Call_Table, zoom = 3, file="img/02_Apple_Call_Table.png") 
 ```
 
-<figure style='margin-left:0%;'>
+<figure style='margin-left:0%; margin-right:0%;'>
     <font size="3" color = "grey">
     <figcaption> Comparing the returns from owning 100 shares vs. 1 call. </figcaption>
     </font>
@@ -639,12 +639,12 @@ Apple_Put_Table <- Apple_Put_Table %>%
 kableExtra:::save_kable(Apple_Put_Table, zoom = 3, file = "img/02_Apple_Put_Table.png") 
 ```
 
-<figure style='margin-left:0%;'>
+<figure style='margin-left:0%; margin-right:0%;'>
     <font size="3" color = "grey">
     <figcaption> Comparing the returns from owning 100 shares vs. 1 put. </figcaption>
     </font>
     <p> <img src="img/02_Apple_Put_Table.png"
-         style='height:auto; width:auto%; border:none; display:block;' /> </p>
+         style='height:auto; width:auto; border:none; display:block;' /> </p>
 </figure>
 
 For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(Apple_Current_Price)` to `r currency(1.10*Apple_Current_Price)`), a shareholder will make `r currency(1.10*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r currency(1.10*Apple_Current_Price-Apple_Current_Price)` per share. If Apple’s stock declines 10% (from `r currency(Apple_Current_Price)` to `r currency(0.90*Apple_Current_Price)`), a shareholder loses `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Current_Price)` = `r -currency(0.90*Apple_Current_Price-Apple_Current_Price)` per share. Now, let’s look at the put. It costs `r currency(Apple_Put_Cost)` per share, so if Apple’s shares stay above `r currency(Apple_Put_K)`, the put buyer loses `r currency(Apple_Put_Cost)` per share. If Apple’s stock falls to `r currency(0.90*Apple_Current_Price)`, the put buyer makes `r currency(Apple_Put_K)` - `r currency(0.90*Apple_Current_Price)` - `r currency(Apple_Put_Cost)` = `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` per share, which is <sup> `r currency(Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)` </sup> &frasl; <sub> `r currency(Apple_Put_Cost)` </sub> = `r round( (Apple_Put_K-0.90*Apple_Current_Price-Apple_Put_Cost)/Apple_Put_Cost,2 )` times his orginal investment of `r currency(Apple_Put_Cost)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
@@ -727,7 +727,7 @@ kableExtra:::save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 3,
              file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png")
 ```
 
-<figure style='margin-left:0%;'>
+<figure style='margin-left:0%; margin-right:0%;'>
     <font size="3" color = "grey">
     <figcaption> Dollar return if held to expiry. </figcaption>
     </font>
@@ -827,7 +827,7 @@ kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
 zoom = 3, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
 ```
 
-<figure style='margin-left:0%;'>
+<figure style='margin-left:0%; margin-right:0%;'>
     <font size="3" color = "grey">
     <figcaption> Relative return if held to expiry. </figcaption>
     </font>
