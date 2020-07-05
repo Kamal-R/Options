@@ -680,12 +680,12 @@ kableExtra:::save_kable(Apple_Different_Strikes, zoom = 2.5,
                         file = "img/02_Apple_Different_Strikes.png") 
 ```
 
-<figure style='margin-left:30%;'>
+<figure style='margin-left:10%;'>
     <font size="3" color = "grey">
     <figcaption> Cost on Sept. 11, 2019. </figcaption>
     </font>
     <p> <img src="img/02_Apple_Different_Strikes.png" 
-         style='height:30%; max-width:40%; border:none; display:block;' /> </p>
+         style='height:auto; max-width:30%; border:none; display:block;' /> </p>
 </figure>
 
 
