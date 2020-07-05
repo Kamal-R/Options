@@ -698,19 +698,19 @@ To keep the discussion simple, we’ll continue to focus on the price of the opt
 5. Increase a lot to `r currency(Apple_Future_Prices[5])`.
 
 ```{r Apple-Different-Strikes-Call-Payoff-Table}
-Apple_Different_Strikes_Call_Payoff <- tibble( "Share Price" = scales::dollar(Apple_Future_Prices),
+Apple_Different_Strikes_Call_Payoff <- tibble( "Stock Price" = scales::dollar(Apple_Future_Prices),
       "100 Shares" = scales::dollar(100 * (Apple_Future_Prices - Apple_Current_Price),
                                     negative_parens = TRUE), 
-      "1 $145 Strike Call" = scales::dollar( 100 * ( 
+      "$145 Strike Call" = scales::dollar( 100 * ( 
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[1] ) - Apple_Call_Costs[1] ), 
         negative_parens = TRUE ),
-      "1 $180 Strike Call" = scales::dollar( 100 * ( 
+      "$180 Strike Call" = scales::dollar( 100 * ( 
         pmax(0, Apple_Future_Prices - Apple_Prices_K[2] ) - Apple_Call_Costs[2] ), 
         negative_parens = TRUE ),
-      "1 $205 Strike Call" = scales::dollar( 100 * ( 
+      "$205 Strike Call" = scales::dollar( 100 * ( 
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[3] ) - Apple_Call_Costs[3] ), 
         negative_parens = TRUE ),
-      "1 $230 Strike Call" = scales::dollar( 100 * ( 
+      "$230 Strike Call" = scales::dollar( 100 * ( 
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[4] ) - Apple_Call_Costs[4] ), 
         negative_parens = TRUE ) )
 
@@ -804,13 +804,13 @@ Apple_Future_Returns <-  Apple_Future_Prices - Apple_Current_Price
 
 Apple_Different_Strikes_Call_Relative_Payoff <- tibble( "Share Price" = currency(Apple_Future_Prices),
       "100 Shares" = percent( sign(Apple_Future_Returns) ), 
-      "1 $145 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+      "$145 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
                                         ( pmax( 0, (Apple_Future_Prices - 145 ) ) - 78.45 ) ),
-      "1 $180 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+      "$180 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
                                         ( pmax( 0, (Apple_Future_Prices - 180 ) ) - 44.85 ) ),
-      "1 $205 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+      "$205 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
                                         ( pmax( 0, (Apple_Future_Prices - 205 ) ) - 23.63 ) ), 
-      "1 $230 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
+      "$230 Strike Call" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
                                         ( pmax( 0, (Apple_Future_Prices - 230 ) ) - 8.50 ) ) )
 
 Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Relative_Payoff %>%
