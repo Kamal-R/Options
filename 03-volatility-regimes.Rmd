@@ -75,7 +75,7 @@ We're going to compare Apple and Amazon's price action to their volatility signa
 
 To make the plots more readable, we'll look at three years in three different charts.
 
-```{r Apple-Price-Volatility-Plots-2018, echo = FALSE, message = FALSE}
+```{r Apple-Price-Volatility-Plots-2018, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
 ### The buy and sell regions are manually annoted (by me) 
 Color <- rep("black", 271)
 Color[ 1:271 %in% ( 20 + c(1:9, 28:54, 84:118, 146:167, 182:191) ) ] <- "green" 
@@ -141,7 +141,7 @@ If the buy-and-hold investor bought Apple on January 1, 2018 at \$41.51 and stil
 The volatility-based investor outperformed largely because he avoided the crash at the end of 2018. This wasn't specific to Apple -- the entire US market was selling off then -- but avoiding it still helps. The Apple's volatility ramped into a much higher *regime* in early October and made two attempts to start trending into a lower *regime*, but couldn't quite pull it off. Let's extend the comparison into 2019 to see if the volatility-based investor can keep outperforming.
 
 
-```{r Apple-Price-Volatility-Plots-2019, echo = FALSE, message = FALSE}
+```{r Apple-Price-Volatility-Plots-2019, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
 ### The buy and sell regions are manually annoted (by me) 
 Color <- rep("black", 252)
 Color[ 1:252 %in% c(21:54, 81:88, 116:146, 173:188, 210:252) ] <- "green" 
