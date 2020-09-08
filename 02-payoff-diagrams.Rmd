@@ -512,7 +512,7 @@ kableExtra:::save_kable(Apple_Different_Strikes, zoom = 3,
     <figcaption> Cost on Sept. 11, 2019. </figcaption>
     </font>
     <p> <img src="img/02_Apple_Different_Strikes.png" 
-         style='height:50%; width:50%; border:none; display:block;' /> </p>
+         style='height:25%; width:50%; border:none; display:block;' /> </p>
 </figure>
 
 
