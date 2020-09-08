@@ -105,10 +105,8 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-temp 
-
-# if ( !output_epub ) { print(temp); rm(temp) }
-# if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Protective-Put-1.png") }
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Protective-Put-1.png") }
 ```
 
 ## Covered Call
@@ -163,14 +161,15 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-temp 
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Covered-Call-1.png")  
 ```
 
 ## A Collar 
 
 In the covered call, we bought 100 shares and sold 1 call. In the protective put, we bought 100 shares and bought 1 put. In the collar, we *combine* these two strategies: we buy 100 shares, buy 1 put, and sell 1 call. The idea here is that we want the protection offered by the put, but we want to offset the cost of the put so we sell a call too. 
 
-```{r XYZ-Collar, fig.align = "center", out.width = out_width_plot, message = FALSE}
+```{r XYZ-Collar-Left, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Put_cost <- 16; Put_K <- 180
 Call_cost <- 8; Call_K <- 220
 Stock_cost <- 200
@@ -224,12 +223,11 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-temp; rm(temp)
-# if ( !output_epub ) { print(temp); rm(temp) }
-# if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Collar-Left-1.png") }
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Collar-Left-1.png") }
 ```
 
-```{r XYZ-Collar-Right}
+```{r XYZ-Collar-Right, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Put_cost <- 16; Put_K <- 180
 Call_cost <- 8; Call_K <- 220
 Stock_cost <- 200
@@ -283,9 +281,8 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-temp; rm(temp)
-# if ( !output_epub ) { print(temp); rm(temp) }
-# if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Collar-Right -1.png") }
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Collar-Right-1.png") }
 ```
 
 
@@ -293,7 +290,7 @@ temp; rm(temp)
 
 Say we want to replicate the payoff diagram of owning Company XYZ's using calls and puts. 
 
-```{r Company-XYZ-Stock-Chapter-3, fig.align = "center", out.width = out_width_plot, message = FALSE}
+```{r XYZ-Stock-Demo, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Stock_cost <- 200
 x_min = 160; x_max = 240
 
@@ -306,7 +303,7 @@ s1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
 s2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
 
 ### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
-temp <- stock_payoff(Stock_Payoff_XYZ, main = "Buy XYZ's shares at $200.")
+temp <- stock_payoff(Stock_Payoff_XYZ, main = "Buy XYZ's shares at $200/share.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
@@ -323,14 +320,14 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotation_custom( s1 ) + annotation_custom( s2 ) 
 
 if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Stock-Demo-1.png") }
+if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/XYZ-Stock-Demo-1.png") }
 ```
 
 This is the payoff diagram for owning Company XYZ's stock that we saw in Chapter 2. I want the *same* payoff diagram using calls and puts. The key is to remember that a call makes money when the stock goes up, and a put makes money when the stock goes down. The easiest way to do this is to look at the different *parts* of the payoff diagram. This one has two parts, on one each side of the breakeven price of \$200. To the right of the breakeven, we *make* money when the stock goes up. That sounds like a call, so I'm going to buy a \$200 strike call to replicate the green part of the payoff diagram. To the left of \$200, we lose money as the stock goes down. If I buy a put, I make money as the stock goes down, but I want the opposite of that. So I'm going to sell a \$200 strike put to replicate the red part of payoff diagram. 
 
 My first attempt at replicating the payoff diagram of owning one share of Company XYZ is to buy a \$200 strike call for \$15 (per share) and sell a \$200 strike put for \$20 (per share), where the call and the put have the same expiry date.  
 
-```{r Company-XYZ-Synthetic-Long-Stock, fig.align = "center", out.width = out_width_plot, message = FALSE}
+```{r XYZ-Synthetic-Long, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 15; Put_cost <- 20
 Call_K <- 200; Put_K <- 200
 Stock_cost <- 200
@@ -364,7 +361,8 @@ sl2 <- bracketsGrob(0.725, 0.725, 0.725, 0.465, lwd=2, col="green3")
 
 temp <- synthetic_long_payoff(data_synthetic_long = Sythetic_Long_Payoff_XYZ,
                     data_call = Call_Payoff_XYZ_200, data_put = Put_Payoff_XYZ_200,
-                    main = "A Sythentic Long Position\n  Buy 1 XYZ call for $15/share at the $200 strike\n  Sell 1 XYZ put for $20/share at the $200 strike.")
+                    main_title = "A Sythentic Long Position"
+                    sub_title = "Buy 1 XYZ call for $15/share at the $200 strike\nSell 1 XYZ put for $20/share at the $200 strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,

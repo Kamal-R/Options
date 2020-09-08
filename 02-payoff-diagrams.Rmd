@@ -55,7 +55,7 @@ In our first few chapters, we'll be looking at how options perform on their expi
 
 ## Payoff Diagrams for Stocks
 
-```{r Company-XYZ-Stock-Chapter-2, fig.align = "center", out.width = out_width_plot, message = FALSE}
+```{r Stock-Demo-1, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Stock_cost <- 200
 x_min = 160; x_max = 240
 
