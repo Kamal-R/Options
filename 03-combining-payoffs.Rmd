@@ -361,7 +361,7 @@ sl2 <- bracketsGrob(0.725, 0.725, 0.725, 0.465, lwd=2, col="green3")
 
 temp <- synthetic_long_payoff(data_synthetic_long = Sythetic_Long_Payoff_XYZ,
                     data_call = Call_Payoff_XYZ_200, data_put = Put_Payoff_XYZ_200,
-                    main_title = "A Sythentic Long Position"
+                    main_title = "A Sythentic Long Position",
                     sub_title = "Buy 1 XYZ call for $15/share at the $200 strike\nSell 1 XYZ put for $20/share at the $200 strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
