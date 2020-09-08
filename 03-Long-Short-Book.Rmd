@@ -289,7 +289,7 @@ I bought GDX for \$32.84 and sold it for \$41.27, for a gain of 25.7%. It had a 
 
 Unofrtunately for me, I don't always pick winners like GLD and GDX. Sometimes I pick losers. I bought XLU on February , 2020 for  and VNQ on February , 2020 for . They got caught in the coronavirus sell off and are slowly bouncing back, but are still underwater. Let's take a quick look at their charts. 
 
-```{r Core-Allocation-XLU}
+```{r Core-Allocation-XLU, message = FALSE, out.width = out_width_plot, fig.align = "center"}
 XLU_data <- ds.getSymbol.yahoo("XLU", from = "2020-01-01", to = Sys.Date())
 XLU_data <- tibble( "Date" = as.Date(as.character(index(XLU_data))), 
                     "Price" = as.vector(XLU_data$XLU.Close),
@@ -305,7 +305,7 @@ ggplot() +
   options_theme() 
 ```
 
-```{r VNQ-Core-Allocation}
+```{r VNQ-Core-Allocation, message = FALSE, out.width = out_width_plot, fig.align = "center"}
 VNQ_data <- ds.getSymbol.yahoo("VNQ", from = "2020-01-01", to = Sys.Date())
 VNQ_data <- tibble( "Date" = as.Date(as.character(index(VNQ_data))), 
                     "Price" = as.vector(VNQ_data$VNQ.Close),
@@ -445,7 +445,7 @@ Stocks don't go steadily higher. They swing up and down in response to economic 
 
 Let's go back to volatility-adjusted position sizing. There are lots of different ways to do this, but my baseline approach is that I want all of my positions to contribute the *same* volatility to my portfolio. Let's use GLD and GDX as our examples. When I invested in GLD and GDX, I sized my GLD position as twice as large 
 
-```{r GDX-Volatility-Index}
+```{r GDX-Volatility-Index, message = FALSE, out.width = out_width_plot, fig.align = "center"}
 # Source: https://ca.investing.com/indices/cboe-gold-volatitity-historical-data
 GVZ_Data <- read.csv("GVZ-Historical-Data.csv")
 GVZ_Data <- tibble( "Date" = anydate(as.vector(GVZ_Data$Date)), 
