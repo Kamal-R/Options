@@ -162,7 +162,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
 if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Covered-Call-1.png")  
+if ( output_epub ) { knitr::include_graphics("03-payoff-diagrams_files/figure-html/XYZ-Covered-Call-1.png") }
 ```
 
 ## A Collar 
