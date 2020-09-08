@@ -6,6 +6,9 @@ subtitle: ''
 site: bookdown::bookdown_site
 ---
 
+<!-- Pandemic-Proof Your Finances: Pandemic-proof industries -- food, clothing, gasoline, medication... 
+Make inspirational - lifestyle changes attributable to living through the pandemic. -->
+
 # Introduction {-}
 
 Who is book for? Anyone who wants to understand options and how to *think* through options trades. If you've never seen options before and don't remember the last time you took a math class, this is the book for you. If there's something you don't understand, it probably means I didn't do a good enough job. If you let me know, I'll try to make that part of the book better. 

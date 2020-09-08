@@ -2,7 +2,8 @@ book_filename: "Understanding-Options"
 delete_merged_file: true
 new_session: true
 
-rmd_files: ["index.Rmd", "01-options-intro.Rmd", "02-payoff-diagrams.Rmd"]
+rmd_files: ["index.Rmd", "01-options-intro.Rmd", "02-payoff-diagrams.Rmd", "03-combining-payoffs.Rmd", 
+            "03-Long-Short-Book.Rmd", "03-volatility-regimes.Rmd"]
 
 language:
   ui:

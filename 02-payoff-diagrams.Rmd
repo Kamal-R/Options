@@ -32,178 +32,7 @@ out_width_table <- "90%"
 
 grid::grid.locator(unit="npc") 
 output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
-```
-
-```{r Plotting-Helper-Functions}
-### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
-bracketsGrob <- function(...){
-l <- list(...)
-e <- new.env()
-e$l <- l
-  grid:::recordGrob(  {
-    do.call(grid.brackets, l)
-  }, e)
-}
-
-options_theme <- function() {
-  theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.03, face = "plain", size = 13, 
-                                  colour = "grey33", lineheight = 1.2,
-                                  margin = margin(5, 0, 10, 0)),
-        legend.position = "none", 
-        text = element_text(size=16), 
-        panel.border = element_blank(), 
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), 
-        panel.background = element_rect(fill = plot_bg, color = plot_bg),
-        plot.background = element_rect(fill = plot_bg, color = plot_bg),
-        axis.line = element_line(colour = plot_bg),
-        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
-                                    colour = plot_fg),
-        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
-                                    angle = 90),
-        axis.text.x = element_text(colour = "black"), 
-        axis.ticks = element_blank() )
-}
-
-
-stock_payoff <- function(data, main) {
-  ggplot() + 
-  geom_line(data = data, aes(stock_price_x, stock_profit_y, color = Profitable), linetype = "solid") +   
-  geom_segment(data = data,
-               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
-                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
-               show.legend = FALSE, col = "red") + 
-  geom_segment(data = data,
-               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
-                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-               show.legend = FALSE, col = "green3") + 
-  scale_y_continuous(label = scales::dollar) +
-  scale_x_continuous(label = scales::dollar) + 
-  labs(title = main, x = "", y = "") +
-  scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
-                     labels = c("", "", ""), guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
-                                                  linetype = c("dashed","solid","solid")))) + 
-  options_theme()
-}
-
-
-call_payoff <- function(data, main) {
-  ggplot() + 
-  geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
-            linetype = "solid") +   
-  geom_segment(data = data,
-               aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-               show.legend = FALSE, col = "red") + 
-  geom_segment(data = data,
-               aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-               show.legend = FALSE, col = "green3") + 
-  scale_y_continuous(label = scales::dollar) +
-  scale_x_continuous(label = scales::dollar) + 
-  labs(title = main, x = "", y = "") +
-  scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
-                     labels = c("", ""), guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c("white","white"),
-                                                  linetype = c("solid","solid")))) + 
-  options_theme()
-}
-
-
-stock_and_call_payoff <- function(data_stock, data_call, main) { 
-  ggplot() + 
-  geom_line(data = data_stock, aes(stock_price_x, stock_profit_y, color = Profitable), 
-            linetype = "dotdash") +   
-  geom_segment(data = data_stock, linetype = "dotdash",
-               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
-                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
-               show.legend = FALSE, col = adjustcolor("red", alpha.f = 0.5)) + 
-  geom_segment(data = data_stock, linetype = "dotdash",
-               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
-                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-               show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
-  geom_line(data = data_call, aes(Call_x, Call_y, color = Profitable), linetype = "solid") +   
-  geom_segment(data = data_call,
-               aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-               show.legend = FALSE, col = "red") + 
-  geom_segment(data = data_call,
-               aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-               show.legend = FALSE, col = "green3") + 
-  labs(title = main, x = "", y = "") +
-  scale_y_continuous(label = scales::dollar) +
-  scale_x_continuous(label = scales::dollar) + 
-  scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
-                             "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
-                             "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
-                 labels = c("", "", "", "", ""), guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c("white","white"),
-                                                  linetype = c("solid","solid")))) + 
-  options_theme()
-}
-
-
-put_payoff <- function(data, main) {
-  ggplot() + 
-  geom_line(data = data, aes(Put_x, Put_y, color = Profitable), linetype = "solid") +
-  geom_segment(data = data,
-               aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
-               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-               show.legend = FALSE, col = "green3") + 
-  geom_segment(data = data,
-               aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
-               show.legend = FALSE, col = "red") + 
-  scale_y_continuous(label = scales::dollar) +
-  scale_x_continuous(label = scales::dollar) + 
-  labs(title = main, x = "", y = "") +
-  scale_color_manual(values = c( "Profit" = "green3", "Loss" = "red"),
-                 labels = c("", ""), guide = "legend") + 
-  options_theme()
-}
-
-
-stock_and_put_payoff <- function(data_stock, data_put, main) { 
-  ggplot() + 
-  geom_line(data = data_stock, aes(stock_price_x, stock_profit_y, color = Profitable), 
-            linetype = "dotdash") +   
-  geom_segment(data = data_stock, linetype = "dotdash",
-               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
-                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
-               show.legend = FALSE, col = adjustcolor("red", alpha.f = 0.5)) + 
-  geom_segment(data = data_stock, linetype = "dotdash",
-               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
-                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-               show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
-  geom_line(data = data_put, aes(Put_x, Put_y, color = Profitable), linetype = "solid") +
-  geom_segment(data = data_put,
-               aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
-               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-               show.legend = FALSE, col = "green3") + 
-  geom_segment(data = data_put,
-               aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
-               arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
-               show.legend = FALSE, col = "red") + 
-  labs(title = main, x = "", y = "") +
-  scale_y_continuous(label = scales::dollar) +
-  scale_x_continuous(label = scales::dollar) + 
-  scale_color_manual(values = c( "Profit_put" = "green3", "Loss_put" = "red",
-                             "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
-                             "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
-                 labels = c("", "", "", "", ""), guide = "legend") + 
-  guides(color = guide_legend(override.aes = list(color = c("white","white"),
-                                                  linetype = c("solid","solid")))) + 
-  options_theme()
-}
+source("Plotting_Functions.R")
 ```
 
 ```{r Table-Helper-Functions}
@@ -226,7 +55,7 @@ In our first few chapters, we'll be looking at how options perform on their expi
 
 ## Payoff Diagrams for Stocks
 
-```{r Stock-Demo, fig.align = "center"}
+```{r Company-XYZ-Stock-Chapter-2, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Stock_cost <- 200
 x_min = 160; x_max = 240
 
@@ -239,7 +68,7 @@ s1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
 s2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
 
 ### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
-temp <- stock_payoff(Stock_Payoff_XYZ, main = "Buy XYZ's shares at $200.")
+temp <- stock_payoff(Stock_Payoff_XYZ, main_title = "Buy XYZ's shares at $200.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
@@ -290,7 +119,7 @@ Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.0
 c1 <- bracketsGrob(0.25, 0.10, 0.25, 0.255, lwd=2, col="red")
 c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.255, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_XYZ_200, main = "Buy 1 XYZ call at the $200 strike.")
+temp <- call_payoff(data = Call_Payoff_XYZ_200, main_title = "Buy 1 XYZ call at the $200 strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -309,11 +138,6 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 if ( !output_epub ) { print(temp); rm(temp) }
 if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Call-Option-Payoff-Plot-1.png") }
-
-# ggplotly(call_payoff(data = Call_Payoff_XYZ_230, Call_K = Call_K, Call_cost = Call_cost,
-#                      main = "Buy: Company XYZ's $230 Strike Call")) %>%
-#  style(hovertemplate = paste('<b>Share Price</b>: $%{x:.2f}',
-#                              '<br><b>Profit Per Share</b>: $%{y:.2f}'))
 ```
 
 Reading this payoff diagram is not too bad - suppose the shares are worth `r currency(Future_price)` at expiry. If we own the call, it gives us the power to purchase 100 shares for `r currency(Call_K)` each (on the expiry date) and immediately sell them for `r currency(Future_price)`, for a gain of `r currency(Future_price)` - `r currency(Call_K)` = `r currency(Future_price-Call_K)` per share. The call cost `r currency(Call_cost)`, so we end up making `r currency(Future_price-Call_K)` - `r currency(Call_cost)` = `r currency(Future_price-Call_K-Call_cost)` per share. Looking at the payoff diagram, the per-share profit when the stock is at `r currency(Future_price)` is indeed `r currency(Future_price-Call_K-Call_cost)`. 
@@ -349,7 +173,8 @@ c2 <- bracketsGrob(0.80, 0.70, 0.80, 0.45, lwd=2, col="green3", lty = "solid")
 
 
 temp <- stock_and_call_payoff( data_stock = Stock_Payoff_XYZ, data_call = Call_Payoff_XYZ_200, 
-                               main = "Buying 1 XYZ call at the $200 strike (solid line) vs. \nbuying XYZ shares at $200. (dashed line)." ) 
+                               main_title = "Buying Shares vs. Buying a Call",
+                               sub_title = "Buy 1 XYZ call at the $200 strike (solid line)\nBuy XYZ shares for $200/share (dashed line).") 
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -393,7 +218,7 @@ Put_Payoff_XYZ_180 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01)
 p1 <- bracketsGrob(0.625, 0.225, 0.625, 0.125, lwd=2, col="red", lty = "solid")
 p2 <- bracketsGrob(0.25, 0.225, 0.25, 0.625, lwd=2, col="green3", lty = "solid")
 
-temp <- put_payoff(data = Put_Payoff_XYZ_180, main = "Buy 1 XYZ $180 strike put.")
+temp <- put_payoff(data = Put_Payoff_XYZ_180, main_title = "Buy 1 XYZ $180 strike put.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -441,7 +266,8 @@ p1 <- bracketsGrob(0.25, 0.58, 0.25, 0.75, lwd=2, col="green3", lty = "solid")
 p2 <- bracketsGrob(0.50, 0.58, 0.50, 0.525, lwd=2, col="red", lty = "solid")
 
 temp <- stock_and_put_payoff( data_stock = Stock_Payoff_XYZ, data_put = Put_Payoff_XYZ_180, 
-                              main = "Buying 1 XYZ put at the $180 strike (solid line) vs. \nbuying XYZ's shares at $200 (dashed line)." ) 
+                              main_title = "Buying Shares vs. Buying a Put",
+                              sub_title = "Buy 1 XYZ put at the $180 strike (solid line)\nBuy XYZ shares for $200/share (dashed line).") 
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -486,7 +312,7 @@ Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
 c1 <- bracketsGrob(0.30, 0.085, 0.30, 0.265, lwd=2, col="red")
 c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.28, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_Apple_205, main = "Buy 1 Apple $205 strike call.")
+temp <- call_payoff(data = Call_Payoff_Apple_205, main_title = "Buy 1 Apple $205 strike call.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,

@@ -1,0 +1,533 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+CRAN_repo = getOption("repos")
+CRAN_repo["CRAN"] = "http://cran.us.r-project.org"
+options(repos = CRAN_repo)
+
+if ( !require("here") )          { install.packages("here") };            require(here)
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
+if ( !require("pBrackets") )     { install.packages("pBrackets") };       require(pBrackets)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
+if ( !require("rtsdata") )       { install.packages("rtsdata") };         require(rtsdata)
+if ( !require("PerformanceAnalytics") )     { install.packages("PerformanceAnalytics") };   require(PerformanceAnalytics)
+if ( !require("anytime") )       { install.packages("anytime") };         require(anytime)
+
+options(kableExtra.html.bsTable = TRUE)
+options(kableExtra.auto_format = FALSE)
+```
+
+```{r Set-Global-Chapter-Variables}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # #929292"
+plot_fg_alt <- "#969696" # ??
+
+save_tables_as_pictures <- FALSE
+load_table_pictures <- TRUE
+out_width_plot <- "80%"
+out_width_table <- "90%"
+
+grid::grid.locator(unit="npc") 
+output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
+```
+
+```{r Plotting-Helper-Functions}
+### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
+bracketsGrob <- function(...){
+l <- list(...)
+e <- new.env()
+e$l <- l
+  grid:::recordGrob(  {
+    do.call(grid.brackets, l)
+  }, e)
+}
+
+options_theme <- function() {
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.03, face = "plain", size = 13, 
+                                  colour = "grey33", lineheight = 1.2,
+                                  margin = margin(5, 0, 10, 0)),
+        legend.position = "none", 
+        text = element_text(size=16), 
+        panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = plot_bg, color = plot_bg),
+        plot.background = element_rect(fill = plot_bg, color = plot_bg),
+        axis.line = element_line(colour = plot_bg),
+        axis.title.x = element_text(margin = unit(c(4, 0, 0, 0), "mm"), 
+                                    colour = plot_fg),
+        axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
+                                    angle = 90),
+        axis.text.x = element_text(colour = "black"), 
+        axis.ticks = element_blank() )
+}
+
+
+stock_payoff <- function(data, main) {
+  ggplot() + 
+  geom_line(data = data, aes(stock_price_x, stock_profit_y, color = Profitable), linetype = "solid") +   
+  geom_segment(data = data,
+               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
+                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+               show.legend = FALSE, col = "red") + 
+  geom_segment(data = data,
+               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
+                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = main, x = "", y = "") +
+  scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
+                     labels = c("", "", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
+                                                  linetype = c("dashed","solid","solid")))) + 
+  options_theme()
+}
+
+
+call_payoff <- function(data, main) {
+  ggplot() + 
+  geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
+            linetype = "solid") +   
+  geom_segment(data = data,
+               aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+               show.legend = FALSE, col = "red") + 
+  geom_segment(data = data,
+               aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = main, x = "", y = "") +
+  scale_color_manual(values = c("Profit" = "green3", "Loss" = "red"),
+                     labels = c("", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                  linetype = c("solid","solid")))) + 
+  options_theme()
+}
+
+
+stock_and_call_payoff <- function(data_stock, data_call, main) { 
+  ggplot() + 
+  geom_line(data = data_stock, aes(stock_price_x, stock_profit_y, color = Profitable), 
+            linetype = "dotdash") +   
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
+                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+               show.legend = FALSE, col = adjustcolor("red", alpha.f = 0.5)) + 
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
+                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+  geom_line(data = data_call, aes(Call_x, Call_y, color = Profitable), linetype = "solid") +   
+  geom_segment(data = data_call,
+               aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+               show.legend = FALSE, col = "red") + 
+  geom_segment(data = data_call,
+               aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  labs(title = main, x = "", y = "") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
+                             "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
+                             "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
+                 labels = c("", "", "", "", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                  linetype = c("solid","solid")))) + 
+  options_theme()
+}
+
+
+put_payoff <- function(data, main) {
+  ggplot() + 
+  geom_line(data = data, aes(Put_x, Put_y, color = Profitable), linetype = "solid") +
+  geom_segment(data = data,
+               aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  geom_segment(data = data,
+               aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
+               show.legend = FALSE, col = "red") + 
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  labs(title = main, x = "", y = "") +
+  scale_color_manual(values = c( "Profit" = "green3", "Loss" = "red"),
+                 labels = c("", ""), guide = "legend") + 
+  options_theme()
+}
+
+
+stock_and_put_payoff <- function(data_stock, data_put, main) { 
+  ggplot() + 
+  geom_line(data = data_stock, aes(stock_price_x, stock_profit_y, color = Profitable), 
+            linetype = "dotdash") +   
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
+                   y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+               show.legend = FALSE, col = adjustcolor("red", alpha.f = 0.5)) + 
+  geom_segment(data = data_stock, linetype = "dotdash",
+               aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
+                   y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+               show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+  geom_line(data = data_put, aes(Put_x, Put_y, color = Profitable), linetype = "solid") +
+  geom_segment(data = data_put,
+               aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
+               arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+               show.legend = FALSE, col = "green3") + 
+  geom_segment(data = data_put,
+               aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
+               arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
+               show.legend = FALSE, col = "red") + 
+  labs(title = main, x = "", y = "") +
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_continuous(label = scales::dollar) + 
+  scale_color_manual(values = c( "Profit_put" = "green3", "Loss_put" = "red",
+                             "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
+                             "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
+                 labels = c("", "", "", "", ""), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                  linetype = c("solid","solid")))) + 
+  options_theme()
+}
+```
+
+```{r Table-Helper-Functions}
+at_least_number <- function(x,number) {
+  ifelse( typeof(x) == "character", 
+          return( as.numeric(gsub('\\(','-',gsub('[)$,]', '', x))) >= number ),
+          return( x >= number) )
+}
+
+remove_negative_zeros <- function(x) { (x[which(-1e-4 < x & x < 1e-4)] = 0); return(x) }
+```
+
+# Portfolio Construction
+
+The options strategies you'll want to use in your portfolio depends on the kind of performance you want. The performance depends on the *return* you get and the *risk* you take to get it. Your return is how much money you make every year. There are different ways to measure risk, but roughly speaking it's how much your returns vary every year. Everyone has different risk preferences, and there's no right or wrong one. It just depends on your personality and what kind of behavior you're comfortable with for your investments. There are a bunch of different ways to measure risk. Some of them, like the Sharpe ratio, Value-at-Risk (VaR), and alpha and beta are favored by institutional investors. Regardless of how you measure it, constructing a portfolio that matches your risk preferences will reduce stress and improve your investing decisions.
+
+## Risk Preferences
+
+I'm going to use my risk preferences as an example, to give you an idea of how to think about risk. I know other investors with vastly different risk preferences than I have, and I'll briefly describe them afterwards. Remember, there is no right way or wrong way to think about risk, but you should be thinking about it. I hope that going through some examples and the thought processes behind them will make you think about how you view risk.
+
+I want my portfolio go up in a straight line, and I want to make 7%-8% per year. And not always in that order. My perfect portfolio goes up 8% per year and doesn't go down for a single day. It just slowly grind higher every day. That's an almost impossible goal because investment returns are volatile, but I invest with that goal in mind. It makes me prefer less volatile stocks, quickly sell stocks that might sell off, actively limit my exposure to market risk, and engage in (very) active trading to manage my risk. You might find some of what I do goes against investing advice you've heard before -- I'm not a passive investor, I'm not using a 60%/40% portfolio, I want to remove market risk rather than buy the S&P 500, and so on. In the end, it's just a way for me to invest in line with my risk preferences.
+
+Let's dive into that by looking at some of my investing choices between May 2020 and August 2020. The coronavirus selloff was bottoming, and I started accumulating core commodity positions. I bought GLD at \$161.00 on May 26th (and sold half on July 29th, only to buy it back on August 4th), GDX at \$32.84 on June 17th (and sold it all on July 21st), and PALL at \$200.00 on August 4th. I also bought TIP at \$121.29 on June 3rd, and averaged down on three oil positions -- Gear Energy, Baytex Energy, and Bonterra Energy -- on July 29th. I had other small commodity positions, usually held for only 1-10 days over that period, but these were my core commodity positions. I also wanted to establish core postions in SLV (silver) and GBTC (bitcoin), but wasn't able to buy them before they took off. I'm hoping they pull back I get a buying opportunity.
+
+```{r Core-Allocation-GLD, message = FALSE, out.width = out_width_plot, fig.align = "center"}
+GLD_data <- ds.getSymbol.yahoo("GLD", from = "2020-03-01", to = Sys.Date())
+GLD_data <- tibble( "Date" = as.Date(as.character(index(GLD_data))), 
+                    "Price" = as.vector(GLD_data$GLD.Close),
+                    "Color" = ifelse( "2020-05-26" <= as.Date(as.character(index(GLD_data))) & 
+                      as.Date(as.character(index(GLD_data))) <= as.Date(Sys.Date()), "Own", "Not_Own") )
+
+ggplot() + 
+  geom_line(data = GLD_data, aes(x = Date, y = Price, color = Color, group = 1)) +
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Daily closing price of GLD - A Phsyical Gold ETF. \nOwned from May 26, 2020 - August 7, 2020.", x = "", y = "") +
+  scale_color_manual(values = c( "Not_Own" = "black", "Own" = "blue")) + 
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+```
+
+Since I first bought it, GLD has increased by 18.5% (from \$161 to \$190.81). Outside of a little dip in early June, it went straight higher. This fits my "steady grind higher" philosophy -- it didn't have many down days and has so far produced significant gains. It's not shown on this chart, but I sold half of the GLD position (reducing it from 7% to 3.5%) on July 29th and bought it back on August 4th. 
+
+
+```{r Core-Allocation-TIP, message = FALSE, out.width = out_width_plot, fig.align = "center"}
+TIP_data <- ds.getSymbol.yahoo("TIP", from = "2020-03-01", to = Sys.Date())
+TIP_data <- tibble( "Date" = index(TIP_data), 
+                    "Price" = as.vector(TIP_data$TIP.Close),
+                    "Color" = ifelse( "2020-06-03" <= as.Date(as.character(index(TIP_data))) & 
+                      as.Date(as.character(index(TIP_data))) <= as.Date(Sys.Date()), "Own", "Not_Own") )
+
+ggplot() + 
+  geom_line(data = TIP_data, aes(x = Date, y = Price, color = Color, group = 1)) +
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Daily closing price of TIP - A Treasury Inflation-Protected Security ETF \nOwned from July 6, 2020 to August 7, 2020.", x = "", y = "") +
+  scale_color_manual(values = c( "Not_Own" = "black", "Own" = "blue")) + 
+  scale_x_date(date_labels = "%B") + # theme(axis.text.x = element_text(angle=45, hjust = 1)) + 
+  options_theme() 
+```
+
+Since I first bought it, TIP has increased by 4.0% (from \$121.29 to \$126.17). Outside of a little dip in early June, it has gone straight higher. 
+
+```{r Core-Allocation-GDX, message = FALSE, out.width = out_width_plot, fig.align = "center"}
+GDX_data <- ds.getSymbol.yahoo("GDX", from = "2020-03-01", to = Sys.Date())
+GDX_data <- tibble( "Date" = as.Date(as.character(index(GDX_data))), 
+                    "Price" = as.vector(GDX_data$GDX.Close),
+                    "Color" = ifelse( "2020-06-17" <= as.Date(as.character(index(GDX_data))) & 
+                      as.Date(as.character(index(GDX_data))) <= "2020-07-21",  "Own", "Not_Own") )
+
+ggplot() + 
+  geom_line(data = GDX_data, aes(x = Date, y = Price, color = Color, group = 1)) +
+  scale_y_continuous(label = scales::dollar) +
+  scale_color_manual(values = c( "Not_Own" = "black", "Own" = "blue")) + 
+  labs(title = "Daily closing price of GDX - A Senior Gold Miner ETF. \nOwned from June 17, 2020 - July 21, 2020.", 
+       x = "", y = "") +
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+```
+
+I bought GDX for \$32.84 and sold it for \$41.27, for a gain of 25.7%. It had a not-so-little dip in early July, but other than that fit my goals pretty well. Just like with GLD, I'm willing to tolerate some volatility for higher returns, especially when I already have substantial gains. Much like GLD, I made the decision to sell GDX based on a volatility signal. I'll discuss the decision more in the section on volatility. 
+
+Unofrtunately for me, I don't always pick winners like GLD and GDX. Sometimes I pick losers. I bought XLU on February , 2020 for  and VNQ on February , 2020 for . They got caught in the coronavirus sell off and are slowly bouncing back, but are still underwater. Let's take a quick look at their charts. 
+
+```{r Core-Allocation-XLU}
+XLU_data <- ds.getSymbol.yahoo("XLU", from = "2020-01-01", to = Sys.Date())
+XLU_data <- tibble( "Date" = as.Date(as.character(index(XLU_data))), 
+                    "Price" = as.vector(XLU_data$XLU.Close),
+                    "Color" = ifelse( "2020-02-03" <= as.Date(as.character(index(XLU_data))) & 
+                      as.Date(as.character(index(XLU_data))) <= as.Date(Sys.Date()), "Own", "Not_Own") )
+
+ggplot() + 
+  geom_line(data = XLU_data, aes(x = Date, y = Price, color = Color, group = 1)) +
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Daily closing price of XLU - A Utilities ETF. \nOwned from February 03, 2020 - August 7, 2020.", x = "", y = "") +
+  scale_color_manual(values = c( "Not_Own" = "black", "Own" = "blue")) + 
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+```
+
+```{r VNQ-Core-Allocation}
+VNQ_data <- ds.getSymbol.yahoo("VNQ", from = "2020-01-01", to = Sys.Date())
+VNQ_data <- tibble( "Date" = as.Date(as.character(index(VNQ_data))), 
+                    "Price" = as.vector(VNQ_data$VNQ.Close),
+                    "Color" = ifelse( "2020-02-25" <= as.Date(as.character(index(VNQ_data))) & 
+                      as.Date(as.character(index(VNQ_data))) <= as.Date(Sys.Date()), "Own", "Not_Own") )
+
+ggplot() + 
+  geom_line(data = VNQ_data, aes(x = Date, y = Price, color = Color, group = 1)) +
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Daily closing price of VNQ - A Real Estate ETF. \nOwned from February 25, 2020 - August 7, 2020.", x = "", y = "") +
+  scale_color_manual(values = c( "Not_Own" = "black", "Own" = "blue")) + 
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+```  
+
+The moral of the story is that it's not enough to make stock "picks" to reach your investment goals. You need a risk management process. It doesn't have to be my process, but you need a process that keeps you out of trouble if your picks go wrong. 
+
+
+## Compound Your Returns 
+
+Another reason to dislike volatility and large drawdowns is that it hurts your ability to *compound* your savings. Chances are you've heard someone, possibly your parents or someone at a bank, tell you that if you start saving \$200 a month when you're 18, you'll have some crazy large amount like \$1,000,000 saved up by the time you retire at 65. How does that work? Through the magic of compounding. We need to make an important assumption to know how much compounding helps our savings, and that is how much our account returns every year. For the next 40-odd years. We have no way of knowing that rate, but my target return is 7%, so I'm going to assume I hit my target rate of 7% and see how the account does. 
+
+```{r Coupound-Seven}
+
+```
+
+
+
+
+## Negatively Correlated Assets 
+
+The struggle to build a portfolio that slowly grinds higher doesn't end with making the right "picks". You can't always get the picks right, so I have to use other tools to get the job done. The next tool in the toolbox is allocating chunks of the portfolio to negatively correlated assets. 
+
+```{r Negatively-Correlated-Assets, message = FALSE, out.width = out_width_plot, fig.align = "center"}
+### Source: https://quant.stackexchange.com/questions/2892/
+### how-to-simulate-correlated-assets-for-illustrating-portfolio-diversification
+# library(mvtnorm)
+# k <- 3; N <- 100
+# Sigma <- matrix( c(1,0.75,-0.25, 0.75,1,0.5, -0.25,0.5,1), nrow=k, ncol=k)
+# BMs <- apply( rmvnorm(N, rep(0,k), sigma), 2, cumsum )
+# matplot(BMs, type="l", lty=1)
+
+N <- 252; n <- 1:N/10
+A = 1000 * ( n/500 + sin(n-30)/50  ) + 100 
+B = 1000 * ( sin(n-100)/80 - 0.025 + n/750 ) + 100
+C = 1000 * ( sin(n-90)/100 - n/750 + (n-10)/800 - 0.05 ) + 100
+
+Assets <- data.frame( n = seq(from = as.Date("2019-01-01"), to = as.Date("2019-12-10"), length = N), 
+                      A = A, B = B, C = C )
+
+# c( cor(Assets$A, Assets$B), cor(Assets$A, Assets$C), cor(Assets$B, Assets$C) )
+# 0.8102105 -0.6733144 -0.6105057
+
+ggplot(data = Assets) + 
+  geom_line( aes(x = n, y = A, color = "A") ) +
+  geom_line( aes(x = n, y = B, color = "B")  ) + 
+  geom_line( aes(x = n, y = C, color = "C") ) + 
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_date(date_labels = "%B") +
+  labs(title = "Which two assets would you like to own?", 
+       x = "", y = "") +
+  scale_color_manual(values = c("A" = "green", "B" = "blue", "C" = "red"), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
+                                                  linetype = c("dashed","solid","solid")))) + 
+  options_theme()
+```
+
+At first glance, Assets 1 and 2 look like the winners. They go up a fair bit over the year, while Asset 3 does not. Assuming we own a 50%/50% split of 2 assets, we can construct three different portfolios. The first portfolio is 50% Asset 1 and 50% Asset 2, the second portfolio is 50% Asset 2 and 50% Asset 3, and the third portfolio is 50% Asset 1 and 50% Asset 3. Before jumping to conclusions, let's see how these 3 portfolios perform. 
+
+```{r Portfolio-Compare, message = FALSE, out.width = out_width_plot, fig.align = "center"}
+One = 0.5*A + 0.5*B
+Two =  0.5*A + 0.5*C
+Three = 0.5*B + 0.5*C
+
+Portfolio_Compare <- data.frame( n = seq(from = as.Date("2019-01-01"), to = as.Date("2019-12-10"), length = N), 
+                                 A = A, B = B, C = C, One = One, Two = Two, Three = Three )
+
+ggplot(data = Portfolio_Compare) + 
+  geom_line( aes(x = n, y = A, color = "A") ) +
+  geom_line( aes(x = n, y = B, color = "B")  ) + 
+  geom_line( aes(x = n, y = C, color = "C")  ) + 
+  geom_line( aes(x = n, y = One, color = "One") ) +
+  geom_line( aes(x = n, y = Two, color = "Two") ) +
+  geom_line( aes(x = n, y = Three, color = "Three") ) + 
+  scale_y_continuous(label = scales::dollar) +
+  scale_x_date(date_labels = "%B") +
+  labs(title = "Comparing the three portfolios.", x = "", y = "") +
+  scale_color_manual(values = c("A" = alpha("green",0.25), "B" = alpha("blue",0.20), C = alpha("red",0.20),
+                                "One" = "black", "Two" = "black", "Three" = "black"), guide = "legend") + 
+  guides(color = guide_legend(override.aes = list(color = c("white", "white","white"),
+                                                  linetype = c("dashed","solid","solid")))) + 
+  options_theme()
+```
+
+
+```{r Three-Portfolio-Risk-Characteristics}
+One_ts <- as.data.frame(One) 
+row.names(One_ts) <- seq(from = as.Date("2019-01-01"), to = as.Date("2019-12-10"), length = N)
+One_ts <- as.xts(One_ts); One_ts <- CalculateReturns(One_ts, "discrete")
+
+Two_ts <- as.data.frame(Two) 
+row.names(Two_ts) <- seq(from = as.Date("2019-01-01"), to = as.Date("2019-12-10"), length = N)
+Two_ts <- as.xts(Two_ts); Two_ts <- CalculateReturns(Two_ts, "discrete")
+
+Three_ts <- as.data.frame(Three) 
+row.names(Three_ts) <- seq(from = as.Date("2019-01-01"), to = as.Date("2019-12-10"), length = N)
+Three_ts <- as.xts(Three_ts); Three_ts <- CalculateReturns(Three_ts, "discrete")
+
+Portfolio_Returns <- tibble ( 
+  " " = c( "Portfolio One", "Portfolio Two", "Portfolio Three"),
+  "Average Daily Return" = scales::percent( c( mean(One_ts, na.rm = TRUE), 
+                                               mean(Two_ts, na.rm = TRUE), 
+                                               mean(Three_ts, na.rm = TRUE) ) ),
+  "Maximum Drawdown" = scales::percent( c( maxDrawdown(R = One_ts), 
+                                           maxDrawdown(R = Two_ts), 
+                                           maxDrawdown(R = Three_ts) ) ),
+  "Sharpe Ratio" = round( c( SharpeRatio(R = One_ts, rf = 1, FUN = "StdDev", scale = 252),
+                             SharpeRatio(R = Two_ts, rf = 1, FUN = "StdDev", scale = 252), 
+                             SharpeRatio(R = Three_ts, rf = 1, FUN = "StdDev", scale = 252) ), 4 ) ) 
+
+knitr::kable(Portfolio_Returns) %>%
+  kable_styling(bootstrap_options = c("bordered", "condensed", "responsive"),
+                full_width = FALSE )
+```
+
+## Volatility Adjusted Position Sizing
+
+So far, we've seen that there are times where stocks go up in a relatively straight line, and that using negatively correlated assets can improve the risk characteristics of your portfolio. We're building towards constructing a portfolio, and explaining how different option strategies can be used to enhance different aspects of that portfolio. The next tool we need is something that helps us understand how to size our positions. Just like before, there's no right or wrong way to do this. I'm going to describe how I size positions. It works well for me, but more important than my method is the thought process behind. I hope it gives you a way of thinking about position sizing in your own portfolio, so that you can devise a method that works for you. 
+
+The big idea is that stock's return has two main components - a trend over time, and fluctations around that trend. Since I want my portfolio to steadily increase over time, I prefer stocks with increasing trends and small fluctuations. Timing matters, though. No stock behaves like that all the time. For example TIP and GLD were perfect investments for someone like myself from when I bought them, GLD perhaps more than TIP. They both steadily increased over time, but GLD spiked higher heading into August so I made more money on it. Given my goals, XLU and VNQ were poor investments based on when I bought them. I bought them in February, but if I had waited until May or June they'd be better investments. The lesson here is that timing matters. 
+
+Now we're viewing the return of each of our investments as having two components -- a trend over time, and fluctuations around that trend. The fluctations around the trend have a special name, *volatility*. The more volatile a stock is, the more it fluctates around it's long-term trend. Technology stocks tend to be quite volatile, while GLD and TIP tend not to be. The important thing to remember here is that each stock has its *own* volatility. A stock's volatility changes over time, much like its price does, as investors are constantly updating their opinions about that stock. As an investor, our desire to minimize volatility is probably related to how much we dislike potentially wild swings in prices. 
+
+I'm saving up to try and buy a home, so if there's a recession stocks and housing prices could fall at the same time. I want to be able to take advantage of when houses are cheap, so my current investing style that aims for steady growth gives me a good chance of doing that. If I ever do manage to buy the home, I won't have that large expense looming so my investing style will likely change. Regardless, I'll still use the tools introduced here to better understand my portfolio. We've already seen *volatility*, which measures the how much a stock fluctates around a trend. The other tool we'll use is *beta*, which measures the volatility of a stock relative to a benchmark. The first thing you have to do is chose a benchmark. You can chose any benchmark you want, but the beta's you see online (on Yahoo Finance or Google Finance) are using the S&P 500 as the benchmark. Once we have a benchmark, we can use beta to understand how different investments.
+
+Stocks don't go steadily higher. They swing up and down in response to economic conditions, investor sentiment, or no discernable reason at all. Even a relatively diversified index like the S&P 500 can have dramatic declines that takes years to recover from. Beta tells us how much our stock *amplifies* the price moves of our benchmark, the S&P 500. A beta of 1 means that for every 1% move in the S&P 500, our stock (tends to) moves by 1%. A beta greater than 1 means our stock moves by more than 1%, and a beta less than 1 means it moves by less than 1%. To meet my investing goals, I have to smooth out the swings in the market, so I want to construct a low beta portfolio. My ideal beta is 0.3 (or less). We'll come back to beta when we talk about constructing the long-short portfolio. 
+
+Let's go back to volatility-adjusted position sizing. There are lots of different ways to do this, but my baseline approach is that I want all of my positions to contribute the *same* volatility to my portfolio. Let's use GLD and GDX as our examples. When I invested in GLD and GDX, I sized my GLD position as twice as large 
+
+```{r GDX-Volatility-Index}
+# Source: https://ca.investing.com/indices/cboe-gold-volatitity-historical-data
+GVZ_Data <- read.csv("GVZ-Historical-Data.csv")
+GVZ_Data <- tibble( "Date" = anydate(as.vector(GVZ_Data$Date)), 
+                      "Price" = as.vector(GVZ_Data$Price),
+                      "Color_GVZ" = ifelse( "2020-05-26" <= anydate(as.vector(GVZ_Data$Date)) & 
+                                            anydate(as.vector(GVZ_Data$Date)) <= "2020-08-09",  
+                                            "Own", "Not_Own") )
+
+# Source: https://ca.investing.com/indices/cboe-gold-miners-etf-volatility-historical-data
+VXGDX_data <- read.csv("VXGDX-Historical-Data.csv")
+VXGDX_data <- tibble( "Date" = anydate(as.vector(VXGDX_data$Date)), 
+                      "Price" = as.vector(VXGDX_data$Price),
+                      "Color_GDX" = ifelse( "2020-06-17" <= anydate(as.vector(VXGDX_data$Date)) & 
+                                            anydate(as.vector(VXGDX_data$Date)) <= "2020-07-21",  
+                                            "Own", "Not_Own") )
+
+ggplot() + 
+  geom_line(data = VXGDX_data, aes(x = Date, y = Price, color = Color_GDX, group = 1)) +
+  geom_line(data = GVZ_Data, aes(x = Date, y = Price, color = Color_GVZ, group = 1)) +
+  scale_color_manual(values = c( "Not_Own" = "black", "Own" = "blue")) + 
+  labs(title = "Volatility Indices - GLD and GDX", x = "", y = "") +
+  scale_x_date(date_labels = "%B") + ylim(0,80) +
+  options_theme() 
+```
+
+While I owned GLD, its volatility ranged from 15-25. While I owned GDX, it's volatility ranged from 40-50. Since I want GLD and GDX to both contribute the *same* amount of volatility to my portfolio, I invested a little over twice as much into GLD as I did GDX. I allocated 10% of my portfolio to gold, so I invested ~3% in GDX, and ~7% in GLD. So within an allocation,  I use the volatility of each asset to determine how much to invest in it. In other words, I sized my investments based on their *risk*. 
+
+But how did I decide to allocate 10% to gold? I use the same volatility-adjusted allocation system to determine how much invest in a single portfolio position. Just like GLD and GDX have different volatility levels, different asset classes have different levels, too. For me, the investment universe has 4 main asset classes -- currencies, bonds, stocks, and commodities. Currencies tend to be the least volatile, followed by bonds and stocks. Commodities tend to be the most volatile. Volatility plays a big role in the price of an option, so being able to think of investments in terms of their volatility will be very helpful in the next chapter where we'll be discussing specific options strategies. Like I did in this chapter, I will be using trades that I've made as examples and discussing them in the context of my goal of having my portfolio's value grind steadily higher. 
+
+The volatility of GLD and GDX changes every day, and you can improve the method described here by regularly adjusting the positioning based on the new volatilities. I just eye-balled it and said GDX had twice the volatility of GLD, so I sized GLD about twice as large as GDX. I could have been more precise and adjusted that 2-to-1 ratio every day. I do actively manage my account but I like the core positions to be more hands-off, so I'd probably adjust it every month or every quarter. My goal is less "active management" and more "make reasonable investment decisions." The next question in this GLD/GDX story is: how did I decide when to close the GDX position? 
+
+Although it isn't shown on the chart, I reduced my GLD position by 50% (from ~7% to ~3.5%) on July 29th and took it back up to ~7% on August 4th. You might notice that GLD's volatility spiked from below 20 to 30. When it started coming down towards 20 again, I took the full ~7% position. I used the same strategy in deciding when to close my GDX position, except that I pulled the trigger faster. I thought that if GDX's volatility spiked, its price might crash before I could sell the position. So I sold the entire GDX position. With GLD, I though that even if its volatility spiked, tI would be able to sell the position before its price crashed. To protect some of my gains I sold half of the GLD postion, then bought it bought quickly when gold volatility didn't spike above 30.
+
+There are two ideas at work here. The first is that sharply rising volatility can be a signal of lower prices to come. In addition to using volatility to decide *how* to allocate between investments in my 10% gold allocation, I'm also using it to provide sell signals. Much like a volatility-based allocation strategy sizes positions based on risk, volatility-based sell signals remove risk from a portfolio. That was my primary goal when I made those decisions to sell - I was trying to remove the risk of losses from a decline in the price of GLD or GDX. The other idea is that I was much quicker to sell GDX than I was GLD. That's because GDX is an ETF of (gold mining) stocks, and stocks are more volatile than GLD (physical gold). As I described, I thought GDX could fall much faster and I was less willing to hold it through a potential decline. So I sold it much more quickly that I did GLD.
+
+My final thoughts on these two trades are to those who think that I was too cautious by selling the GDX and temporarily reducing my GLD position. I made 26.7% in the month or so I owned GDX, and 18.6% in the two months I've owned GLD. Those are very good returns, and are much higher than my target return of 7% per year. While selling them may remove some upside from my portfolio, I'm very happy to buy them back if favorable investing conditions (including, but not limited to their volatility trending lower again) return. As these two examples demonstrate, I'm not actively managing my investment account chasing returns. In line with risk-based investment philosphy, I am actively managing my portfolio to remove risk, not speculate that my "picks" are going higher. 
+
+It's this idea of having a rules based risk management process that I want you to take away from these examples. My method tells me when to buy (falling volatility) and sell (volatility that spikes higher) stocks, and how to size my positions (volatility-weighting within an allocation, and beta-weighting between allocations). I also chose the examples to demonstrate that there are much more investment opportunities on the market .
+
+When trying to determine how much to invest in each position, I'll size my position so that it is "like" a 5%-6% position in the S&P 500. Beta, a measure of how much an investment *amplifies* the price movements of the S&P 500, lets me do that. An important caveat is that beta measures the relationship between the price movements of my investment and the S&P 500, and that relationship changes. So the beta between my investment and S&P 500 changes over time. It's not a fixed number, and in some market environments, like a coronavirus selloff, it can change dramatically (for the worse, if you were me). 
+
+Let's look at some examples to see how this works. I'll use the same five positions -- TIP, GLD, GDX, XLU, and VNQ -- to demonstrate how to beta-adjust positions (and how it can go wrong). 
+
+```{r Calculate-Beta}
+SPY_data <- ds.getSymbol.yahoo("SPY", from = "2016-01-01", to = Sys.Date())
+SPY_data <- tibble( "Date" = as.vector(index(SPY_data)), 
+                    "Price" = as.vector(SPY_data$Price) )
+
+TIP_data <- ds.getSymbol.yahoo("TIP", from = "2016-01-01", to = Sys.Date())
+TIP_data <- tibble( "Date" = anydate(index(TIP_data)), 
+                    "Price" = as.vector(TIP_data$Price) )
+
+GLD_data <- ds.getSymbol.yahoo("GLD", from = "2016-01-01", to = Sys.Date())
+GLD_data <- tibble( "Date" = anydate(index(GLD_data)), 
+                    "Price" = as.vector(GLD_data$Price) )
+
+GDX_data <- ds.getSymbol.yahoo("GDX", from = "2016-01-01", to = Sys.Date())
+GDX_data <- tibble( "Date" = anydate(index(GDX_data$Date)), 
+                    "Price" = as.vector(GDX_data$Price) )
+
+XLU_data <- ds.getSymbol.yahoo("XLU", from = "2016-01-01", to = Sys.Date())
+XLU_data <- tibble( "Date" = anydate(index(XLU_data)), 
+                    "Price" = as.vector(XLU_data$Price) )
+
+VNQ_data <- ds.getSymbol.yahoo("VNQ", from = "2016-01-01", to = Sys.Date())
+VNQ_data <- tibble( "Date" = anydate(index(VNQ_data$Date)), 
+                    "Price" = as.vector(VNQ_data$Price) )
+
+
+# Beta_TIP_SPY <- BetaCoVariance(, na.rm = TRUE)
+# Beta_GLD_SPY <- BetaCoVariance(, na.rm = TRUE)
+# Beta_GDX_SPY <- BetaCoVariance(, na.rm = TRUE)
+# Beta_XLU_SPY <- BetaCoVariance(, na.rm = TRUE)
+# Beta_VNQ_SPY <- BetaCoVariance(, na.rm = TRUE)
+#   
+# Beta_GDX_GLD <- BetaCoVariance(, na.rm = TRUE)
+```
+
+
+<!-- 
+We'll take a brief detour into $\alpha$ and $\beta$ because they give us a very useful way to think about risk -- $\beta$ is the return attributable to *market risk*, and $\alpha$ is the excess return not attributable to market risk. You can think of market risk as the risk that you can't diversify away. There are lots of risks you can diversify away. An oil pipeline company faces a number of specific challenges that other companies do not -- political/permitting risk, environmental liability, potential damage to the pipeline, fluctations in the price of oil, and so on. You can diversify these risks away by buying companies that aren't exposed to these specific risks, like Amazon or Apple. Market risk is not specific to one company -- you can think of it as the risk from owning the S&P 500, a well-known and reasonably diversified American stock market index. There's just natural risk to owning the stocks in the S&P 500 and we call that market risk. 
+
+A $\beta$ of 1 means your portfolio has the *same* market risk as the S&P 500. A $\beta$ below 1 means your portfolio has *less* market risk, while a $\beta$ above 1 means your portfolio has *more* market risk. $\alpha$ is the excess return you achieve not attributable to market risk, so it a measure of *risk-adjusted* return. If we have two portfolios that have both made 8% this year, we'd probably prefer the one with a lower $\beta$ (less market risk) and more $\alpha$ (higher risk-adjusted performance). I'm not interested in the math behind $\alpha$ and $\beta$, but the ideas behind them give us a framework that lets us think about how much of our returns are our returns are coming from market risk. We'll be using that idea over and over again while walking through different options strategies and how they can help control portfolio risk. 
+-->
+
