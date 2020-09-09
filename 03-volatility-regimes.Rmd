@@ -433,7 +433,7 @@ grid.arrange(TBond_Price_plot, TBond_Volatility_Chart, ncol=1)
 ```
 
 
-```{r T-Bond-Price-Volatility-Plots-2018, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
+```{r T-Bond-Price-Volatility-Plots-2019, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
 ### The buy and sell regions are manually annoted (by me) 
 Color <- rep("black", 252)
 TBond_Price_data_2019 <- ds.getSymbol.yahoo("IEF", from = "2019-01-01", to = "2020-01-01")
