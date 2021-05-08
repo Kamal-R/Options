@@ -53,7 +53,7 @@ This isn't a book about modeling or math. Models are very useful, but people oft
 <!-- 
 ## Acknowledgments {-}
 
-This book is written in Rmarkdown using the *bookdown* package, hosted on Netlify, and built using Travis CI. The *Authoring Books and Technical Documents with R Markdown* at https://musing-aryabhata-b16338.netlify.com/ was very helpful in setting up Netlify and Travis CI. 
+This book is written in Rmarkdown using the *bookdown* package, hosted on Netlify, and built using Travis CI. The *Authoring Books and Technical Documents with R Markdown* at https://musing-aryabhata-b16338.netlify.com/ was very helpful in setting up Netlify and Travis CI.  
 
 ```{r, results='asis', echo = FALSE, eval = TRUE} 
 if(knitr:::pandoc_to() == "html") { 
