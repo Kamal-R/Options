@@ -28,7 +28,6 @@ if ( !require("grid") )          { install.packages("grid") };            requir
 if ( !require("magick") )        { install.packages("magick") };          require(magick)
 if ( !require("gridExtra") )     { install.packages("gridExtra") };       require(gridExtra)
 
-    
 options(kableExtra.html.bsTable = TRUE)
 options(kableExtra.auto_format = FALSE)
 ```
@@ -93,8 +92,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( s1 ) + annotation_custom( s2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Stock-Demo-1.png") }
+temp; rm(temp)
 ```
 
 ## Options on Expiry Day
@@ -145,8 +143,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( c1 ) + annotation_custom( c2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Call-Option-Payoff-Plot-1.png") }
+temp; rm(temp)
 ```
 
 Reading this payoff diagram is not too bad - suppose the shares are worth `r currency(240)` at expiry. If we own the call, it gives us the power to purchase 100 shares for `r currency(200)` each and immediately sell them for `r currency(240)` (on the expiry date), for a gain of `r currency(240)` - `r currency(200)` = `r currency(40-Call_K)` per share. The call cost `r currency(15)`, so we end up making `r currency(40)` - `r currency(15)` = `r currency(25)` per share. Looking at the payoff diagram, the per-share profit when the stock is at `r currency(240)` is indeed `r currency(25)`. 
@@ -197,8 +194,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotation_custom( c1 ) + annotation_custom( c2 ) + 
      annotation_custom( s1 ) + annotation_custom( s2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Stock-vs-Call-Payoff-Plot-1.png") }
+temp; rm(temp)
 ```
 
 The payoff diagram summarizes all of this information, and helps us see the price levels that go along with these decisions very quickly. Drawing payoff diagrams is one of the easiest and most effective ways to understand the potential profit or loss of an option.
@@ -244,8 +240,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                hjust = 0, label = "Breakev", size = 4 ) +
      annotation_custom( p1 ) + annotation_custom( p2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Put-Option-Payoff-Plot-1.png") }
+temp; rm(temp)
 ```     
 
 The breakeven of the put is `r currency(170)`, because we need the shares to fall by `r currency(10)` to recover the cost of buying the put. Similar to calls, we can't lose more than we paid for the put. Unlike calls, the dollar-for-dollar "upside" participation we get happens when the stock goes down. This is the big idea behind puts - they make money when prices go down. This is a magical property because it opens up so many new investing strategies. Some are simple and some are very complex. But they're all built the same way - by mixing and matching different combinations of puts, calls, and shares to control how much an investment portfolio goes up (or down) when market prices go up. We'll come back to this idea every time we use options to construct risk-managed investments, which we'll do many times in this book.
@@ -290,8 +285,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotation_custom( p1 ) + annotation_custom( p2 ) + 
      annotation_custom( s1 ) + annotation_custom( s2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Stock-vs-Put-Payoff-Plot-1.png") }
+temp; rm(temp)
 ```
 
 ## Apple: Calls and Puts
@@ -338,8 +332,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                hjust = 0, label = "Breakev", size = 4 ) +
      annotation_custom( c1 ) + annotation_custom( c2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Apple-Call-Payoff-Plot-1.png") }
+temp; rm(temp)
 ```
 
 Here's a payoff diagram of the call option. Below `r currency(205)`, the buyer loses `r currency(6.84)` per share, which is what he paid for the call. This is the entire cost of the call, since it expires worthless. Since he paid `r currency(6.84)` per share for the call, he has to make `r currency(6.84)` back before he becomes profitable. Therefore, his breakeven is `r currency(205)` + `r currency(6.84)` = `r currency(211.84)`. This is reflected in the payoff diagram, where his profits are negative when the stock is below `r currency(211.84)` and positive when it is above `r currency(211.84)`.
@@ -372,7 +365,7 @@ Apple_Call_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
                             "Calls/Shares" = sign(Apple_Calls_Dollar_Return) * 
                                percent( Apple_Calls_Dollar_Return / Apple_Shares_Dollar_Return ) )
 
-Apple_Call_Table <- Apple_Call_Table %>% 
+temp <- Apple_Call_Table %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Call_Table)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr::kable(booktabs = TRUE, escape = FALSE) %>% 
@@ -381,22 +374,10 @@ Apple_Call_Table <- Apple_Call_Table %>%
   add_header_above(c(" " = 1, "100 Shares" = 2, 
                      "1 Call" = 2, "Relative Return" = 1) ) 
 
-kableExtra:::save_kable(Apple_Call_Table, zoom = 3, 
-                        file="img/02_Apple_Call_Table.png") 
+kableExtra:::save_kable(temp, zoom = 3, file="img/02_Apple_Call_Table.png")
 img = image_read('img/02_Apple_Call_Table.png')
-img = image_crop(img, "1500x900"); img
-
+img = image_crop(img, "1500x900"); img; rm(temp)
 ```
-
-<!--
-<figure style='margin-left:0%; margin-right:0%;'>
-    <font size="3" color = "grey">
-    <figcaption> Comparing the returns from owning 100 shares vs. 1 call. </figcaption>
-    </font>
-    <p> <img src="img/02_Apple_Call_Table.png"
-         style='height:auto; width:auto; border:none; display:block;' /> </p>
-</figure>
--->
 
 The buyer can make a ton of money with this call. To double his investment, he only needs to recover the `r currency(6.84)` it cost to buy the call (done at the breakeven of `r currency(205)` + `r currency(6.84)` = `r currency(211.84)`), and have the shares go up another `r currency(6.84)` to `r currency(211.84)` + `r currency(6.84)` = `r currency(218.68)`. Remember that Apple was trading for `r currency(205.44)` when he bought the call. If he bought shares instead, the buyer would make <sup> (`r currency(218.68)` - `r currency(205.44)`) </sup> &frasl; <sub> `r currency(205.44)` </sub> = `r percent(0.0666)` on his investment. By using calls, he makes <sup> (`r currency(218.68)` - `r currency(205)` - `r currency(6.84)`) </sup> &frasl; <sub> `r currency(6.84)` </sub> = `r percent(1)`. `r percent(1)` is so much larger than `r percent(0.066)` that this seems impossible, but the way to think about this is by looking at how much of the upside in the stock the call buyer participates in. 
 
@@ -435,8 +416,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = paste0("Losses"), size = 5 ) + 
      annotation_custom( p1 ) + annotation_custom( p2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Apple-Put-Option-Payoff-Plot-1.png") }
+temp; rm(temp)
 ```
 
 This put gives its buyer the option to sell shares of Apple at `r currency(205)` on September 20, 2019. That means if Apple's shares are below `r currency(205)` on that day, the put buyer makes money. When the shares are above `r currency(205)`, the put buyer has lost the entire `r currency(6.10)` per share that he spent buying the put. If the shares are below `r currency(205)`, the buyer must recover the cost of his put (done at `r currency(205)` - `r currency(6.10)` = `r currency(198.60)`). Once Apple's shares are below `r currency(198.90)`, the put buyer partcipates dollar for dollar in the downside of the stock, which is the upside of the put.
@@ -468,7 +448,7 @@ Apple_Put_Table <- tibble( "Stock Price" = currency(Apple_Stock_Prices),
                              percent(remove_negative_zeros ( Apple_Puts_Dollar_Return /
                                                                Apple_Shares_Dollar_Return ) ) )
 
-Apple_Put_Table <- Apple_Put_Table %>% 
+temp <- Apple_Put_Table %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Put_Table)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr::kable(booktabs = TRUE, escape = FALSE) %>% 
@@ -477,21 +457,10 @@ Apple_Put_Table <- Apple_Put_Table %>%
   add_header_above(c(" " = 1, "100 Shares" = 2, 
                      "1 Put" = 2, "Relative Return" = 1) )
 
-kableExtra:::save_kable(Apple_Put_Table, zoom = 3, 
-                        file = "img/02_Apple_Put_Table.png") 
+kableExtra:::save_kable(temp, zoom = 3, file = "img/02_Apple_Put_Table.png") 
 img = image_read('img/02_Apple_Put_Table.png')
-img = image_crop(img, "1500x900"); img
+img = image_crop(img, "1500x900"); img; rm(temp)
 ```
-
-<!--
-<figure style='margin-left:0%; margin-right:0%;'>
-    <font size="3" color = "grey">
-    <figcaption> Comparing the returns from owning 100 shares vs. 1 put. </figcaption>
-    </font>
-    <p> <img src="img/02_Apple_Put_Table.png"
-         style='height:auto; width:auto; border:none; display:block;' /> </p>
-</figure>
--->
 
 For now, let’s look at how owning Apple stock compares to holding the put to expiry. If Apple’s stock increases by 10% (from `r currency(205.44)` to `r currency(1.10*205.44)`), a shareholder will make `r currency(1.10*205.44)` - `r currency(205.44)` = `r currency(1.10*205.44-205.44)` per share. If Apple’s stock declines 10% (from `r currency(205.44)` to `r currency(0.90*205.44)`), a shareholder loses `r currency(0.90*205.44)` - `r currency(205.44)` = `r -currency(0.90*205.44-205.44)` per share. Now, let’s look at the put. It costs `r currency(6.10)` per share, so if Apple’s shares stay above `r currency(205)`, the put buyer loses `r currency(6.10)` per share. If Apple’s stock falls to `r currency(0.90*205.44)`, the put buyer makes `r currency(205)` - `r currency(0.90*205.44)` - `r currency(6.10)` = `r currency(205.44-0.90*205.44-6.10)` per share, which is <sup> `r currency(205-0.90*205.44-6.10)` </sup> &frasl; <sub> `r currency(6.10)` </sub> = `r round( (205-0.90*205.44-6.10)/6.10,2 )` times his orginal investment of `r currency(6.10)` in the puts. This number may seem too big to be true but once again, the way to think about it is through how much participation a put gives it buyer to the downside of a stock (which is the upside of the put). 
 
@@ -518,26 +487,15 @@ Apple_Different_Strikes <- tibble( "Strike" = currency(Apple_Prices_K),
                                    "1 Call" = currency(Apple_Call_Costs),
                                    "1 Put" = currency(Apple_Put_Costs) ) 
 
-Apple_Different_Strikes <- Apple_Different_Strikes %>% 
+temp <- Apple_Different_Strikes %>% 
   knitr:::kable(booktabs = TRUE, escape = FALSE) %>% 
   kable_styling( bootstrap_options = c("bordered", "condensed", "responsive"),
                  full_width = FALSE )
 
-kableExtra:::save_kable(Apple_Different_Strikes, zoom = 3, 
-                        file = "img/02_Apple_Different_Strikes.png") 
-img = image_read('img/02_Apple_Different_Strikes.png')
-img = image_crop(img, "500x450"); img
+kableExtra:::save_kable(temp, zoom = 3, file = "img/02_Apple_Different_Strikes_Table.png") 
+img = image_read('img/02_Apple_Different_Strikes_Table.png')
+img = image_crop(img, "500x450"); img; rm(temp)
 ```
-
-<!--
-<figure style='margin-left:10%;'>
-    <font size="3" color = "grey">
-    <figcaption> Cost on Sept. 11, 2019. </figcaption>
-    </font>
-    <p> <img src="img/02_Apple_Different_Strikes.png" 
-         style='height:23%; width:45%; border:none; display:block;' /> </p>
-</figure>
--->
 
 To keep the discussion simple, we’ll continue to focus on the price of the option on its expiry date. Remember, one call lets its buyer purchase 100 shares of Apple at its strike price, and one put lets its buyer sell 100 shares at its strike price. Let’s compare the dollar return of each call option to owning 100 shares if, on December 20, 2019, Apple's shares:
 
@@ -564,7 +522,7 @@ Apple_Different_Strikes_Call_Payoff <- tibble( "Stock Price" = scales::dollar(Ap
         pmax( 0, Apple_Future_Prices - Apple_Prices_K[4] ) - Apple_Call_Costs[4] ), 
         negative_parens = TRUE ) )
 
-Apple_Different_Strikes_Call_Payoff <- Apple_Different_Strikes_Call_Payoff %>% 
+temp <- Apple_Different_Strikes_Call_Payoff %>% 
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Different_Strikes_Call_Payoff)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr:::kable(booktabs = TRUE, escape = FALSE) %>% 
@@ -572,21 +530,10 @@ Apple_Different_Strikes_Call_Payoff <- Apple_Different_Strikes_Call_Payoff %>%
                 full_width = FALSE ) %>%
   add_header_above(c(" " = 1, "Call" = 5))
 
-kableExtra:::save_kable(Apple_Different_Strikes_Call_Payoff, zoom = 3, 
-             file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png")
+kableExtra:::save_kable(temp, zoom = 3, file = "img/02_Apple_Different_Strikes_Call_Payoff_Table.png")
 img = image_read('img/02_Apple_Different_Strikes_Call_Payoff_Table.png')
-img = image_crop(img, "1500x750"); img
+img = image_crop(img, "1500x750"); img; rm(temp)
 ```
-
-<!--
-<figure style='margin-left:0%; margin-right:0%;'>
-    <font size="3" color = "grey">
-    <figcaption> Dollar return if held to expiry. </figcaption>
-    </font>
-    <p> <img src="img/02_Apple_Different_Strikes_Call_Payoff_Table.png" 
-         style='height:auto; width:auto; border:none; display:block;' /> </p>
-</figure>
--->
 
 To give these dollar returns some context, buying
 
@@ -630,9 +577,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                hjust = 0, label = "Breakev", size = 4 ) +
      annotation_custom( c1 ) + annotation_custom( c2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-payoff-diagrams_files/figure-html/Apple-205-Strike-Call-Payoff-Plot-1.png"
-) }
+temp; rm(temp)
 ```
 
 The `r currency(205)` strike call is similar. We've drawn the payoff diagram this time, and it gives the breakeven to be `r currency(205 + 23.63)`. When shares are below `r currency(205)`, the call expires worthless and the buyer loses 100 * `r currency(23.63)` = `r currency(100*23.63)`. The call buyer still loses money when shares are at `r currency(220)` because `r currency(220)` is below this call's breakeven of `r currency(205 + 23.63)`. The call costs `r currency(205 + 23.63)`, but the buyer will have only made `r currency(220)` - `r currency(205)` = `r currency(220 - 205)` per share (`r 100*currency(220 - 205)` per call) before paying for the call. This leaves him with a loss of `r 100*currency(220 - 205)` - `r currency(100*23.63)` = `r 100*currency(220 - 205 - 23.63)` per share.
@@ -667,7 +612,7 @@ Apple_Different_Strikes_Call_Relative_Payoff <- tibble( "Share Price" = currency
       "$230 Strike" = percent( sign(Apple_Future_Returns) / Apple_Future_Returns * 
                                  ( pmax( 0, (Apple_Future_Prices - 230 ) ) - 8.50 ) ) )
 
-Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Relative_Payoff %>%
+temp <- Apple_Different_Strikes_Call_Relative_Payoff %>%
   mutate_if(c(FALSE,rep(TRUE,dim(Apple_Different_Strikes_Call_Relative_Payoff)[2]-1)), 
               ~cell_spec(.x, color = ifelse( at_least_number(.x,0), "green"," red"))) %>%
   knitr::kable(booktabs = TRUE, escape = FALSE, format = "html") %>% 
@@ -675,27 +620,16 @@ Apple_Different_Strikes_Call_Relative_Payoff <- Apple_Different_Strikes_Call_Rel
                 full_width = FALSE) %>%
   add_header_above(c(" " = 1, "Call" = 5))
 
-kableExtra:::save_kable(Apple_Different_Strikes_Call_Relative_Payoff,
-                        zoom = 3, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
+kableExtra:::save_kable(temp, zoom = 3, file = "img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png") 
 img = image_read('img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png')
-img = image_crop(img, "3000x2250"); img
+img = image_crop(img, "3000x2250"); img; rm(temp)
 ```
-
-<!--
-<figure style='margin-left:0%; margin-right:0%;'>
-    <font size="3" color = "grey">
-    <figcaption> Relative return if held to expiry. </figcaption>
-    </font>
-    <p> <img src="img/02_Apple_Different_Strikes_Call_Relative_Payoff_Table.png" 
-         style='height:auto; width:auto; border:none; display:block;' /> </p>
-</figure>
---> 
 
 The relative return table does an excellent job of capturing how much participation we get when there are extreme price movements (up or down). As we move across the `r currency(150)` row, the cheaper calls limit our downside. And in the `r currency(245)` and `r currency(300)` rows, they give good upside participation relative to owning 100 shares. The `r currency(200)` and `r currency(220)` rows are harder to interpret. The percentages are large, but we know from earlier that their dollar losses are small - they are still limited to the cost of the option. So while relative return tables are helpful, they can be difficult to understand without some sense of the magnitude of the dollar amounts. 
 
-The next thing to notice is that the price of an option varies wildly depending on its strike price. To understand why, we can decompose the price of an option into two components - time value and intrinsic value. The intrinsic value of an option is how much money the buyer would make if they exercised the option today. With Apple trading at `r currency(222.76)`, the `r currency(205)` call costs `r currency(23.63)` and the `r currency(205)` put costs `r currency(5.45)`. If we exercised the call today, we would make `r currency(222.76)` - `r currency(205)` = `r currency(222.76-205)`. This is the intrinsic value of the call. The remaining `r currency(23.76)` - `r currency(222.76-205)` =`r currency(23.76+222.76-205)` is the time value of the call. The put has no intrinstic value, because Apple's shares at `r currency(222.76)` are trading well above the put's strike price of `r currency(205)`. This means the entire `r currency(23.76+222.76-205)` cost of the put comes from its time value. 
+The next thing to notice is that the price of an option varies wildly depending on its strike price. To understand why, we can decompose the price of an option into two components - time value and intrinsic value. The intrinsic value of an option is how much money the buyer would make if they exercised the option today. With Apple trading at `r currency(222.76)`, the `r currency(205)` call costs `r currency(23.63)` and the `r currency(205)` put costs `r currency(5.45)`. If we exercised the call today, we would make `r currency(222.76)` - `r currency(205)` = `r currency(222.76-205)`. This is the intrinsic value of the call. The remaining `r currency(23.76)` - `r currency(222.76-205)` =`r currency(23.76+222.76-205)` is the time value of the call. The put has no intrinsic value, because Apple's shares at `r currency(222.76)` are trading well above the put's strike price of `r currency(205)`. This means the entire `r currency(23.76+222.76-205)` cost of the put comes from its time value. 
 
-The time value of an option slowly decays to `r currency(0)` as it approaches expiry, leaving only its intrinsic value. This distinction between time value and instrinsic value helps explain the wide variation in options prices in Table \@ref(tab:Apple-Different-Strikes-Call-Payoff-Table). The most extreme differences are in the `r currency(145)` strike call and `r currency(230)` strike put. The `r currency(145)` strike call is worth `r currency(78.45)` and the put is worth `r currency(0.32)`. With Apple trading at `r currency(222.76)`, the `r currency(78.45)` call has `r currency(222.76)` - `r currency(145)` = `r currency(222.76-145)` of intrinsic value and `r currency(78.45)` - `r currency(222.76-145)` = `r currency(78.45+222.76-145)` of time value. The `r currency(145)` put, in comparison, carries no intrinsic value and `r currency(0.32)` of time value. 
+The time value of an option slowly decays to `r currency(0)` as it approaches expiry, leaving only its intrinsic value. This distinction between time value and intrinsic value helps explain the wide variation in options prices in an earlier table. The most extreme differences are in the `r currency(145)` strike call and `r currency(230)` strike put. The `r currency(145)` strike call is worth `r currency(78.45)` and the put is worth `r currency(0.32)`. With Apple trading at `r currency(222.76)`, the `r currency(78.45)` call has `r currency(222.76)` - `r currency(145)` = `r currency(222.76-145)` of intrinsic value and `r currency(78.45)` - `r currency(222.76-145)` = `r currency(78.45+222.76-145)` of time value. The `r currency(145)` put, in comparison, carries no intrinsic value and `r currency(0.32)` of time value. 
 
 The takeaway here is that the seemingly large difference in cost between the `r currency(145)` calls and `r currency(145)` puts is due to their different intrinsic values, and that they have roughly the same amount of time value. To summarize time value and instrinsic value: 
 
@@ -703,4 +637,4 @@ The takeaway here is that the seemingly large difference in cost between the `r 
 2. Time value is related to time to expiry. It gradually declines as the option gets closer to expiry. 
 3. Decomposing option prices into time value and intrinsic value can help us understand their prices.
 
-Distinguishing bewteen the time and intrinsic value of an option has another advantage - it will serve as our foundation while we work through how to price and trade options before their expiry date. So far, we've focused on building intuition behind a few big picture ideas that we'll be using for the rest of the book - payoff diagrams, comparing absolute and relative performance with tables, and decomposing an option's price into different pieces. All of these tools will be extremely helpful when we discuss risk-managing options trades in later chapters.
+Distinguishing between the time and intrinsic value of an option has another advantage - it will serve as our foundation while we work through how to price and trade options before their expiry date. So far, we've focused on building intuition behind a few big picture ideas that we'll be using for the rest of the book - payoff diagrams, comparing absolute and relative performance with tables, and decomposing an option's price into different pieces. All of these tools will be extremely helpful when we discuss risk-managing options trades in later chapters.

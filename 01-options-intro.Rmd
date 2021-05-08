@@ -3,12 +3,17 @@
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 
+if ( !require("here") )          { install.packages("here") };            require(here)
 if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
 if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
+if ( !require("pBrackets") )     { install.packages("pBrackets") };       require(pBrackets)
 if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
 if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
 if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
 if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
+if ( !require("grid") )          { install.packages("grid") };            require(grid)
+if ( !require("magick") )        { install.packages("magick") };          require(magick)
+if ( !require("gridExtra") )     { install.packages("gridExtra") };       require(gridExtra)
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
@@ -52,9 +57,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
-
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("02-options-intro/figure-html/Treadmill-Covered-Call-1.png") }
+temp; rm(temp)
 ```
 
 This is our first payoff diagram. They'll get more complicated as we go along, but they'll always be color-coded so that we can see the key information with a glance. The plot shows when the \$25 fee starts saving you money. The line is green above \$525 (so it saves you money), and red below \$525 (so it costs you money). You save \$0 if the treadmill costs \$525 6 months from now, so you've "broken even" on the deal. So we call \$525 the *breakeven* (price). The plot tells us you start losing money when the treadmill costs \$525, and keep losing more until it costs \$500. By then, you've lost \$25 and can't lose any more.
