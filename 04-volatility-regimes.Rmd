@@ -1,0 +1,301 @@
+<!-- Each chapter is set to compile separately - include "global" set-up -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+CRAN_repo = getOption("repos")
+CRAN_repo["CRAN"] = "http://cran.us.r-project.org"
+options(repos = CRAN_repo)
+
+if ( !require("here") )          { install.packages("here") };            require(here)
+if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
+if ( !require("pBrackets") )     { install.packages("pBrackets") };       require(pBrackets)
+if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
+if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
+if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
+if ( !require("kableExtra") )    { install.packages("kableExtra") };      require(kableExtra)
+if ( !require("rtsdata") )       { install.packages("rtsdata") };         require(rtsdata)
+if ( !require("PerformanceAnalytics") )     { install.packages("PerformanceAnalytics") };   require(PerformanceAnalytics)
+if ( !require("anytime") )       { install.packages("anytime") };         require(anytime)
+if ( !require("gridExtra") )     { install.packages("gridExtra")};        require(gridExtra)
+
+
+options(kableExtra.html.bsTable = TRUE)
+options(kableExtra.auto_format = FALSE)
+```
+
+```{r Set-Global-Chapter-Variables}
+plot_bg <- "#FFFFFF" # "#191919"
+plot_fg <- "#000000" # #929292"
+plot_fg_alt <- "#969696" # ??
+vline_color <- "#D2B48C"
+  
+save_tables_as_pictures <- FALSE
+load_table_pictures <- TRUE
+out_width_plot <- "80%"
+out_width_table <- "90%"
+
+grid::grid.locator(unit="npc") 
+output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
+source("Plotting_Functions.R")
+```
+ 
+
+```{r Table-Helper-Functions}
+at_least_number <- function(x,number) {
+  ifelse( typeof(x) == "character", 
+          return( as.numeric(gsub('\\(','-',gsub('[)$,]', '', x))) >= number ),
+          return( x >= number) )
+}
+
+remove_negative_zeros <- function(x) { (x[which(-1e-4 < x & x < 1e-4)] = 0); return(x) }
+```
+
+# Thinking in Volatility
+
+Volatility is one of the most important components for pricing options. The more volatile a stock is, the more expensive it's options are. We can see why if we look at two stocks both trading at \$100 today. Company A is equally likely to be \$90 or \$110 in a month, and Company B is equally likely to be \$99 or \$101 in a month. If we want to buy calls on Company A and Company B, how much should we pay for them? For Company A, the call makes \$10 if the stock is at \$110 on its expiry date and makes nothing if it is at \$90. That's \$10 half the time and \$0 half the time, so we should pay \$5 for it. For Company B, it makes \$1 at \$101 and \$0 at \$99. That's \$1 half the time and \$0 the other half, so we should be willing to pay \$0.50. Applying the same logic to the put, we should pay \$5 or \$0.50 for them.
+
+<!-- Draw 2 bionomial trees - one for each stock/option pair -->
+
+This simple example gives us the intuition we need to use volatility in our trading. There are two key messages. The first is that the bigger we think a stock's range of possible future prices, the more we're willing to pay for its options. The second is that every *every* stock has its own volatility. The most important consequence of this is that when we're trading Company A, we have to use its volatility to give us a trading signal. When we're trading Company B, we have to use its volatility signal. 
+
+There are few other things we'll have keep in mind when it comes to using volatility. The first is that the range of prices we think a stock might have in the future depends on how far in the future we look. Let's say Company B is a drug company, developing a promsing treatment for breast cancer. They won't know if it gets approved until a clinical trial ends a year from now. If it gets approved, we think their stock will go up to \$150. It if it doesn't, we think their stock will fall to \$90. Assuming both of these outcomes are equally likely, a call that expires in 1 year costs $25. This is very different than the \$0.50 we saw for a call that expires in one month. 
+
+The one-month volatility is the most important one in the market, so it's the one we'll be focusing on. Before getting to how we can use volatility to help us select the correct options strategy, I'm going to go over the idea of *volatility regimes*, which I'll be applying to Apple and Amazon as a short-term trading signal. For an investor like me, who is very concerned about volatile investments and large draw-downs, it is a very helpful tool to use to help manage risk. I've chosen Apple and Amazon because they are very well-known stocks, although I do not trade Apple or Amazon myself. I'll describe a number of trades I have made using volatility regimes after introducing the concept with Apple and Amazon.  
+
+## Apple's Volatility
+
+Every stock has it's own volatility, but we need a way to know what it is. Generally speaking, we need to purchase (expensive) options data to do that. Luckily for us, the Chicago Board Options Exchange (CBOE) provides volatility data for some stocks and ETFs for free. We're going to start by looking at Apple and Amazon, which are 2 of the 5 stocks the CBOE provides (one-month) volatility data for.
+
+We're going to compare Apple and Amazon's price action to their volatility signals, and see how they are related. To spoil the surprise, we're going to see that their prices are related to *volatility regimes*. Roughly speaking, a volatility regime is the trading rage of a stock's volatility index. I'm going to describe these ranges by looking at the volatility charts. This is an appealing way to describe regimes, because it's simple and easy to understand. It's to keep in mind, however, that we could improve our ability to describe volatility regimes if we used a model to determine them. 
+
+To make the plots more readable, we'll look at three years in three different charts.
+
+```{r Apple-Price-Volatility-Plots-2018, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
+### The buy and sell regions are manually annoted (by me) 
+Color <- rep("black", 271)
+Color[ 1:271 %in% ( 20 + c(1:9, 28:54, 84:118, 146:167, 182:191) ) ] <- "green" 
+Color[ 1:271 %in% ( 20 + c(10:29, 55:84, 119:146, 168:181, 192:251) ) ] <- "red"
+
+Apple_Price_data_2018 <- ds.getSymbol.yahoo("AAPL", from = "2017-12-01", to = "2019-01-01")
+Apple_Price_data_2018 <- tibble( "Date" = anydate( index(Apple_Price_data_2018) ), 
+                                 "Price" = as.vector(Apple_Price_data_2018$AAPL.Adjusted),
+                                 "Color" = Color )
+
+Apple_Volatility_data_2018 <- read.csv("vxapldailyprices.csv", header = TRUE, sep = ",", 
+                                   stringsAsFactors = FALSE, skip = 1)
+Apple_Volatility_data_2018$Date <- anydate( Apple_Volatility_data_2018$Date )
+Apple_Volatility_data_2018 <- Apple_Volatility_data_2018[ anydate("2017-12-01") <= Apple_Volatility_data_2018$Date
+                                                          & Apple_Volatility_data_2018$Date <= anydate("2018-12-31"), ]
+
+Apple_Volatility_data_2018 <- tibble( "Date" = Apple_Volatility_data_2018$Date,
+                                      "Volatility" = Apple_Volatility_data_2018$Close,
+                                      "Color" = Color )  
+
+Apple_Price_plot <- ggplot() + 
+  geom_line(data = Apple_Price_data_2018, aes(x = Date, y = Price, color = Color, group = 1)) +
+  geom_vline(xintercept = anydate("2018-01-01"), linetype = "dotted", color = vline_color, size = 1) + 
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Apple: Daily prices for 2018.", x = "", y = "") +
+  scale_x_date(date_labels = "%B") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  options_theme() 
+
+Apple_Volatility_Chart <- ggplot() + 
+  geom_line(data = Apple_Volatility_data_2018, 
+            aes(x = anydate(Date), y = Volatility, color = Color, group = 1)) +
+  geom_vline(xintercept = anydate("2018-01-01"), linetype = "dotted", color = vline_color, size = 1) + 
+  labs(title = "Apple: Daily volatility for 2018.", x = "", y = "") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+
+# Plot the price and volatility charts side-by-side
+grid.arrange(Apple_Price_plot, Apple_Volatility_Chart, ncol=1)
+```
+<!-- Add: Explanation of how I got the "volatility regimes --> 
+
+This gives 5 buy signals and 5 sell signals. I'll list them below, and compare the returns of an investor using Apple's volatility as a trading signal against a buy-and-hold investor that owns Apple for all of 2018. This comparison will help show that the volatility signal can help us avoid large market declines, and ultimately increase our returns over time.
+
+Buy on January 01, 2018 at \$41.51 and sell on January 16, 2018 at \$42.46. </br>
+This is a gain of <sup> \$42.46 - \$41.51 </sup> &frasl; <sub> \$41.51 </sub> = <sup> \$0.95 </sup> &frasl; <sub> \$41.51 </sub> = 2.29%. 
+
+Buy on February 13, 2018 at \$39.77 and sell on March 21, 2018 at \$41.44. </br>
+This is a loss of <sup> \$41.44 - \$39.77 </sup> &frasl; <sub> \$39.77 </sub> = <sup> \$1.67 </sup> &frasl; <sub> \$39.77 </sub> = 4.20%.
+  
+Buy on May 3, 2018 at \$42.80 and sell on June 21, 2018 at \$45.05. </br>
+This is a gain of <sup> \$45.05 - \$42.80 </sup> &frasl; <sub> \$42.80 </sub> = <sup> \$2.25 </sup> &frasl; <sub> \$42.80 </sub> = 5.26%.
+  
+Buy on August 1, 2018 at \$48.95 and sell on August 30 at \$54.85. </br>
+This is a gain of <sup> \$54.85 - \$48.95 </sup> &frasl; <sub> \$48.95 </sub> = <sup> \$5.90 </sup> &frasl; <sub> \$48.95 </sub> = 12.05%.
+  
+Buy on September 20, 2018 at \$53.63 and sell on October 4 at \$55.58 </br>
+This is a gain of <sup> \$55.58 - \$53.63 </sup> &frasl; <sub> \$53.63 </sub> = <sup> \$1.95 </sup> &frasl; <sub> \$53.63 </sub> = 3.64%.
+
+If the buy-and-hold investor bought Apple on January 1, 2018 at \$41.51 and still held it on December 31, 2018 when it was trading at \$38.59, he would have lost $2.92 per share, or 7.03%. Let's compare that to the volatility-based investor. He increased his investment by (100% + 2.29%) * (100% + 4.20%) * (100% + 5.26%) * (100% + 12.05%) * ( 100% + 3.64% ) - 100% = 30.29%. The volatility-based investor's return of 30.29% beat the buy-and-hold investor by more than 35% in 2018. 
+
+The volatility-based investor outperformed largely because he avoided the crash at the end of 2018. This wasn't specific to Apple -- the entire US market was selling off then -- but avoiding it still helps. The Apple's volatility ramped into a much higher *regime* in early October and made two attempts to start trending into a lower *regime*, but couldn't quite pull it off. Let's extend the comparison into 2019 to see if the volatility-based investor can keep outperforming.
+
+
+```{r Apple-Price-Volatility-Plots-2019, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
+### The buy and sell regions are manually annoted (by me) 
+Color <- rep("black", 252)
+Color[ 1:252 %in% c(21:54, 81:88, 116:146, 173:188, 210:252) ] <- "green" 
+Color[ 1:252 %in% c(1:20, 55:80, 89:115, 147:172, 189:210) ] <- "red"
+
+Apple_Price_data_2019 <- ds.getSymbol.yahoo("AAPL", from = "2019-01-01", to = "2020-01-01")
+Apple_Price_data_2019 <- tibble( "Date" = as.Date(as.character(index(Apple_Price_data_2019))), 
+                                 "Price" = as.vector(Apple_Price_data_2019$AAPL.Adjusted),
+                                 "Color" = Color )
+
+Apple_Volatility_data_2019 <- read.csv("vxapldailyprices.csv", header = TRUE, sep = ",", 
+                                   stringsAsFactors = FALSE, skip = 1)
+Apple_Volatility_data_2019$Date <- anydate( Apple_Volatility_data_2019$Date )
+Apple_Volatility_data_2019 <- Apple_Volatility_data_2019[ anydate("2019-01-01") <= Apple_Volatility_data_2019$Date
+                                                          & Apple_Volatility_data_2019$Date <= anydate("2019-12-31"), ]
+
+Apple_Volatility_data_2019 <- tibble( "Date" = Apple_Volatility_data_2019$Date,
+                                      "Volatility" = Apple_Volatility_data_2019$Close,
+                                      "Color" = Color )  
+
+Apple_Price_plot <- ggplot() + 
+  geom_line(data = Apple_Price_data_2019, aes(x = Date, y = Price, color = Color, group = 1)) +
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Apple: Daily Prices for 2019.", x = "", y = "") +
+  scale_x_date(date_labels = "%B") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  options_theme() 
+
+Apple_Volatility_Chart <- ggplot() + 
+  geom_line(data = Apple_Volatility_data_2019, 
+            aes(x = anydate(Date), y = Volatility, color = Color, group = 1)) +
+  labs(title = "Apple: Daily Volatility for 2019.", x = "", y = "") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+
+# Plot the price and volatility charts side-by-side
+grid.arrange(Apple_Price_plot, Apple_Volatility_Chart, ncol=1)
+```
+
+There are 5 buy signals and 4 sell signals. The first sell signal is a continuation of the one from the end of 2018, so the first trading signal the volatility-based investor receives is to buy Apple on January 31, 2019. Let's track his trades after that date.
+
+Buy on January 31, 2019 at \$40.71 and sell on March 31, 2019 at \$47.93. </br>
+This is a gain of <sup> \$47.93 - \$40.71 </sup> &frasl; <sub> \$40.71 </sub> = <sup> \$7.22 </sup> &frasl; <sub> \$40.71 </sub> = 17.74%. 
+
+Buy on February 13, 2019 at \$39.77 and sell on March 21, 2019 at \$41.44. </br>
+This is a loss of <sup> \$41.44 - \$39.77 </sup> &frasl; <sub> \$39.77 </sub> = <sup> \$1.67 </sup> &frasl; <sub> \$39.77 </sub> = 4.20%.
+  
+Buy on April 29, 2019 at \$50.26 and sell on May 09, 2019 at \$49.31. </br>
+This is a loss of <sup> \$49.31 - \$50.26 </sup> &frasl; <sub> \$50.26 </sub> = <sup> -\$0.95 </sup> &frasl; <sub> \$50.26 </sub> = -1.89%.
+  
+Buy on June 18, 2019 at \$48.94 and sell on August 01, 2019 at \$51.40. </br>
+This is a gain of <sup> \$51.40 - \$48.94 </sup> &frasl; <sub> \$48.94 </sub> = <sup> \$2.46 </sup> &frasl; <sub> \$48.94 </sub> = 5.03%.
+  
+Buy on September 09, 2019 at \$53.02 and sell on October 01, 2019 at \$55.60. </br>
+This is a gain of <sup> \$55.60 - \$53.02 </sup> &frasl; <sub> \$53.02 </sub> = <sup> \$2.58 </sup> &frasl; <sub> \$53.02 </sub> = 4.87%.
+
+Buy on October 31, 2019 at \$61.58 and hold through December 21, 2019 at $72.91. </br>
+This is a gain of <sup> \$72.91 - \$61.58 </sup> &frasl; <sub> \$61.58 </sub> = <sup> \$11.33 </sup> &frasl; <sub> \$61.58 </sub> = 18.40%.
+
+The buy-and-hold investor bought at the beginning of 2018 at \$41.51 and still holds it on December 31, 2019 at \$72.91, which is a gain of <sup> \$72.91 - \$41.51 </sup> &frasl; <sub> \$41.51 </sub> = <sup> \$31.40 </sup> &frasl; <sub> \$41.51 </sub> = 75.64%. In 2019, the volatility-based investor makes (100% + 17.74%) * (100% + 4.20%) * (100% - 1.89%) * (100% + 5.03%) * (100% + 4.87%) * (100% + 18.40%) - 100% = 56.97%. Togtether with his 30.29% gain in 2018, the volatility-based investor has a total gain of (100% + 30.29%) * (100% + 56.97%) - 100% = 104.52%. 
+
+The volatility-based investor has a total gain of 104.52% from 2018-2019, while the buy-and-hold investor has a total gain of 75.64%. The volatility-based investor is *still* out-performing by about 30%, even though he did worse in 2019. Why is that? It's because of the power of *compounding*. The volatility-based investor made 57% in 2019 on 130% of his original investment, because he was already up 30% at the end of 2018. That 57% gain is actually a (130% * 57%) * 100 = 74.10% gain on his original investment. So, the volatility-based investor matched in 1 year what the buy-and-hold investor did in 2 years. 
+
+Let's look at the performance of \$10,000 invested under each strategy and see what happens to the dollar amounts through 2018 and 2019. If that didn't make sense yet, it will after we take a closer look at what happened to each account. 
+
+```{r Apple-Accounts-Under-Each-Strategy, eval = FALSE}
+```
+
+
+
+## Amazon's Volatility
+
+```{r Amazon-Price-Volatility-Plots-2018, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
+### The buy and sell regions are manually annoted (by me) 
+Color <- rep("black", 271)
+Color[ 1:271 %in% ( 20 + c(0) ) ] <- "green" 
+Color[ 1:271 %in% ( 20 + c(0) ) ] <- "red"
+
+Amazon_Price_data_2018 <- ds.getSymbol.yahoo("AMZN", from = "2017-12-01", to = "2019-01-01")
+Amazon_Price_data_2018 <- tibble( "Date" = as.Date(as.character(index(Amazon_Price_data_2018))), 
+                                  "Price" = as.vector(Amazon_Price_data_2018$AMZN.Adjusted),
+                                  Color = Color )
+
+Amazon_Volatility_data_2018 <- read.csv("vxazndailyprices.csv", header = TRUE, sep = ",", 
+                                   stringsAsFactors = FALSE, skip = 1)
+Amazon_Volatility_data_2018$Date <- anydate( Amazon_Volatility_data_2018$Date )
+Amazon_Volatility_data_2018 <- Amazon_Volatility_data_2018[ anydate("2017-12-01") <= Amazon_Volatility_data_2018$Date
+                                                            & Amazon_Volatility_data_2018$Date <= anydate("2018-12-31"), ]
+
+Amazon_Volatility_data_2018 <- tibble( "Date" = Amazon_Volatility_data_2018$Date,
+                                       "Volatility" = Amazon_Volatility_data_2018$Close,
+                                       "Color" = Color )  
+
+Amazon_Price_plot <- ggplot() + 
+  geom_line(data = Amazon_Price_data_2018, aes(x = Date, y = Price, color = Color, group = 1)) +
+  geom_vline(xintercept = anydate("2018-01-01"), linetype = "dotted", color = vline_color, size = 1) + 
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Amazon: Daily Prices for 2018.", x = "", y = "") +
+  scale_x_date(date_labels = "%B") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  options_theme() 
+
+Amazon_Volatility_Chart <- ggplot() + 
+  geom_line(data = Amazon_Volatility_data_2018, 
+            aes(x = anydate(Date), y = Volatility, color = Color, group = 1)) +
+  geom_vline(xintercept = anydate("2018-01-01"), linetype = "dotted", color = vline_color, size = 1) + 
+  labs(title = "Amazon Daily Volatility for 2018.", x = "", y = "") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+
+# Plot the price and volatility charts side-by-side
+grid.arrange(Amazon_Price_plot, Amazon_Volatility_Chart, ncol=1)
+```
+
+```{r Amazon-Price-Volatility-Plots-2019, fig.align = "center", out.width = out_width_plot, echo = FALSE, message = FALSE}
+### The buy and sell regions are manually annoted (by me) 
+Color <- rep("black", 252)
+Color[ 1:252 %in% ( c(0) ) ] <- "green" 
+Color[ 1:252 %in% ( c(0) ) ] <- "red"
+
+Amazon_Price_data_2019 <- ds.getSymbol.yahoo("AMZN", from = "2019-01-01", to = "2020-01-01")
+Amazon_Price_data_2019 <- tibble( "Date" = as.Date(as.character(index(Amazon_Price_data_2019))), 
+                                  "Price" = as.vector(Amazon_Price_data_2019$AMZN.Adjusted),
+                                  Color = Color )
+
+Amazon_Volatility_data_2019 <- read.csv("vxazndailyprices.csv", header = TRUE, sep = ",", 
+                                   stringsAsFactors = FALSE, skip = 1)
+Amazon_Volatility_data_2019$Date <- anydate( Amazon_Volatility_data_2019$Date )
+Amazon_Volatility_data_2019 <- Amazon_Volatility_data_2019[ anydate("2019-01-01") <= Amazon_Volatility_data_2019$Date
+                                                            & Amazon_Volatility_data_2019$Date <= anydate("2019-12-31"), ]
+
+Amazon_Volatility_data_2019 <- tibble( "Date" = Amazon_Volatility_data_2019$Date,
+                                       "Volatility" = Amazon_Volatility_data_2019$Close,
+                                       "Color" = Color )  
+
+Amazon_Price_plot <- ggplot() + 
+  geom_line(data = Amazon_Price_data_2019, aes(x = Date, y = Price, color = Color, group = 1)) +
+  scale_y_continuous(label = scales::dollar) +
+  labs(title = "Amazon: Daily Prices for 2019.", x = "", y = "") +
+  scale_x_date(date_labels = "%B") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  options_theme() 
+
+Amazon_Volatility_Chart <- ggplot() + 
+  geom_line(data = Amazon_Volatility_data_2019, 
+            aes(x = anydate(Date), y = Volatility, color = Color, group = 1)) +
+  labs(title = "Amazon Daily Volatility for 2019.", x = "", y = "") +
+  scale_color_manual(values = c( "black" = "black", "red" = "red", "green" = "green")) + 
+  scale_x_date(date_labels = "%B") +
+  options_theme() 
+
+# Plot the price and volatility charts side-by-side
+grid.arrange(Amazon_Price_plot, Amazon_Volatility_Chart, ncol=1)
+```
+
+## Gold's Volatility
+
+

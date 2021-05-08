@@ -1,9 +1,10 @@
 <!-- Each chapter is set to compile separately - include "global" set-up -->
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
 if ( !require("tidyverse") )     { install.packages("tidyverse") };       require(tidyverse)
+if ( !require("ggtext") )        { install.packages("ggtext") };          require(ggtext)
 if ( !require("htmlwidgets") )   { install.packages("htmlwidgets") };     require(htmlwidgets)
 if ( !require("plotly") )        { install.packages("plotly") };          require(plotly)
 if ( !require("formattable") )   { install.packages("formattable") };     require(formattable)
@@ -11,6 +12,12 @@ if ( !require("kableExtra") )    { install.packages("kableExtra") };      requir
 
 options(kableExtra.html.bsTable = T)
 options(kableExtra.auto_format = FALSE)
+source("Plotting_Functions.R")
+out_width_plot <- "80%"
+out_width_table <- "90%"
+
+grid::grid.locator(unit="npc") 
+output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
 ```
 
 ``` {r Set-Global-Chapter-Variables, echo = FALSE}
@@ -21,79 +28,71 @@ plot_fg_alt <- "#969696" # ??
 
 # What is an Option? 
 
-You might have heard stories about people who made \$100,000 in a week or \$1,000,000 in a year trading stock options, after starting out with $5,000 (or less) in the bank. You might have wondered - what are stock options and how did they do that? This book is designed to answer those questions. By the time you reach the end, you'll be able to construct your own options trades and understand the risk-reward tradeoffs of those trades. 
-
-
-## Forward Contracts 
-
-Before we get to options, we're going to meet the forward contract. Say you want a new pair of \$1000 shoes. If you buy them today, you'll pay \$1000. If you want to buy them in 6 months, you'd have to pay the price 6 months from now, and you're willing to pay up to \$1050 for them then. If you're worried they'll go up above \$1050, you might try finding someone who would agree to sell them to you in 6 months for \$1050. 
-
-That way, you know you'll always pay \$1050 6 months from now. It doesn't matter if they go up to \$1200 or down to \$900. When you come back in 6 months, you'll always pay \$1050. We call this a *forward contract*. A *forward contract* is where a seller agrees to sell something to a buyer in the future, but at a price they agree on today. This way, the buyer doesn't have to worry about the price going up and the seller doesn't have to worry about the price going down. 
-
-That's the key to the forward contract - it removes risk for the buyer and the seller, so they both have some reason to enter the contract. If the price goes up to \$1200 and the seller has to sell the shoes for \$1050, he "lost" the \$150 he could have made if he was able to sell them for \$1200. And if the price goes down to \$900, the buyer has "lost" the \$150 he would have saved if he was able to buy them for \$1050. If the buyer *and* the seller think that removing the risk is worth "losing" that money, they will probably agree to do the deal at \$1050 in 6 months. 
-
-We call \$1050 the *forward price*. You might ask - why is it \$1050? The price they agree to has to be fair. The buyer keeps \$1000 for 6 months and can earn interest on it, so he should be willing to pay more then \$1000. The seller has to continue to store the shoe for 6 months and take the risk of it being stolen or damaged. He should be asking for more than \$1000. So the forward price should be more than \$1000. How much more depends on how the buyer and seller value these factors (and perhaps others). 
-
-Let's say they agree to do the deal at \$1050. The key feature of a forward contract is that the buyer and seller *must* complete the transaction. The buyer must pay \$1050, and the seller must provide the shoes. Neither of them has the option to back out of the deal. If that's what both of them want, then a forward contract is a fantastic way to do that. But what if the buyer wants a deal where he only has to buy the shoes at \$1050 if 6 months if it saves him money? 
+You might have heard stories about making \$100,000 in a week trading stock options, after starting out with $5,000 (or less) in the bank. What are options? How did they do that? Can I do that? You probably can, and we'll dissect some of those winning trades later. But first, we have to go over what an option is.
 
 
 ## Options Contracts
 
-In other words, the buyer wants is the flexibility to buy them for \$1050 if they're over \$1050, but to buy them at the going price if they're under \$1050 in 6 months. If he finds someone willing to enter this deal, here's how much money he'll being paying for the shoes 6 months from now. 
+You've been eyeing this \$500 treadmill for a while, but you know you won't have the money to buy it for about 6 months. You have to wait, but you don't want to pay more than \$500. You talk to the store manager to see if they can sell you the treadmill for \$500 or it's price 6 months from now, whichever is cheaper. To your amazement, they agree but say you have to pay \$25 now to lock in the deal. You don't really want to pay \$25, but you can come up with it and you really want that treadmill. So you do it.
 
-<!-- Insert picture of covered call (short put?) with strike price of $1050 -->
+```{r Treadmill-Covered-Call, out.width = out_width_plot, fig.align = "center", message = FALSE}
+Call_cost <- 25; Call_K <- 500
+Treadmill_cost <- 500
+x_min <- 475; x_max = 580
 
-This diagram shoes what the buyer pays for the shoes under this deal. If the shoes are selling for \$1050 or less, the buyer gets that much. If the shoes are selling for more than \$1050, the buyer only pays \$1050. We can see this in the diagram - the line flattens out above \$1050. Now it gets interesting - neither the buyer nor the seller knows if the shoes will be worth more than \$1050 6 months from now, but they might be. 
+Call_Payoff_Treadmill <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                                 "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                                 "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                       "Profit","Loss") )
 
-That's a one-sided deal - only the buyer can benefit. He might save money and the seller might be lose money, but the other way can't happen. The seller gets nothing out this deal. To make it fair, the buyer would have to pay the seller to compensate him for his potentially lower profits. It gets even better - the buyer should be willing to pay the seller, because he is protecting himself against having to buy the shoes for more than \$1050. You can think of this as the buyer paying for *insurance* against the shoes getting more expensive.
+temp <- call_payoff(data = Call_Payoff_Treadmill, main_title = "Treadmill Cost In 6 Months.",
+                    sub_title = "When Does the $25 Start Helping?.")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 
-You can also flip it around - the seller might want the flexibility to sell someone the shoes for \$1050 if they're below that 6 months from now, but to sell them for more than \$1050 if they're above that. This is also a one-sided deal - the buyer gets nothing out of this deal. To make this deal, the seller should be willing to pay the buyer. You can think of this as the seller buying *insurance* against the shoes getting cheaper.
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("02-options-intro/figure-html/Treadmill-Covered-Call-1.png") }
+```
 
-<!-- Insert picture of a call (protective put?) with strike price of $1050 -->
+This is our first payoff diagram. They'll get more complicated as we go along, but they'll always be color-coded so that we can see the key information with a glance. The plot shows when the \$25 fee starts saving you money. The line is green above \$525 (so it saves you money), and red below \$525 (so it costs you money). You save \$0 if the treadmill costs \$525 6 months from now, so you've "broken even" on the deal. So we call \$525 the *breakeven* (price). The plot tells us you start losing money when the treadmill costs \$525, and keep losing more until it costs \$500. By then, you've lost \$25 and can't lose any more.
 
-This diagram shows what the seller gets for the shoes under this deal. The flat line shows that when the shoes are below \$1050, he gets \$1050. And when they are above \$1050, he gets whatever they're going for. 
+Let's break down the information in the diagram. Remember that you actually agreed to buy the treadmill for \$25 up front, plus the smaller of \$500 and its price 6 months from now. If the treadmill is less than \$500, you spent that \$25 for nothing because you can just buy the treadmill for less than \$500. If the treadmill is between \$500 and \$525, you save the difference between them. That's less than \$25, so you still lose money. When it is more than \$525, you can buy it for \$500. So you get back your \$25, plus however much more than \$525 the treadmll costs. I had to use a lot of words to capture the information in the payoff diagram, so hopefully this example helps you see how helpful they can be.
 
-These are *payoff diagrams*, and we'll be spending time with them in the next chapter. But one thing we can make note of here is that the two diagrams are like opposites of each other. We can see this more clearly if we overlay them both on the same plot. 
-
-<!-- Insert picture of a call (protective put?) + covered call (short put?) with strike price of $1050 -->
-
-Combining options like this is how you build options strategies, and we'll spend a fair amount of time showing how this works for the strategies we take up in this book. 
-
-Here's a question I'll plant in your mind that we'll return to when we get into something called implied volatility. The buyer has to pay to protect against prices going up, and the seller has to pay to protect against prices going down. They're both paying for protection on the shoes at \$1050 6 months from now. The diagrams are opposites of each other, so do they pay the same amount for protection? Or a different amount? 
+Before moving on, let's ask ourselves -- why did the store ask for \$25? Remember that they agreed to sell the treadmill for the smaller of \$500 and the price in 6 months. If it's below \$500, they don't make anything extra. If it's above \$500, they lose money. They can only lose by agreeing to the deal, so they won't do it unless their paid up front. But why \$25? They could have picked the number out of thin air, but it's more likely that they used their knowledge of the treadmill market to come up with it. So how much they charge depends on how much they think the price might go up in the future. Nobody knows what's going to happen in the future, so it's a guess. But it's their best guess and one they were willing to do business at. You, on the other hand, are only willing to pay so much to lock in the price at \$500. So they can't go too high or you won't take the deal. 
 
 
 ## Options are Insurance
 
-What are options? They are exactly this kind of insurance. Instead of shoes, we're now talking about shares of some company. Let's call it Company XYZ. There are two basic types of options. 
+You bought an option from the treadmill store, a call option. A call lets you buy an item for no more than a particular price at some future date. Just like this example, the call is worthless if the item is less than that price. There's another type of option, a put. Just for completeness, I've written out a more careful definition of a call and a put below. 
 
   1. A *call* gives its owner the option to buy shares at a pre-specified price on a pre-specified date in the future. The *call* gives its owner protection against the price of shares going up between now and the future.
   2. A *put* gives its owner the option to sell shares at a pre-specified price on a pre-specified date in the future. The *put* gives its owner protection against the price of the shares going down between now and the future.
 
-Perhaps because of this close relationship with insurance, the price of an option (a call or put) is called its *premium*. There are options strategies that explicitly use options as insurance. We'll meet one such strategy, the *protective put*, before long. But there are many other strategies that have nothing to do with insuring against prices going up or down. These strategies try to profit in changes in the price of the option contract.
+To me, options are insurance. A call protects me from the price of the treadmill going up, and a put would protect me from the price of the treadmill going down. I wouldn't have any interest in paying for a put, because I don't sell treadmills. But a store that has to carry a large inventory of them might want protection from the price of their inventory going down. Perhaps because they are like insurance, the price of an option (a call or put) is called its *premium*. There are options strategies that explicitly use options as insurance. We'll meet one such strategy, the *protective put*, soon enough. But there are many other strategies that are more speculative and try to profit from the changes in the price of the option. We'll see some of those strategies soon, too. 
 
 
 ## Pricing Insurance Contracts
 
-We'll go into more specific details about how options are priced later, but for now let's just think of them as insurance contract. What could make your car insurance more expensive? Here's what I came up with: 
+What could make your car insurance more expensive? I don't own a car so maybe my list is missing some things, but here's what I came up with: 
 
   1. How many accidents you have been in. 
-  2. Your demographics - gender and age.
+  2. Your demographics (gender and age).
   3. How many companies are offering car insurance in your area.
   4. Your deductible. 
   
-A deductible is how much you have to pay out-of-pocket before your insurance coverage kicks in. For example, if you have car insurance with a \$1000 deductible, the insurance won't cover the first \$1000 it costs to repair or replace your car. The higher your deductible, the lower your insurance premium will be. Because you'll end up paying more of the insurance bill, and the insurance company will pay less of it. 
+A deductible is how much you have to pay out-of-pocket before your insurance coverage kicks in. For example, if you have car insurance with a \$1000 deductible, the insurance won't cover the first \$1000 it costs to repair or replace your car. The higher your deductible, the lower your insurance premium will be. That's because you'll end up paying more of the insurance bill, and the insurance company will pay less of it. 
 
-What could make health insurance more expensive? Here's what I came up with: 
+What could make your health insurance more expensive? Here's what I came up with: 
 
-  1. If not forbidden by law, pre-existing conditions.
-  2. Your demographics - gender and age.
-  3. If you are a smoker. 
-  4. Your deductible. 
+  1. If it is a "guaranteed" plan that doesn't require a medical background.
+  2. If it has higher maximum coverage amounts (for prescription drugs, dental, etc.)
+  3. Your demographics (gender and age).
+  4. If you are a smoker. 
+  5. Your deductible. 
   
-You get the idea - anything that makes paying out a claim more likely takes up the price of insurance. We can apply the same logic to *calls* and *puts*. The more likely the price movement we're insuring against is to happen, the more expensive the insurance will be.
+You get the idea - anything that makes paying out a claim more likely takes up the price of insurance. We can apply the same logic to calls and puts. The more likely the price movement we're insuring against is to happen, the more expensive the option will be. A call protects you against the price going up.  Say you wait 3 months to take the treadmill store up on its offer, and the price goes from \$500 to \$550 by then. The treadmill is already \$50 more than \$500, so they will charge you at least \$50 to lock the price in at \$500. That's 2x (or more) what you could have bought the call for earlier. A put protects against the price going down. If the store wants to sell the treadmill for no less than \$500 in 6 months, they'll have to pay \$25 for it. If they wait 3 months and the price drops to \$450, that's \$50 less than the \$500 they want to sell the treadmill for. They'll have to pay at least \$50 for the put, which is 2x (or more) what they could have bought it for earlier.
 
-A *call* protects us against the price going up. If the shares goes up, the call should get more expensive. Think about it this way: if you're buying those shoes and waited 3 months to buy protection against them going up in price, you'd have to pay more to buy them at \$1050 (in 3 months) if they had already went up from \$1000 to \$1100 while you waited. 
-
-A *put* protects us against the price going down. If the shares go down, the put should get more expensive. If you're selling those shoes and waited 3 months to buy protection against them going down in price, you'd have to pay more to sell them at \$1050 (in 3 months) if they had already gone down from \$1000 to \$900 while you waited. 
-
-There's more to pricing insurance contracts. We've just brushed the surface on how increasing the chances of the event you're insuring against actually happening makes the insurance more expensive. Beyond that, we also have to account for the interest someone who doesn't have insurance could make if they saved all those insurance payments and put them into a bank account. But we've built good intution - let's move on to options. 
+There's more to pricing options, but we've built good intuition from this example. Here's one last question for you to think about while we move on to a deeper dive into payoff diagrams. In the treadmill example, when the treadmill is at \$500 the call you buy and the put the store buys are both worth \$25. Is that realistic, or do you think one form of protection cost more than the other? 

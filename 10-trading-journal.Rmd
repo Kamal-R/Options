@@ -54,3 +54,47 @@ I bought a \$339.00 SPY February 21 2020 call when SPY was at \$337.22, so all o
 <!-- TODO: Add a section on how theta is the cost of gamma? Or perhaps do it here? -->
 
 It's after the market close on February 12, 2020. The call closed at my cost basis of $1.40, and SPY went up slightly to \$337.42. That's a gain of only \$0.20 (or 0.06%), but it was enough to offset my first day of *theta* burn. The VIX index is a good proxy for the implied volatility of SPY, and it fell from 14.55 to 13.74 since I bought these calls. If my strategy is correct, this is likely (but not certain) to lead SPY higher, and my short-term \$339.00 SPY calls will work out for me. I'm not sure, and I've never done an *all-or-nothing* trade before. So I guess I'll have to wait and see. 
+
+
+### The SU and CVE Calls
+
+*Written on December 15th, 2020*
+
+I have a "dividend" portfolio that mostly owns REITs, utilities, and telecom companies. It gives 5% in dividends every year, which is good. The idea is to reinvest the dividends. and hold the position over the long term. If I reinvest the dividends every year, I own 5% more stock so I get 5% more in dividends. And the dividends go up most years, by about 4%. So every year I get 8%-10% more in dividends just by holding these positions. 
+
+If I hold everything for 20-30 years, I'll have a big chunk of capital gains, too. But maybe not as much as I would like, because REITs and utilities aren't the most exciting sectors. I tried to solve this by investing in energy companies that pay a dividend. It'll only be for the next 3-6 months (the period I expect energy stocks to go up for), but the primary goal of this portfolio is still to hold REITs, utilities, and telecoms for the long term. 
+
+So I only allocated 30% of the portfolio to these energy companies. But that's not capturing enough upside for me, so I allocated 1.5% of the portfolio to calls (that expire in 3-4 months) on these energy companies. If they perform the way I expect them, I'll double my returns on my energy allocation (or more). And I only had to risk 1.5% of the portfolio. The worst case is that the calls expire worthless, and I lose that 1.5%. 
+
+The quick recap: 
+- Invested 30% of a dividend portfolio in dividend yielding energy companies. 
+- Capturing more potential upside by allocating 1.5% to buy calls in those energy companies.
+- Maintaining a 70% weighting in "safe" dividend-yielding investments for the long term. 
+
+Using calls this way accomplishes a couple of things 
+- Limits the amount of capital I risk on volatile energy companies, while capturing much more of the potential returns
+- Keeps most (70%) the portfolio invested in "safe" assets
+- Maintains my long-term focus on growing the dividends the portfolio gives me. 
+
+My goal is to reinvest the gains from the energy companies (and their calls) back into utilities and REITs, so that I can grow the dividends even faster. I'll know how it turns out in 3-6 months, which isn't too long from now.
+
+
+*Written on March 5th, 2021*
+
+The call overlay I'm doing in my dividend portfolio seems to be working very well. 
+
+The \$24 strike Suncor calls that expire March 19th that were \$1.05 are around \$4.00 today.  Between then and now, I started doing it with another Canadian energy company, CVE. I bought March 19 calls at the \$9 strike, up 2x in about 2 weeks. I then rolled up (and out to the April 19th expiry) to the \$10 strike, which I sold today when they were up around 3x in about 2 weeks. I've rolled the position up to the $11 strike, still at the April 19th expiry. I'll have to wait and see how that position goes. 
+
+I only allocate 2% of the capital in the account to options at a time. That goes up to 4%-5% before I roll, since I've been rolling once a call is up 2x-3x. My calls have taken my portfolio up 4% in a month all by themselves, which is really good. 80% of the account is still invested in high-dividend stocks, and an extra 4%-8%/year from this call-buying strategy really changes the long-term outlook of the account.
+
+This strategy was the inspiration for the modified straddle I mentioned last weekend. I want to allocate ~10% of this portfolio to calls (say 1% on 10 high-beta stocks), but I can't do it and maintain a good risk/return profile without hedging the calls. My is to hedge the calls with puts on the S&P (with, say, 10%-15% of the portfolio). If 1 of the 10 calls (1% of the portfolio) goes up 2x-3x, the portfolio goes up 2%-3%. That should cover the time value I burn on the put, and the other 9 calls. If 2-3 of the calls goes up 2x-3x, the portfolio goes up 4%-9%. After covering the time value I burn, that's maybe 2%-6%.
+
+That's just if the calls work, though. If the market falls 10% (this is very possible - the NASDAQ is down 9.23% over the last month), the put should more or less double. If that happens and just 1 of the 10 calls works, I'm still up a few percent in a month. That is also very possible even in a down market - Twitter is up ~25% since the end of January, even with the NASDAQ down. I still make money because of the asymmetry of options. I can only lose the option premium, but I get what you can think of as "leveraged returns" on profitable options. That's because the position is long gamma.
+
+I get a bunch of long volatility exposure from this position, because I'm long all those calls and a bunch of puts. I also get correlation risk. Ideally, the stocks I bought calls on will go up and the index will go down. Wanting prices to move in opposite directions like that is another way of saying I want the price of the stocks and the index to be negatively correlated, hence the correlation risk. 
+
+That's the basic idea behind the modified straddle - take 10 1% positions (or 20 0.5% positions) in calls that are on stocks you'd like to own, and hedge them with puts on an index. Depending on what you buy calls on, the S&P or the NASDAQ could be good indices to buy puts on. This strategy also has the advantage of no leverage (it uses options to get "leverage"), so there's no chance of a margin call.
+
+
+
+

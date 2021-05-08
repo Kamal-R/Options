@@ -18,6 +18,7 @@ if ( !require("kableExtra") )    { install.packages("kableExtra") };      requir
 if ( !require("rtsdata") )       { install.packages("rtsdata") };         require(rtsdata)
 if ( !require("PerformanceAnalytics") )     { install.packages("PerformanceAnalytics") };   require(PerformanceAnalytics)
 if ( !require("anytime") )       { install.packages("anytime") };         require(anytime)
+if ( !require("nor1mix") )       { install.packages("nor1mix") };         require(nor1mix)
 
 options(kableExtra.html.bsTable = TRUE)
 options(kableExtra.auto_format = FALSE)
@@ -391,7 +392,249 @@ It might take a minute or two of staring at the plot, but you should be able to 
 Jumping back into the picture, the breakeven is \$195. That's because we bought a \$200 strike call for \$15, and sold a \$200 strike for \$20. Let's ignore the cost of the two options for a moment, and suppose that XYZ's shares are exactly at \$200 on the expiry date. The 
 
 
+## The Straddle
+
+```{r XYZ-Straddle, fig.align = "center", out.width = out_width_plot, message = FALSE}
+Call_cost <- 10; Put_cost <- 15
+Call_K <- 200; Put_K <- 200
+x_min <- 120; x_max = 280
+Stock_cost <- 200
+
+Breakeven_right <- Put_K - Put_cost - Call_cost
+Breakeven_left <- Call_K + Call_cost + Put_cost
+
+Call_Payoff_XYZ <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                            "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+Put_Payoff_XYZ <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01),
+                          "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
+                          "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) >= 0,
+                                                "Profit_put", "Loss_put") )
+
+Straddle_Payoff_XYZ_left <- tibble( "Straddle_x" = seq(from = x_min, to = Breakeven_right, by = 0.01),
+                                     "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                     - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                     "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                            - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_right_straddle","Loss_right_straddle") )  
+
+Straddle_Payoff_XYZ_center <- tibble( "Straddle_x" = seq(from = Breakeven_right, to = Breakeven_left, by = 0.01),
+                                      "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                      - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                      "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                             - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_center_straddle","Loss_center_straddle") )  
+
+Straddle_Payoff_XYZ_right <- tibble( "Straddle_x" = seq(from = Breakeven_left, to = x_max, by = 0.01),
+                                    "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                    - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                    "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                           - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                           "Profit_right_straddle","Loss_right_straddle") )  
+
+temp <- straddle_payoff( data_straddle_left = Straddle_Payoff_XYZ_left,
+                         data_straddle_center = Straddle_Payoff_XYZ_center,
+                         data_straddle_right = Straddle_Payoff_XYZ_right,
+                         data_call = Call_Payoff_XYZ, 
+                         data_put = Put_Payoff_XYZ,
+                         main_title = "A Straddle",
+                         sub_title = "Buy 1 XYZ call for $10/share at the $200 strike.\nBuy 1 XYZ put for $15/share at the $200 strike.")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-1.png") }
+```
+
+```{r XYZ-Straddle-Normal, fig.align = "center", out.width = out_width_plot, message = FALSE}
+Call_cost <- 10; Put_cost <- 15
+Call_K <- 200; Put_K <- 200
+x_min <- 120; x_max = 280
+Stock_cost <- 200
+
+Breakeven_right <- Put_K - Put_cost - Call_cost
+Breakeven_left <- Call_K + Call_cost + Put_cost
+
+Call_Payoff_XYZ <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                            "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+Put_Payoff_XYZ <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01),
+                          "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
+                          "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) >= 0,
+                                                "Profit_put", "Loss_put") )
+
+Straddle_Payoff_XYZ_left <- tibble( "Straddle_x" = seq(from = x_min, to = Breakeven_right, by = 0.01),
+                                     "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                     - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                     "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                            - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_right_straddle","Loss_right_straddle") )  
+
+Straddle_Payoff_XYZ_center <- tibble( "Straddle_x" = seq(from = Breakeven_right, to = Breakeven_left, by = 0.01),
+                                      "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                      - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                      "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                             - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_center_straddle","Loss_center_straddle") )  
+
+Straddle_Payoff_XYZ_right <- tibble( "Straddle_x" = seq(from = Breakeven_left, to = x_max, by = 0.01),
+                                    "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                    - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                    "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                           - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                           "Profit_right_straddle","Loss_right_straddle") )  
+
+Straddle_Payoff_Normal <- tibble( "Dist_x" = seq(from = x_min, to = x_max, by = 0.01), 
+                                  "Dist_y" = 10 * 1000 * (55/200) * dnorm(Dist_x, mean = 200, sd = 20) )
 
 
+temp <- straddle_payoff_dist_overlay( data_straddle_left = Straddle_Payoff_XYZ_left,
+                                      data_straddle_center = Straddle_Payoff_XYZ_center,
+                                      data_straddle_right = Straddle_Payoff_XYZ_right,
+                                      data_distribution_overlay = Straddle_Payoff_Normal, 
+                                      fill_rgb = col2rgb("cornflowerblue"),
+                                      main_title = "A Straddle",
+                                      sub_title = "Buy 1 XYZ call for $10/share at the $200 strike.\nBuy 1 XYZ put for $15/share at the $200 strike.",
+                                      curve_text = "We capture \nthe trader's view \nof the unknown \nfuture price with \ncurves like this one.",
+                                      curve_text_x = 200, 
+                                      curve_text_y = 30 )
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-Normal-1.png") }
+```
+
+```{r XYZ-Straddle-Lognormal-Over-K, fig.align = "center", out.width = out_width_plot, message = FALSE}
+Call_cost <- 10; Put_cost <- 15
+Call_K <- 200; Put_K <- 200
+x_min <- 120; x_max = 280
+Stock_cost <- 200
+
+Breakeven_right <- Put_K - Put_cost - Call_cost
+Breakeven_left <- Call_K + Call_cost + Put_cost
+
+Call_Payoff_XYZ <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                            "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+Put_Payoff_XYZ <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01),
+                          "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
+                          "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) >= 0,
+                                                "Profit_put", "Loss_put") )
+
+Straddle_Payoff_XYZ_left <- tibble( "Straddle_x" = seq(from = x_min, to = Breakeven_right, by = 0.01),
+                                     "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                     - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                     "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                            - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_right_straddle","Loss_right_straddle") )  
+
+Straddle_Payoff_XYZ_center <- tibble( "Straddle_x" = seq(from = Breakeven_right, to = Breakeven_left, by = 0.01),
+                                      "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                      - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                      "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                             - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_center_straddle","Loss_center_straddle") )  
+
+Straddle_Payoff_XYZ_right <- tibble( "Straddle_x" = seq(from = Breakeven_left, to = x_max, by = 0.01),
+                                    "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                    - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                    "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                           - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                           "Profit_right_straddle","Loss_right_straddle") )  
+
+Straddle_Payoff_Lognormal <- tibble( "Dist_x" = seq(from = x_min, to = x_max, by = 0.01), 
+                                     "Dist_y" = 10 * 1000 * (45/200) * dlnorm(Dist_x, meanlog = log(225), sdlog = log(1.075)) )
+
+temp <- straddle_payoff_dist_overlay( data_straddle_left = Straddle_Payoff_XYZ_left,
+                                      data_straddle_center = Straddle_Payoff_XYZ_center,
+                                      data_straddle_right = Straddle_Payoff_XYZ_right,
+                                      data_distribution_overlay = Straddle_Payoff_Lognormal, 
+                                      fill_rgb = col2rgb("cornflowerblue"),
+                                      main_title = "A Straddle",
+                                      sub_title = "Another trader's view of the price of \nXYZ's shares on the expiry date.",
+                                      curve_text = "He thinks the \nstock is much \nmore likely to \nbe over $200.",
+                                      curve_text_x = 225, 
+                                      curve_text_y = 30 )
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-Lognormal-Over-K-1.png") }
+```
 
 
+```{r XYZ-Straddle-Multimodal, fig.align = "center", out.width = out_width_plot, message = FALSE}
+Call_cost <- 10; Put_cost <- 15
+Call_K <- 200; Put_K <- 200
+x_min <- 120; x_max = 280
+Stock_cost <- 200
+
+Breakeven_right <- Put_K - Put_cost - Call_cost
+Breakeven_left <- Call_K + Call_cost + Put_cost
+
+Call_Payoff_XYZ <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                            "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+Put_Payoff_XYZ <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01),
+                          "Put_y" = -Put_cost - (Put_x < Put_K) * (Put_x - Put_K),
+                          "Profitable" = ifelse(-Put_cost - (Put_x < Put_K) * (Put_x - Put_K) >= 0,
+                                                "Profit_put", "Loss_put") )
+
+Straddle_Payoff_XYZ_left <- tibble( "Straddle_x" = seq(from = x_min, to = Breakeven_right, by = 0.01),
+                                     "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                     - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                     "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                            - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_right_straddle","Loss_right_straddle") )  
+
+Straddle_Payoff_XYZ_center <- tibble( "Straddle_x" = seq(from = Breakeven_right, to = Breakeven_left, by = 0.01),
+                                      "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                      - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                      "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                             - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_center_straddle","Loss_center_straddle") )  
+
+Straddle_Payoff_XYZ_right <- tibble( "Straddle_x" = seq(from = Breakeven_left, to = x_max, by = 0.01),
+                                     "Straddle_y" = -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                     - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K),
+                                     "Profitable" = ifelse( -Put_cost - (Straddle_x < Put_K) * (Straddle_x - Put_K) 
+                                                            - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
+                                                            "Profit_right_straddle","Loss_right_straddle") )  
+
+Straddle_Payoff_Multimodal <- tibble( "Dist_x" = seq(from = x_min, to = x_max, by = 0.01), 
+                                      "Dist_y" = 2.5 * 1000 * dnorMix( x = Dist_x, 
+                                                          obj = norMix(mu = c(175, 220), sigma = c(10,17.5), w = c(0.4,0.6)) ) )
+
+temp <- straddle_payoff_dist_overlay( data_straddle_left = Straddle_Payoff_XYZ_left,
+                                      data_straddle_center = Straddle_Payoff_XYZ_center,
+                                      data_straddle_right = Straddle_Payoff_XYZ_right,
+                                      data_distribution_overlay = Straddle_Payoff_Multimodal, 
+                                      fill_rgb = col2rgb("cornflowerblue"),
+                                      main_title = "A Straddle",
+                                      sub_title = "A third trader's view of the price of \nXYZ's shares on the expiry date.",
+                                      curve_text = "She thinks \nit is likely more \nthan $200 or less \nthan $200.",
+                                      curve_text_x = 220.5, 
+                                      curve_text_y = 17 )
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+
+if ( !output_epub ) { print(temp); rm(temp) }
+if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-Multimodal-1.png") }
+```

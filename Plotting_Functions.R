@@ -27,7 +27,7 @@ options_theme <- function() {
                                       colour = plot_fg),
           axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
                                       angle = 90),
-          axis.text.x = element_text(colour = "black"), 
+          axis.text.x = element_text(colour = "grey50"), 
           axis.ticks = element_blank() )
 }
 
@@ -63,11 +63,13 @@ call_payoff <- function(data, main_title, sub_title = "") {
     geom_line(data = data, aes(Call_x, Call_y, color = Profitable),
               linetype = "solid") +   
     geom_segment(data = data,
-                 aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
+                 aes(x = min(Call_x), xend = min(Call_x), 
+                     y = min(Call_y), yend = min(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
                  show.legend = FALSE, col = "red", linetype = "dotted") + 
     geom_segment(data = data,
-                 aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
+                 aes(x = max(Call_x)-1, xend = max(Call_x), 
+                     y = max(Call_y)-1, yend = max(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
                  show.legend = FALSE, col = "green3", linetype = "dotted") + 
     scale_y_continuous(label = scales::dollar) +
@@ -127,11 +129,13 @@ put_payoff <- function(data, main_title, sub_title = "") {
   ggplot() + 
     geom_line(data = data, aes(Put_x, Put_y, color = Profitable), linetype = "solid") +
     geom_segment(data = data,
-                 aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
+                 aes(x = min(Put_x), xend = min(Put_x)-1, 
+                     y = max(Put_y), yend = max(Put_y)+1), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
                  show.legend = FALSE, col = "green3", linetype = "solid") + 
     geom_segment(data = data,
-                 aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
+                 aes(x = max(Put_x), xend = max(Put_x), 
+                     y = min(Put_y), yend = min(Put_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
                  show.legend = FALSE, col = "red", linetype = "solid") + 
     scale_y_continuous(label = scales::dollar) +
@@ -482,4 +486,135 @@ collar_payoff_right <- function(data_collar, data_stock, data_put,
     options_theme() + 
     theme( plot.title = element_text(vjust = 0), 
            plot.subtitle = element_text(vjust = -5) )
+}
+
+
+straddle_payoff <- function(data_straddle_left, data_straddle_center, data_straddle_right, 
+                            data_call, data_put, main_title, sub_title = "") { 
+  ggplot() + 
+    geom_line( data = data_straddle_right, 
+               aes( Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +
+    geom_line( data = data_straddle_center, 
+               aes(x = Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +   
+    geom_line( data = data_straddle_left, 
+               aes(x = Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +   
+    geom_segment( data = data_straddle_left, linetype = "solid",
+                  aes( x = min(Straddle_x), xend = min(Straddle_x)-1, 
+                       y = max(Straddle_y), yend = max(Straddle_y)+1 ), 
+                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+                  show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+    geom_segment( data = data_straddle_right, linetype = "solid", 
+                  aes( x = max(Straddle_x)-1, xend = max(Straddle_x), 
+                       y = max(Straddle_y)-1, yend = max(Straddle_y)), 
+                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+                  show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+    geom_line( data = data_call, 
+               aes(Call_x, Call_y, color = Profitable), 
+               linetype = "dotdash" ) +   
+    geom_segment( data = data_call,
+                  aes(x = min(Call_x), xend = min(Call_x), 
+                      y = min(Call_y), yend = min(Call_y)), 
+                  arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+                  show.legend = FALSE, col = adjustcolor("red", alpha.f = 0.5), 
+                  linetype = "dotdash") + 
+    geom_segment( data = data_call, 
+                  aes(x = max(Call_x)-1, xend = max(Call_x), 
+                      y = max(Call_y)-1, yend = max(Call_y)), 
+                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+                  show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5),
+                  linetype = "dotdash") + 
+    geom_line( data = data_put, 
+               aes(Put_x, Put_y, color = Profitable), 
+               linetype = "dotdash") +
+    geom_segment( data = data_put, 
+                  aes(x = min(Put_x), xend = min(Put_x)-1, 
+                      y = max(Put_y), yend = max(Put_y)+1), 
+                  arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
+                  show.legend = FALSE, col = "green3", linetype = "dotted" ) + 
+    geom_segment( data = data_put,
+                  aes(x = max(Put_x), xend = max(Put_x), 
+                      y = min(Put_y), yend = min(Put_y)), 
+                  arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
+                  show.legend = FALSE, col = "red", linetype = "dotted" ) + 
+    labs( title = main_title, 
+          subtitle = sub_title, 
+          x = "", y = "") +
+    scale_y_continuous( label = scales::dollar ) +
+    scale_x_continuous( label = scales::dollar ) + 
+    scale_color_manual( values = c( "Profit_center_straddle" = "white", 
+                                    "Loss_center_straddle" = "red",
+                                    "Profit_right_straddle" = "green3",
+                                    "Loss_right_straddle" = "white",
+                                    "Profit_left_straddle" = "green3",
+                                    "Loss_left_straddle" = "white",
+                                    "Profit_put" = adjustcolor("green3", alpha.f = 0.5),
+                                    "Loss_put" = adjustcolor("red", alpha.f = 0.5),
+                                    "Profit_call" = adjustcolor("green3", alpha.f = 0.5),
+                                    "Loss_call" = adjustcolor("red", alpha.f = 0.5) ),
+                        labels = c("", "", "", "", "", 
+                                   "", "", "", "", ""), guide = "legend" ) + 
+    guides( color = guide_legend(override.aes = list(color = rep("white",10),
+                                                     linetype = rep("solid",10))) ) + 
+    options_theme() + 
+    theme( plot.title = element_text(vjust = -1), 
+           plot.subtitle = element_text(vjust = -5) )
+}
+
+
+straddle_payoff_dist_overlay <- function( data_straddle_left, data_straddle_center, 
+                                          data_straddle_right, data_distribution_overlay,
+                                          fill_rgb, curve_text, curve_text_x, curve_text_y,
+                                          main_title, sub_title = "" ) { 
+  ggplot() + 
+    geom_polygon( data = data_distribution_overlay, 
+                  aes(x = Dist_x, y = Dist_y), 
+                  fill = rgb( red = fill_rgb[1], 
+                              green = fill_rgb[2],
+                              blue = fill_rgb[3],
+                              max = 255, alpha = 50 ) ) +
+    annotate( "text", x = curve_text_x, y = curve_text_y, 
+              label = curve_text, 
+              color = "grey50", size = 4 ) + 
+    geom_line( data = data_straddle_right, 
+               aes( Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +
+    geom_line( data = data_straddle_center, 
+               aes(x = Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +   
+    geom_line( data = data_straddle_left, 
+               aes(x = Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +   
+    geom_line( data = data_distribution_overlay, 
+               aes(x = Dist_x, y = Dist_y), 
+               linetype = "solid", color = "gray50" ) + 
+    geom_segment( data = data_straddle_left, linetype = "solid",
+                  aes( x = min(Straddle_x), xend = min(Straddle_x)-1, 
+                       y = max(Straddle_y), yend = max(Straddle_y)+1 ), 
+                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+                  show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+    geom_segment( data = data_straddle_right, linetype = "solid", 
+                  aes( x = max(Straddle_x)-1, xend = max(Straddle_x), 
+                       y = max(Straddle_y)-1, yend = max(Straddle_y)), 
+                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+                  show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+    labs( title = main_title, 
+          subtitle = sub_title, 
+          x = "", y = "") +
+    scale_y_continuous( label = scales::dollar ) +
+    scale_x_continuous( label = scales::dollar ) + 
+    scale_color_manual( values = c( "Profit_center_straddle" = "white", 
+                                    "Loss_center_straddle" = "red",
+                                    "Profit_right_straddle" = "green3",
+                                    "Loss_right_straddle" = "white",
+                                    "Profit_left_straddle" = "green3",
+                                    "Loss_left_straddle" = "white" ),
+                        labels = rep("", 6), guide = "legend" ) + 
+    guides( color = guide_legend(override.aes = list(color = rep("white",6),
+                                                     linetype = rep("solid",6))) ) + 
+    options_theme() + 
+    theme( plot.title = element_text(vjust = -1), 
+           plot.subtitle = element_text(vjust = -4) )
 }
