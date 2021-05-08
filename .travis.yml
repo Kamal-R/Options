@@ -6,7 +6,6 @@ cache:                          # optional
   packages: true                # optional
   directories:
   - $HOME/.npm  # optional
-  - $TRAVIS_BUILD_DIR/_book
 pandoc_version: 2.3.1
 
 before_install:
@@ -26,6 +25,7 @@ script:
 
 deploy:
   - provider: script
+    cleanup: false
     script: netlify deploy --dir _book -s $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod --message "$DEPLOY_MSG"
     on:
       branch: master
