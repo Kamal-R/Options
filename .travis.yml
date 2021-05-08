@@ -30,7 +30,6 @@ script:
 deploy:
   - provider: script
     script: netlify deploy --dir _book -s $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod --message "$DEPLOY_MSG"
-    cleanup: true
     on: 
       branch: master
 
