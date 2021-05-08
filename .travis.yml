@@ -25,7 +25,7 @@ script:
 
 deploy:
   - provider: script
-    cleanup: false
+    skip_cleanup: true
     script: netlify deploy --dir _book -s $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod --message "$DEPLOY_MSG"
     on:
       branch: master
