@@ -3,8 +3,7 @@ dist: focal
 group: edge
 arch: arm64-graviton2
 
-language: R
-sudo: false
+language: r
 cache:                          # optional
   packages: true                # optional
   directories:
@@ -24,14 +23,14 @@ env:
 
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
-- Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'
+# - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'
 # - Rscript -e 'bookdown::kindlegen(exec="tmp/kindlegen/kindlegen")'  
 # - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_document2")'
 
 deploy:
   - provider: script
     script: netlify deploy --dir _book -s $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod --message "$DEPLOY_MSG"
-    skip_cleanup: true
+    cleanup: true
     on:
       branch: master
 
