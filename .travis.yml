@@ -1,9 +1,5 @@
-os: linux
-dist: focal
-group: edge
-arch: arm64-graviton2
-
 language: r
+sudo: false
 cache:                          # optional
   packages: true                # optional
   directories:
@@ -30,6 +26,7 @@ script:
 deploy:
   - provider: script
     script: netlify deploy --dir _book -s $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod --message "$DEPLOY_MSG"
+    skip_cleanup: true
     on:
       branch: master
 
