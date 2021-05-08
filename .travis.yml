@@ -6,6 +6,7 @@ cache:                          # optional
   packages: true                # optional
   directories:
   - $HOME/.npm  # optional
+  - $TRAVIS_BUILD_DIR/_book
 pandoc_version: 2.3.1
 
 before_install:
@@ -21,9 +22,7 @@ env:
 
 script:
 - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
-- Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'
-# - Rscript -e 'bookdown::kindlegen(exec="tmp/kindlegen/kindlegen")'  
-# - Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_document2")'
+- Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::epub_book")'  
 
 deploy:
   - provider: script
