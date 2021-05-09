@@ -618,3 +618,30 @@ straddle_payoff_dist_overlay <- function( data_straddle_left, data_straddle_cent
     theme( plot.title = element_text(vjust = -1), 
            plot.subtitle = element_text(vjust = -4) )
 }
+
+
+
+call_delta_explain_payoff <- function( data_call, main_title, sub_title = "") { 
+  ggplot() + 
+    geom_line(data = data_call, aes(Call_x, Call_y, color = Profitable), linetype = "solid") +   
+    geom_segment(data = data_call,
+                 aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
+                 arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+    geom_segment(data = data_call,
+                 aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
+                 arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+                 show.legend = FALSE, col = "green3", linetype = "dotted") + 
+    labs(title = main_title, subtitle = sub_title, x = "", y = "") +
+    scale_y_continuous(label = scales::dollar) +
+    scale_x_continuous(label = scales::dollar) + 
+    scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
+                                   "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
+                                   "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
+                       labels = c("", "", "", "", ""), guide = "legend") + 
+    guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                    linetype = c("solid","solid")))) + 
+    options_theme() + 
+    theme( plot.title = element_text(vjust = -1), 
+           plot.subtitle = element_text(vjust = -5) )
+}

@@ -22,20 +22,15 @@ if ( !require("nor1mix") )       { install.packages("nor1mix") };         requir
 
 options(kableExtra.html.bsTable = TRUE)
 options(kableExtra.auto_format = FALSE)
-```
 
-```{r Set-Global-Chapter-Variables}
-plot_bg <- "#FFFFFF" # "#191919"
-plot_fg <- "#000000" # #929292"
-plot_fg_alt <- "#969696" # ??
-
-save_tables_as_pictures <- FALSE
-load_table_pictures <- TRUE
-out_width_plot <- "80%"
-out_width_table <- "90%"
-
+out_width_plot <- "97.5%"
+out_width_table <- "97.5%"
 grid::grid.locator(unit="npc") 
-output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
+
+plot_bg <- "#FFFFFF"
+plot_fg <- "#000000" 
+plot_fg_alt <- "#969696" 
+
 source("Plotting_Functions.R")
 ```
 
@@ -106,8 +101,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Protective-Put-1.png") }
+temp; rm(temp)
 ```
 
 ## Covered Call
@@ -162,8 +156,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Covered-Call-1.png") }
+temp; rm(temp)
 ```
 
 ## A Collar 
@@ -224,8 +217,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Collar-Left-1.png") }
+temp; rm(temp)
 ```
 
 ```{r XYZ-Collar-Right, fig.align = "center", out.width = out_width_plot, message = FALSE}
@@ -282,8 +274,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( sl1 ) + annotation_custom( sl2 )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Collar-Right-1.png") }
+temp; rm(temp)
 ```
 
 
@@ -320,8 +311,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +
      annotation_custom( s1 ) + annotation_custom( s2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Stock-Demo-1.png") }
+temp; rm(temp)
 ```
 
 This is the payoff diagram for owning Company XYZ's stock that we saw in Chapter 2. I want the *same* payoff diagram using calls and puts. The key is to remember that a call makes money when the stock goes up, and a put makes money when the stock goes down. The easiest way to do this is to look at the different *parts* of the payoff diagram. This one has two parts, on one each side of the breakeven price of \$200. To the right of the breakeven, we *make* money when the stock goes up. That sounds like a call, so I'm going to buy a \$200 strike call to replicate the green part of the payoff diagram. To the left of \$200, we lose money as the stock goes down. If I buy a put, I make money as the stock goes down, but I want the opposite of that. So I'm going to sell a \$200 strike put to replicate the red part of payoff diagram. 
@@ -380,8 +370,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                label = "Breakev", size = 4 ) +  
      annotation_custom( sl1 ) + annotation_custom( sl2 ) 
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Synthetic-Long-1.png") }
+temp; rm(temp)
 ```
 In this picture, the \$200 strike *long call* and \$200 strike *short put* are the two dashed lines, and the replicated *long stock* position is the solid line. Putting "long" or "short" before a position is just a shorthand way of saying if we bought it (are "long" it) or sold it (are "short" it). We bought the \$200 strike call, so it is a *long call*. We sold the \$200 strike put, so it is a *short put*. We are replicating the payoff of owning a stock, so it is a *long stock* position. This is a very useful shorthand, and one that I'll be using throughout the rest of the book.
 
@@ -446,8 +435,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-1.png") }
+temp; rm(temp)
 ```
 
 ```{r XYZ-Straddle-Normal, fig.align = "center", out.width = out_width_plot, message = FALSE}
@@ -509,8 +497,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-Normal-1.png") }
+temp; rm(temp)
 ```
 
 ```{r XYZ-Straddle-Lognormal-Over-K, fig.align = "center", out.width = out_width_plot, message = FALSE}
@@ -571,8 +558,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-Lognormal-Over-K-1.png") }
+temp; rm(temp)
 ```
 
 
@@ -635,6 +621,5 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
-if ( !output_epub ) { print(temp); rm(temp) }
-if ( output_epub ) { knitr::include_graphics("03-combining-payoffs_files/figure-html/XYZ-Straddle-Multimodal-1.png") }
+temp; rm(temp)
 ```

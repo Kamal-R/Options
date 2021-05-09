@@ -15,20 +15,18 @@ if ( !require("grid") )          { install.packages("grid") };            requir
 if ( !require("magick") )        { install.packages("magick") };          require(magick)
 if ( !require("gridExtra") )     { install.packages("gridExtra") };       require(gridExtra)
 
-options(kableExtra.html.bsTable = T)
+options(kableExtra.html.bsTable = TRUE)
 options(kableExtra.auto_format = FALSE)
-source("Plotting_Functions.R")
-out_width_plot <- "80%"
-out_width_table <- "90%"
 
+out_width_plot <- "97.5%"
+out_width_table <- "97.5%"
 grid::grid.locator(unit="npc") 
-output_epub = knitr::opts_knit$get("rmarkdown.pandoc.to") == "epub3"
-```
 
-``` {r Set-Global-Chapter-Variables, echo = FALSE}
-plot_bg <- "#FFFFFF" # "#191919"
-plot_fg <- "#000000" # "#929292"
-plot_fg_alt <- "#969696" # ??
+plot_bg <- "#FFFFFF" 
+plot_fg <- "#000000" 
+plot_fg_alt <- "#969696" 
+
+source("Plotting_Functions.R")
 ```
 
 # What is an Option? 
