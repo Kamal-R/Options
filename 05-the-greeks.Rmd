@@ -134,52 +134,22 @@ Try not to confuse the strike price of `r currency(200)` with the breakeven of `
 
 We've seen stocks, which are delta one. And we've seen calls on their expiry date, which have a delta of zero below their strike price and a delta of one above their strike price. What about the payoffs of calls (and puts) before their expiry date? It depends on how far away from expiry the call is. We'll explore this by looking at the payoff diagram of the `r currency(200)` strike call 3, 6, and 12 months before it's expiry date. 
 
-```{r}
-call_delta_explain_payoff <- function( data_call, main_title, sub_title = "") { 
-  ggplot() + 
-    geom_line(data = data_call, aes(Call_x, Call_delta_first, color = Delta_first), linetype = "solid", size = 2) +   
-    geom_line(data = data_call, aes(Call_x, Call_delta_third, color = Delta_third), linetype = "solid", size = 2) +   
-    geom_line(data = data_call, aes(Call_x, Call_delta_second, color = Delta_second), linetype = "solid", size = 2) +   
-        geom_line(data = data_call, aes(Call_x, Call_payoff, color = Profitable), linetype = "solid") +   
-    geom_segment(data = data_call,
-                 aes(x = min(Call_x), xend = min(Call_x), y = min(Call_payoff), yend = min(Call_payoff)), 
-                 arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-                 show.legend = FALSE, col = "red", linetype = "dotted") + 
-    geom_segment(data = data_call,
-                 aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_payoff)-1, yend = max(Call_payoff)), 
-                 arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-                 show.legend = FALSE, col = "green3", linetype = "dotted") + 
-    labs(title = main_title, subtitle = sub_title, x = "", y = "") +
-    scale_y_continuous(label = scales::dollar) +
-    scale_x_continuous(label = scales::dollar) + 
-    scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
-                                   "Show_delta_first" = "gray50", "Hide_delta_first" = "white",
-                                   "Show_delta_second" = "gray50", "Hide_delta_second" = "white",
-                                   "Show_delta_third" = "gray50", "Hide_delta_third" = "white" ),
-                       labels = c("", "", "", "", ""), guide = "legend") + 
-    guides(color = guide_legend(override.aes = list(color = c("white","white"),
-                                                    linetype = c("solid","solid")))) + 
-    options_theme() + 
-    theme( plot.title = element_text(vjust = -1), 
-           plot.subtitle = element_text(vjust = -5) )
-}
-```
+Before we get into it, a quick note -- the cost of a call varies depending on how far away from expiry it is. The intuition is that the closer the `r currency(200)` strike call gets to expiring, the less time the stock has to go up. So it loses (time) value every day. We'll get into the details of how that works when we talk about two other greeks, *theta* and *vega*. For now, I'll say we bought the call for `r currency(15)` like before, and that we hold it until it is 3, 6, or 12 months from expiry. 
 
-```{r XYZ-Delta-Before-Expiry-200, echo=FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE}
+```{r XYZ-Delta-3-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
 Call_K <- 200
 Current_price <- 200
 x_min = 140; x_max = 260
 
 Call_x <- seq(from = x_min, to = x_max, by = 0.1)
-Call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.12, r = 0.02, tt = 0.5, d = 0) })
-Call_cost <- bscall(s = 200, k = 200, v = 0.12, r = 0.02, tt = 0.5, d = 0)
-
+Call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.16, r = 0.02, tt = 0.25, d = 0) })
+Call_cost <- 15 # bscall(s = 200, k = 200, v = 0.16, r = 0.02, tt = 0.25, d = 0)
 Call_payoff <- Call_price - Call_cost
 
 Call_delta <- vector(length = length(Call_price)) 
 for (ii in 1:length(Call_price)) { 
-  Call_delta[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.12, 
-                                   r = 0.02, tt = 0.5, d = 0) )[2] 
+  Call_delta[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.16, 
+                                   r = 0.02, tt = 0.25, d = 0) )[2] 
 }
 
 idx_1 <- which(Call_x == 160)
@@ -188,7 +158,7 @@ tangent_line_1 <- tangent_line_1 - tangent_line_1[idx_1] + Call_payoff[idx_1]
 
 idx_2 <- which(Call_x == Call_K)
 tangent_line_2 <- Call_delta[idx_2] * Call_x 
-tangent_line_2 <- tangent_line_2 - tangent_line_2[idx_2] 
+tangent_line_2 <- tangent_line_2 - tangent_line_2[idx_2] + Call_payoff[idx_2]
 
 idx_3 <- which(Call_x == 240)
 tangent_line_3 <- Call_delta[idx_3] * Call_x
@@ -206,89 +176,306 @@ Call_Payoff_XYZ_200_3months <- tibble( "Call_x" = currency(seq(from = x_min, to 
                        "Delta_second" = ifelse( abs(Call_x-200) < 5, "Show_delta_second","Hide_delta_second"), 
                        "Delta_third" = ifelse( abs(Call_x-240) < 5, "Show_delta_third","Hide_delta_third") )
 
-annotate_arrow_1 <- data.frame(x1 = 160.5, x2 = 160.5, y1 = -25, y2 = -12.5)
-annotate_arrow_2 <- data.frame(x1 = 202.5, x2 = 202.5, y1 = -21.5, y2 = -4)
-annotate_arrow_3 <- data.frame(x1 = 242.5, x2 = 242.5, y1 = 13.5, y2 = 31)
+Call_Payoff_XYZ_200_expiry <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                               "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                               "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+annotate_arrow_1 <- data.frame(x1 = 160, x2 = 160, y1 = 0, y2 = -10)
+annotate_arrow_2 <- data.frame(x1 = 200-1, x2 = 200-1, y1 = 7.5, y2 = -2.5)
+annotate_arrow_3 <- data.frame(x1 = 240-2.5, x2 = 240-2.5, y1 = 42.5, y2 = 32.5)
 
 
-temp <- call_delta_explain_payoff( data_call = Call_Payoff_XYZ_200_3months, 
-                                   main_title = "Delta: 3 months from call expiry.",
-                                   sub_title = "Buy 1 XYZ call at the $200 strike.") 
+temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_XYZ_200_3months, 
+                                         data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
+                                         main_title = "Buy 1 XYZ call at the $200 strike",
+                                         sub_title = "Payoff 3 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
+temp <- temp + ylim(-20,60)
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
-tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
-                      "red", "green3" )
+tick_color <- c( ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                         "red", "green3" ) )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
-        annotate( geom = "text", x = 150, y = -35, color = "gray50", hjust = 0, 
-                  label = paste0("Stock: $160\nDelta = 0.007"), size = 4 ) + 
-        annotate( geom = "text", x = 195, y = -30, color = "gray50", hjust = 0, 
-                  label = paste0("Stock: $200\nDelta = 0.564"), size = 4 ) +
-        annotate( geom = "text", x = 235, y = 5, color = "gray50", hjust = 0, 
-                  label = paste0("Stock: $240\nDelta = 0.990"), size = 4 ) + 
+        annotate( geom = "text", x = 150, y = 7.5, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $160\nDelta: 0.009"), size = 4 ) + 
+        annotate( geom = "text", x = 190, y = 15, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $200\nDelta: 0.540"), size = 4 ) +
+        annotate( geom = "text", x = 227.5, y = 50, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $240\nDelta: 0.984"), size = 4 ) + 
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
                     arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
                     arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,
-                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" )
-  
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+       annotate( geom = "text", x = Call_K+Call_cost-11, y = -20, color = "green3", hjust = 0,
+                 label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost)), size = 4 ) + 
+       annotate( geom = "text", x = Call_K+Call_cost-11, y = -20, color = "red", hjust = 0,
+                 label = "Breakev", size = 4 ) 
+
 temp; rm(temp)
 ```
 
-```{r Stock-vs-Call-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
-Stock_cost <- 200
-Call_cost <- 15; Call_K <- 200
-x_min <- 140; x_max = 280
+For a call, *delta* increases as we move from left to right. It goes from being near 0 at `r currency(160)` to near 1 at `r currency(240)`. *Gamma* is the rate that *delta* (the slope of the payoff) is increasing. The curve is almost a flat line at \$80, which means that *delta* is near 0. It steepens dramatically between \$95 and \$105, which means that *gamma* increases most quickly near \$100. After \$115, the payoff is an almost straight line and cannot steepen much more, which means *delta* is approaching 1 and *gamma* is approaching 0. 
 
-Stock_Payoff_XYZ <- tibble( "stock_price_x" = seq(from = x_min, to = x_max, by = 0.01),
-                            "stock_profit_y" = -Stock_cost + seq(from = x_min, to = x_max, by = 0.01),
-                            "Profitable" = ifelse(-Stock_cost + seq(from = x_min, to = x_max, by = 0.01) > 0, 
-                                                  "Profit_stock","Loss_stock") )
+```{r XYZ-Delta-6-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
+Call_K <- 200
+Current_price <- 200
+x_min = 140; x_max = 260
 
-Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+Call_x <- seq(from = x_min, to = x_max, by = 0.1)
+Call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.16, r = 0.02, tt = 0.5, d = 0) })
+Call_cost <- 15 # bscall(s = 200, k = 200, v = 0.16, r = 0.02, tt = 0.5, d = 0)
+Call_payoff <- Call_price - Call_cost
+
+Call_delta <- vector(length = length(Call_price)) 
+for (ii in 1:length(Call_price)) { 
+  Call_delta[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.16, 
+                                   r = 0.02, tt = 0.5, d = 0) )[2] 
+}
+
+idx_1 <- which(Call_x == 160)
+tangent_line_1 <- Call_delta[idx_1] * Call_x
+tangent_line_1 <- tangent_line_1 - tangent_line_1[idx_1] + Call_payoff[idx_1]
+
+idx_2 <- which(Call_x == Call_K)
+tangent_line_2 <- Call_delta[idx_2] * Call_x 
+tangent_line_2 <- tangent_line_2 - tangent_line_2[idx_2] + Call_payoff[idx_2]
+
+idx_3 <- which(Call_x == 240)
+tangent_line_3 <- Call_delta[idx_3] * Call_x
+tangent_line_3 <- tangent_line_3 - tangent_line_3[idx_3] + Call_payoff[idx_3]
+
+
+Call_Payoff_XYZ_200_6months <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 0.1)),
+                       "Call_payoff" = currency(Call_payoff), 
+                       "Call_delta_first" = currency(tangent_line_1),
+                       "Call_delta_second" = currency(tangent_line_2),
+                       "Call_delta_third" = currency(tangent_line_3),
+                       "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                             "Profit_call","Loss_call"),
+                       "Delta_first" = ifelse( abs(Call_x-160) < 5,"Show_delta_first","Hide_delta_first"), 
+                       "Delta_second" = ifelse( abs(Call_x-200) < 5, "Show_delta_second","Hide_delta_second"), 
+                       "Delta_third" = ifelse( abs(Call_x-240) < 5, "Show_delta_third","Hide_delta_third") )
+
+Call_Payoff_XYZ_200_expiry <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
                                "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
                                "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                       "Profit_call","Loss_call") )
 
-s1 <- bracketsGrob(0.20, 0.20, 0.20, 0.46, lwd=1, lty = "dotdash", 
-                   col=adjustcolor("red", alpha.f = 0.5))
-s2 <- bracketsGrob(0.85, 0.85, 0.85, 0.44, lwd=1, lty = "dotdash",
-                   col=adjustcolor("green3", alpha.f = 0.5))
-  
-c1 <- bracketsGrob(0.25, 0.34, 0.25, 0.45, lwd=2, col="red", lty = "solid")
-c2 <- bracketsGrob(0.80, 0.70, 0.80, 0.45, lwd=2, col="green3", lty = "solid")
+annotate_arrow_1 <- data.frame(x1 = 160, x2 = 160, y1 = 0, y2 = -10)
+annotate_arrow_2 <- data.frame(x1 = 200-1, x2 = 200-1, y1 = 7.5, y2 = -2.5)
+annotate_arrow_3 <- data.frame(x1 = 240-2.5, x2 = 240-2.5, y1 = 42.5, y2 = 32.5)
 
 
-temp <- stock_and_call_payoff( data_stock = Stock_Payoff_XYZ, data_call = Call_Payoff_XYZ_200, 
-                               main_title = "Buying Shares vs. Buying a Call",
-                               sub_title = "Buy 1 XYZ call at the $200 strike (solid line)\nBuy XYZ shares for $200/share (dashed line).") 
+temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_XYZ_200_6months, 
+                                         data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
+                                         main_title = "Buy 1 XYZ call at the $200 strike",
+                                         sub_title = "Payoff 6 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
+temp <- temp + ylim(-20,60)
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
-tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
-                      "red", "green3" )
+tick_color <- c( ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                         "red", "green3" ) )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
-     annotate( geom = "text", x = 140, y = -5, color = "red", hjust = 0, 
-               label = paste0("Losses"), size = 5 ) + 
-     annotate( geom = "text", x = 270, y = 20, color = "green3", hjust = 0, 
-               label = paste0("Profits"), size = 5 ) + 
-     annotation_custom( c1 ) + annotation_custom( c2 ) + 
-     annotation_custom( s1 ) + annotation_custom( s2 ) 
+        annotate( geom = "text", x = 150, y = 7.5, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $160\nDelta: 0.054"), size = 4 ) + 
+        annotate( geom = "text", x = 190, y = 15, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $200\nDelta: 0.557"), size = 4 ) +
+        annotate( geom = "text", x = 227.5, y = 50, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $240\nDelta: 0.942"), size = 4 ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) 
 
 temp; rm(temp)
 ```
 
-As we move from left to right, *delta* is always increasing. It goes from being near 0 at \$80 to near 1 at \$120. *Gamma* is the rate that *delta* (the slope of the payoff) is increasing. The curve is almost a flat line at \$80, which means that *delta* is near 0. It steepens dramatically between \$95 and \$105, which means that *gamma* increases most quickly near \$100. After \$115, the payoff is an almost straight line and cannot steepen much more, which means *delta* is approaching 1 and *gamma* is approaching 0. 
 
 Although I haven't gone through examples yet, you can build good understanding of how *delta* and *gamma* behave just by looking at payoff diagrams. This is an important skill that we'll build up when we look at more options strategies. 
 
+```{r XYZ-Delta-12-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
+Call_K <- 200
+Current_price <- 200
+x_min = 140; x_max = 260
+
+Call_x <- seq(from = x_min, to = x_max, by = 0.1)
+Call_price <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.16, r = 0.02, tt = 1, d = 0) })
+Call_cost <- 15 # bscall(s = 200, k = 200, v = 0.16, r = 0.02, tt = 1, d = 0)
+
+Call_payoff <- Call_price - Call_cost
+
+Call_delta <- vector(length = length(Call_price)) 
+for (ii in 1:length(Call_price)) { 
+  Call_delta[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.16, 
+                                   r = 0.02, tt = 1, d = 0) )[2] 
+}
+
+idx_1 <- which(Call_x == 160)
+tangent_line_1 <- Call_delta[idx_1] * Call_x
+tangent_line_1 <- tangent_line_1 - tangent_line_1[idx_1] + Call_payoff[idx_1]
+
+idx_2 <- which(Call_x == Call_K)
+tangent_line_2 <- Call_delta[idx_2] * Call_x 
+tangent_line_2 <- tangent_line_2 - tangent_line_2[idx_2] + Call_payoff[idx_2]
+
+idx_3 <- which(Call_x == 240)
+tangent_line_3 <- Call_delta[idx_3] * Call_x
+tangent_line_3 <- tangent_line_3 - tangent_line_3[idx_3] + Call_payoff[idx_3]
+
+
+Call_Payoff_XYZ_200_12months <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 0.1)),
+                       "Call_payoff" = currency(Call_payoff), 
+                       "Call_delta_first" = currency(tangent_line_1),
+                       "Call_delta_second" = currency(tangent_line_2),
+                       "Call_delta_third" = currency(tangent_line_3),
+                       "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                             "Profit_call","Loss_call"),
+                       "Delta_first" = ifelse( abs(Call_x-160) < 5,"Show_delta_first","Hide_delta_first"), 
+                       "Delta_second" = ifelse( abs(Call_x-200) < 5, "Show_delta_second","Hide_delta_second"), 
+                       "Delta_third" = ifelse( abs(Call_x-240) < 5, "Show_delta_third","Hide_delta_third") )
+
+Call_Payoff_XYZ_200_expiry <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                               "Call_y" = -Call_cost + (Call_x > Call_K)*(Call_x-Call_K),
+                               "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+annotate_arrow_1 <- data.frame(x1 = 159.5, x2 = 159.5, y1 = 5, y2 = -10)
+annotate_arrow_2 <- data.frame(x1 = 199.5, x2 = 199.5, y1 = 15, y2 = 2.5)
+annotate_arrow_3 <- data.frame(x1 = 237.5, x2 = 237.5, y1 = 47.5, y2 = 35)
+
+
+temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_XYZ_200_12months, 
+                                         data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
+                                         main_title = "Buy 1 XYZ call at the $200 strike",
+                                         sub_title = "Payoff 12 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- c( ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                         "red", "green3" ), "green3" )
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+        annotate( geom = "text", x = 150, y = 12.5, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $160\nDelta: 0.150"), size = 4 ) + 
+        annotate( geom = "text", x = 192.5, y = 20, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $200\nDelta: 0.580"), size = 4 ) +
+        annotate( geom = "text", x = 230, y = 55, color = "gray50", hjust = 0, 
+                  label = paste0("Stock: $240\nDelta: 0.888"), size = 4 ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+        ylim(-20,60)
+
+temp; rm(temp)
+```
+
 There's also a broader risk-reward story here. The payoff of XYZ's call goes up faster and faster as the stock goes up, so we make money faster and faster. The flip side of that is that the payoff goes down slower and slower as the stock falls, so we lose money slower and slower. *Delta* and *gamma* try to describe this effect with numbers, but most of us won't be using *delta* or *gamma* to aggressively risk-manage positions the way a hedge fund or an algorithm would. That's too complicated and time-consuming for most of us. 
+
+```{r XYZ-Delta-Over-Time-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
+Call_K <- 200
+Current_price <- 200
+x_min = 140; x_max = 260
+Call_x <- seq(from = x_min, to = x_max, by = 0.1)
+
+Call_price_on_expiry <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.18, r = 0.02, tt = 0, d = 0) })
+Call_cost_on_expiry <- 15 # bscall(s = 200, k = 200, v = 0.18, r = 0.02, tt = 0, d = 0)
+Call_payoff_on_expiry <- Call_price_on_expiry - Call_cost_on_expiry
+Call_delta_on_expiry <- vector(length = length(Call_price_on_expiry)) 
+for (ii in 1:length(Call_price_on_expiry)) { 
+  Call_delta_on_expiry[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.18, 
+                                   r = 0.02, tt = 0, d = 0) )[2] 
+}
+
+Call_price_3months_expiry <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.18, r = 0.02, tt = 0.25, d = 0) })
+Call_cost_3months_expiry <- 15 # bscall(s = 200, k = 200, v = 0.18, r = 0.02, tt = 0.25, d = 0)
+Call_payoff_3months_expiry <- Call_price_3months_expiry - Call_cost_3months_expiry
+Call_delta_3months_expiry <- vector(length = length(Call_price_3months_expiry)) 
+for (ii in 1:length(Call_price_3months_expiry)) { 
+  Call_delta_3months_expiry[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.18, 
+                                   r = 0.02, tt = 0.25, d = 0) )[2] 
+}
+
+Call_price_6months_expiry <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.18, r = 0.02, tt = 0.5, d = 0) })
+Call_cost_6months_expiry <- 15 # bscall(s = 200, k = 200, v = 0.18, r = 0.02, tt = 0.5, d = 0)
+Call_payoff_6months_expiry <- Call_price_6months_expiry - Call_cost_6months_expiry
+Call_delta_6months_expiry <- vector(length = length(Call_price_6months_expiry)) 
+for (ii in 1:length(Call_price_6months_expiry)) { 
+  Call_delta_6months_expiry[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.18, 
+                                   r = 0.02, tt = 0.5, d = 0) )[2] 
+}
+
+Call_price_12months_expiry <- sapply(Call_x, function(x) { bscall(s = x, k = 200, v = 0.18, r = 0.02, tt = 1, d = 0) })
+Call_cost_12months_expiry <- 15 # bscall(s = 200, k = 200, v = 0.18, r = 0.02, tt = 1, d = 0)
+Call_payoff_12months_expiry <- Call_price_12months_expiry - Call_cost_12months_expiry
+Call_delta_12months_expiry <- vector(length = length(Call_price_12months_expiry)) 
+for (ii in 1:length(Call_price_12months_expiry)) { 
+  Call_delta_12months_expiry[ii] <- greeks( bscall(s = x_min-0.1+0.1*ii, k = 200, v = 0.18, 
+                                   r = 0.02, tt = 1, d = 0) )[2] 
+}
+
+Call_Delta_XYZ_200_On_Expiry <- tibble( "Call_x" = currency(seq(from = x_min, to = x_max, by = 0.1)),
+                       "Delta_y" = Call_delta_on_expiry, 
+                       "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                             "Profit_call","Loss_call") )
+
+Call_Delta_XYZ_200_3months_Expiry <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.1),
+                               "Delta_y" = Call_delta_3months_expiry,
+                               "Profitable" = ifelse(-Call_cost_3months_expiry + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+Call_Delta_XYZ_200_6months_Expiry <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.1),
+                               "Delta_y" = Call_delta_6months_expiry,
+                               "Profitable" = ifelse(-Call_cost_6months_expiry + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+Call_Delta_XYZ_200_12months_Expiry <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.1),
+                               "Delta_y" = Call_delta_12months_expiry,
+                               "Profitable" = ifelse(-Call_cost_12months_expiry + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
+                                                      "Profit_call","Loss_call") )
+
+annotate_arrow_1 <- data.frame(x1 = 187.5, x2 = 197.5, y1 = 0.80, y2 = 0.80)
+annotate_arrow_2 <- data.frame(x1 = 190, x2 = 190, y1 = 0.175, y2 = 0.275)
+annotate_arrow_3 <- data.frame(x1 = 240, x2 = 240, y1 = 0.75, y2 = 0.85)
+
+temp <- call_delta_over_time( call_delta_on_expiry = Call_Delta_XYZ_200_On_Expiry, 
+                              call_delta_3months_expiry = Call_Delta_XYZ_200_3months_Expiry,
+                              # call_delta_6months_expiry = Call_Delta_XYZ_200_6months_Expiry,
+                              call_delta_12months_expiry = Call_Delta_XYZ_200_12months_Expiry,
+                              main_title = "Buy 1 XYZ call at the $200 strike",
+                              sub_title = "Compare Call Delta Across Time.")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+
+temp <- temp + 
+        annotate( geom = "text", x = 172.5, y = 0.80, color = "gray50", hjust = 0, 
+                  label = paste0("On expiry"), size = 4 ) + 
+        annotate( geom = "text", x = 182.5, y = 0.10, color = "gray50", hjust = 0, 
+                  label = paste0("3 months\nfrom expiry"), size = 4 ) +
+        annotate( geom = "text", x = 232.5, y = 0.675, color = "gray50", hjust = 0, 
+                  label = paste0("12 months\nfrom expiry"), size = 4 ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+        geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) 
+
+temp; rm(temp)
+```
 
 But we might use our knowledge of *delta* and *gamma* to construct favorable trades, and to effectively risk-manage them. We're going to do just that after we go through the three remaining greeks. Once we've finished explaining the greeks, we'll exploit our new knowledge to understand the construction and risk management of two more complicated option strategies - the straddle and the put spread. 
 
 Before we move on to *vega*, I want to emphasis that this call's payoff diagram (before expiry) is still *asymmetric*. It's not the all-or-nothing setup we saw in the first two chapters, and we don't quite get dollar-for-dollar participation to the upside. It took an almost \$15 move to the upside in XYZ's stock to get close to that. But there's still asymmetry: we make more and more money as the stock goes up, and lose less and less money as the stock goes down. In one way or another, all options strategies boil down to trying to exploit that asymmetry. 
 
+<!-- 
 ## Delta 
 
 Let's re
@@ -808,3 +995,4 @@ This *delta*-curve also flattens out as the shares get over \$100, becoming almo
 
 These two diagrams should make it clear - the gamma of an option peaks at (or very near) its strike price, and declines as the stock shares rise or fall away from it. If we think about it long enough, this should match our intuition. *Delta* measures how much this call *participates* in the price movements of a stock, and *gamma* measures how fast the participation is changing. The call expires worthless below its strike of \$100 but makes money over \$100, so the fastest changes in how much the call participates should happen near \$100. 
 
+-->

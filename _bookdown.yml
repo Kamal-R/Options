@@ -1,5 +1,5 @@
 book_filename: "Understanding-Options"
-delete_merged_file: true
+delete_merged_file: false
 new_session: true
 
 rmd_files: ["index.Rmd", "01-options-intro.Rmd", "02-payoff-diagrams.Rmd", "03-combining-payoffs.Rmd",

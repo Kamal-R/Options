@@ -619,16 +619,26 @@ straddle_payoff_dist_overlay <- function( data_straddle_left, data_straddle_cent
            plot.subtitle = element_text(vjust = -4) )
 }
 
-
-
-call_delta_explain_payoff <- function( data_call, main_title, sub_title = "") { 
+call_delta_before_expiry_payoff <- function( data_call_before_expiry, data_call_on_expiry, main_title, sub_title = "") { 
   ggplot() + 
-    geom_line(data = data_call, aes(Call_x, Call_y, color = Profitable), linetype = "solid") +   
-    geom_segment(data = data_call,
+    geom_line(data = data_call_before_expiry, aes(Call_x, Call_delta_first, color = Delta_first), linetype = "solid", size = 2) +   
+    geom_line(data = data_call_before_expiry, aes(Call_x, Call_delta_third, color = Delta_third), linetype = "solid", size = 2) +   
+    geom_line(data = data_call_before_expiry, aes(Call_x, Call_delta_second, color = Delta_second), linetype = "solid", size = 2) +   
+    geom_line(data = data_call_before_expiry, aes(Call_x, Call_payoff, color = Profitable), linetype = "solid") +   
+    geom_segment(data = data_call_before_expiry,
+                 aes(x = min(Call_x), xend = min(Call_x), y = min(Call_payoff), yend = min(Call_payoff)), 
+                 arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+    geom_segment(data = data_call_before_expiry,
+                 aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_payoff)-1, yend = max(Call_payoff)), 
+                 arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+                 show.legend = FALSE, col = "green3", linetype = "dotted") + 
+    geom_line(data = data_call_on_expiry, aes(Call_x, Call_y, color = Profitable), linetype = "dotdash") +
+    geom_segment(data = data_call_on_expiry,
                  aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
                  show.legend = FALSE, col = "red", linetype = "dotted") + 
-    geom_segment(data = data_call,
+    geom_segment(data = data_call_on_expiry,
                  aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
                  show.legend = FALSE, col = "green3", linetype = "dotted") + 
@@ -636,12 +646,32 @@ call_delta_explain_payoff <- function( data_call, main_title, sub_title = "") {
     scale_y_continuous(label = scales::dollar) +
     scale_x_continuous(label = scales::dollar) + 
     scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
-                                   "Profit_stock" = adjustcolor("green3", alpha.f = 0.5),
-                                   "Loss_stock" = adjustcolor("red", alpha.f = 0.5)),
+                                   "Show_delta_first" = "gray50", "Hide_delta_first" = "white",
+                                   "Show_delta_second" = "gray50", "Hide_delta_second" = "white",
+                                   "Show_delta_third" = "gray50", "Hide_delta_third" = "white" ),
                        labels = c("", "", "", "", ""), guide = "legend") + 
     guides(color = guide_legend(override.aes = list(color = c("white","white"),
                                                     linetype = c("solid","solid")))) + 
     options_theme() + 
     theme( plot.title = element_text(vjust = -1), 
+           plot.subtitle = element_text(vjust = -5) )
+}
+
+
+call_delta_over_time <- function( call_delta_on_expiry, call_delta_3months_expiry, 
+                                  call_delta_12months_expiry, main_title, sub_title = "") { 
+  ggplot() + 
+    geom_line(data = call_delta_on_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
+    geom_line(data = call_delta_3months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
+    # geom_line(data = call_delta_6months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
+    geom_line(data = call_delta_12months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") + 
+    labs(title = main_title, subtitle = sub_title, x = "", y = "") +
+    scale_x_continuous(label = scales::dollar) + 
+    scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red"),
+                       labels = c("", "", "", "", ""), guide = "legend") +
+    guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                    linetype = c("solid","solid")))) +
+    options_theme() +
+    theme( plot.title = element_text(vjust = -1),
            plot.subtitle = element_text(vjust = -5) )
 }
