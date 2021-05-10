@@ -29,6 +29,8 @@ plot_fg_alt <- "#969696"
 source("Plotting_Functions.R")
 ```
 
+<!-- pandoc _book/Understanding-Options.md -o Understanding-Options.epub  -->
+
 # What is an Option? 
 
 You might have heard stories about making \$100,000 in a week trading stock options, after starting out with $5,000 (or less) in the bank. What are options? How did they do that? Can I do that? You probably can, and we'll dissect some of those winning trades later. But first, we have to go over what an option is.

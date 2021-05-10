@@ -661,7 +661,7 @@ call_delta_before_expiry_payoff <- function( data_call_before_expiry, data_call_
 call_delta_over_time <- function( call_delta_on_expiry, call_delta_3months_expiry, 
                                   call_delta_12months_expiry, main_title, sub_title = "") { 
   ggplot() + 
-    geom_line(data = call_delta_on_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
+    geom_line(data = call_delta_on_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "dotdash") +   
     geom_line(data = call_delta_3months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
     # geom_line(data = call_delta_6months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
     geom_line(data = call_delta_12months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") + 
@@ -675,3 +675,144 @@ call_delta_over_time <- function( call_delta_on_expiry, call_delta_3months_expir
     theme( plot.title = element_text(vjust = -1),
            plot.subtitle = element_text(vjust = -5) )
 }
+
+
+
+call_gamma_before_expiry_payoff <- function( call_delta_before_expiry, call_delta_on_expiry, 
+                                             main_title, sub_title = "") { 
+  ggplot() + 
+    geom_line(data = call_delta_before_expiry, aes(Call_x, Call_gamma_third, color = Gamma_third), linetype = "solid", size = 2) +   
+    geom_line(data = call_delta_before_expiry, aes(Call_x, Call_gamma_second, color = Gamma_second), linetype = "solid", size = 2) +   
+    geom_line(data = call_delta_before_expiry, aes(Call_x, Call_gamma_first, color = Gamma_first), linetype = "solid", size = 2) +   
+    geom_line(data = call_delta_before_expiry, aes(Call_x, Call_delta, color = Profitable), linetype = "solid") +   
+    geom_segment(data = call_delta_before_expiry,
+                 aes(x = min(Call_x), xend = min(Call_x), y = min(Call_delta), yend = min(Call_delta)), 
+                 arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+    geom_segment(data = call_delta_before_expiry,
+                 aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_delta), yend = max(Call_delta)),
+                 arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"),
+                 show.legend = FALSE, col = "green3", linetype = "dotted") +
+    geom_line(data = call_delta_on_expiry, aes(Call_x, Call_delta, color = Profitable), linetype = "dotdash") +
+    geom_segment(data = call_delta_on_expiry,
+                 aes(x = min(Call_x), xend = min(Call_x), y = min(Call_delta), yend = min(Call_delta)),
+                 arrow = arrow(length = unit(0.50, "cm"), type = "open"),
+                 show.legend = FALSE, col = "red", linetype = "dotted") +
+    # geom_segment(data = call_delta_on_expiry,
+    #              aes(x = max(Call_x), xend = max(Call_x), y = max(Call_delta), yend = max(Call_delta)),
+    #              arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"),
+    #              show.legend = FALSE, col = "green3", linetype = "dotted") +
+    labs(title = main_title, subtitle = sub_title, x = "", y = "") +
+    scale_y_continuous(label = scales::dollar) +
+    scale_x_continuous(label = scales::dollar) + 
+    scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
+                                   "Show_gamma_first" = "gray50", "Hide_gamma_first" = "white",
+                                   "Show_gamma_second" = "gray50", "Hide_gamma_second" = "white",
+                                   "Show_gamma_third" = "gray50", "Hide_gamma_third" = "white" ),
+                       labels = c("", "", "", "", ""), guide = "legend") + 
+    guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                    linetype = c("solid","solid")))) + 
+    options_theme() + 
+    theme( plot.title = element_text(vjust = -1), 
+           plot.subtitle = element_text(vjust = -5) )
+}
+
+
+straddle_payoff_dist_overlay_volatility <- function( data_straddle_left, data_straddle_center, 
+                                          data_straddle_right, data_distribution_overlay,
+                                          curve_text_1, curve_text_x_1, curve_text_y_1,
+                                          curve_text_2, curve_text_x_2, curve_text_y_2,
+                                          fill_rgb, main_title, sub_title = "" ) { 
+  ggplot() + 
+    geom_polygon( data = data_distribution_overlay, 
+                  aes(x = Dist_x, y = Dist_y), 
+                  fill = rgb( red = fill_rgb[1], 
+                              green = fill_rgb[2],
+                              blue = fill_rgb[3],
+                              max = 255, alpha = 50 ) ) +
+    annotate( "text", x = curve_text_x_1, y = curve_text_y_1, 
+              label = curve_text_1, 
+              color = "grey50", size = 4 ) + 
+    annotate( "text", x = curve_text_x_2, y = curve_text_y_2, 
+              label = curve_text_2, 
+              color = "grey50", size = 4 ) + 
+    geom_line( data = data_straddle_right, 
+               aes( Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +
+    geom_line( data = data_straddle_center, 
+               aes(x = Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +   
+    geom_line( data = data_straddle_left, 
+               aes(x = Straddle_x, y = Straddle_y, color = Profitable), 
+               linetype = "solid" ) +   
+    geom_line( data = data_distribution_overlay, 
+               aes(x = Dist_x, y = Dist_y), 
+               linetype = "solid", color = "gray50" ) + 
+    geom_segment( data = data_straddle_left, linetype = "solid",
+                  aes( x = min(Straddle_x), xend = min(Straddle_x)-1, 
+                       y = max(Straddle_y), yend = max(Straddle_y)+1 ), 
+                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+                  show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+    geom_segment( data = data_straddle_right, linetype = "solid", 
+                  aes( x = max(Straddle_x)-1, xend = max(Straddle_x), 
+                       y = max(Straddle_y)-1, yend = max(Straddle_y)), 
+                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+                  show.legend = FALSE, col = adjustcolor("green3", alpha.f = 0.5)) + 
+    labs( title = main_title, 
+          subtitle = sub_title, 
+          x = "", y = "") +
+    scale_y_continuous( label = scales::dollar ) +
+    scale_x_continuous( label = scales::dollar ) + 
+    scale_color_manual( values = c( "Profit_center_straddle" = "white", 
+                                    "Loss_center_straddle" = "red",
+                                    "Profit_right_straddle" = "green3",
+                                    "Loss_right_straddle" = "white",
+                                    "Profit_left_straddle" = "green3",
+                                    "Loss_left_straddle" = "white" ),
+                        labels = rep("", 6), guide = "legend" ) + 
+    guides( color = guide_legend(override.aes = list(color = rep("white",6),
+                                                     linetype = rep("solid",6))) ) + 
+    options_theme() + 
+    theme( plot.title = element_text(vjust = -1), 
+           plot.subtitle = element_text(vjust = -4) )
+}
+
+
+call_gamma_over_time <- function( call_gamma_on_expiry, call_gamma_3months_expiry, 
+                                  call_gamma_12months_expiry, main_title, sub_title = "") { 
+  ggplot() + 
+    geom_line(data = call_gamma_on_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "dotdash") +   
+    geom_line(data = call_gamma_3months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
+    # geom_line(data = call_gamma_6months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") +   
+    geom_line(data = call_gamma_12months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") + 
+    labs(title = main_title, subtitle = sub_title, x = "", y = "") +
+    scale_x_continuous(label = scales::dollar) + 
+    scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red"),
+                       labels = c("", "", "", "", ""), guide = "legend") +
+    guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                    linetype = c("solid","solid")))) +
+    options_theme() +
+    theme( plot.title = element_text(vjust = -1),
+           plot.subtitle = element_text(vjust = -5) )
+}
+
+
+call_theta_over_time <- function( call_theta_high_vol, call_theta_medium_vol, 
+                                  call_theta_low_vol, main_title, sub_title = "") { 
+  ggplot() + 
+    geom_line(data = call_theta_high_vol, aes(Theta_x, Price_y), color = "cornflowerblue", linetype = "solid") +   
+    geom_line(data = call_theta_medium_vol, aes(Theta_x, Price_y), color = "purple", linetype = "solid") +   
+    geom_line(data = call_theta_low_vol, aes(Theta_x, Price_y), color = "gray35", linetype = "solid") + 
+    labs(title = main_title, subtitle = sub_title, x = "", y = "") +
+    scale_color_manual( values = c( "Color_High" = "cornflowerblue", 
+                                    "Color_Med" = "purple",
+                                    "Color_Low" = "gray35" ),
+                        labels = rep("", 3), guide = "legend" ) + 
+    guides(color = guide_legend(override.aes = list(color = c("white","white","white"),
+                                                    linetype = c("solid","solid","solid")))) +
+    options_theme() +
+    theme( plot.title = element_text(vjust = -1),
+           plot.subtitle = element_text(vjust = -4) )
+}
+
+

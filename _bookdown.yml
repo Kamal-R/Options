@@ -3,7 +3,7 @@ delete_merged_file: false
 new_session: true
 
 rmd_files: ["index.Rmd", "01-options-intro.Rmd", "02-payoff-diagrams.Rmd", "03-combining-payoffs.Rmd",
-            "05-the-greeks.Rmd"]
+            "04-the-greeks-I.Rmd", "05-the-greeks-II.Rmd"]
 
 language:
   ui:
