@@ -315,13 +315,14 @@ temp <- call_theta_over_time( call_theta_high_vol = Call_Theta_XYZ_200_High_Vol,
                               main_title = "Buy 1 XYZ call at the $200 strike",
                               sub_title = "Compare Theta Decay Over Time.") 
 
-temp <- temp + scale_x_reverse() + 
+temp <- temp + scale_x_reverse() + xlab("Days to Expiry") + 
+        theme( axis.title.x = element_text(size = 12, colour = "grey50") ) +
         annotate( geom = "text", x = 435, y = 8.5, color = "gray35", hjust = 0,
-                  label = paste0("Volatility: 25"), size = 4 ) +
+                  label = paste0("Volatility: 12"), size = 4 ) +
         annotate( geom = "text", x = 450, y = 25, color = "purple", hjust = 0,
                   label = paste0("Volatility: 16"), size = 4 ) +
         annotate( geom = "text", x = 285, y = 29, color = "cornflowerblue", hjust = 0,
-                  label = paste0("Volatility: 12"), size = 4 ) +
+                  label = paste0("Volatility: 24"), size = 4 ) +
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
                     arrow = arrow(length = unit(0.03, "npc")), color = "gray35" ) +
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,

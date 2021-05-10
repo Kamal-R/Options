@@ -28,6 +28,7 @@ options_theme <- function() {
           axis.title.y = element_text(margin = unit(c(0, 4, 0, 0), "mm"), 
                                       angle = 90),
           axis.text.x = element_text(colour = "grey50"), 
+          axis.text.y = element_text(colour = "grey50"), 
           axis.ticks = element_blank() )
 }
 
