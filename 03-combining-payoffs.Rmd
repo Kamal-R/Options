@@ -46,12 +46,11 @@ remove_negative_zeros <- function(x) { (x[which(-1e-4 < x & x < 1e-4)] = 0); ret
 
 # Building Options Strategies
 
-We can do a lot more with options than just buying or selling one put or one call. Stocks, calls, and puts are our basic building blocks. We can buy and sell these building blocks in any combination to construct an investment with the payoff diagram that we want. There are a lot of option strategies and they all have their different names. You might think that you have to memorize everything about them to know how these strategies work, but they all come from combining these basic building blocks. Don't get me wrong -- it helps to know the names of these strategies, and I'll be using them in this book.
-But you don't *need* to know their names to understand the strengths and weaknesses of a strategy. The goal of this chapter is to give you the tools you need to construct options strategies on-the-fly that have the exact payoff diagram that you want. 
+We can do a lot more with options than just buying or selling one put or one call. Stocks, calls, and puts are the basic building blocks that we can combine to construct investments with any payoff structure we want. There are tons of options strategies, and they're all just combinations of these building blocks. You don't need to know their names to understand their strengths and weaknesses, and the goal of this chapter is to show you how to construct options strategies on-the-fly that have the payoff that you want. In the next few chapters, we'll be getting to the greeks, which will let us break down their risk exposures. For now, let's nail down how to construct their their payoff diagrams.
 
 ## Protective Put
 
-A protective put combines owning shares of a stock with buying puts on the same stock. The goal of this strategy is protect the stock position against large losses. 
+A protective put combines owning shares of a stock with buying puts on the same stock. The goal of this strategy is protect the stock position against large losses. The payoff diagram has two dotted lines 
 
 ```{r XYZ-Protective-Put, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Put_cost <- 16; Put_K <- 180
@@ -79,27 +78,45 @@ Protective_Put_Payoff_XYZ <- tibble( "Protective_Put_x" = seq(from = x_min, to =
 sl1 <- bracketsGrob(0.25, 0.30, 0.25, 0.50, lwd=2, col="red")
 sl2 <- bracketsGrob(0.725, 0.625, 0.725, 0.50, lwd=2, col="green3")
 
+annotate_arrow_1 <- data.frame(x1 = 150, x2 = 140, y1 = 35, y2 = 30)
+annotate_arrow_2 <- data.frame(x1 = 225, x2 = 235, y1 = 50, y2 = 45)
+
 temp <- protective_put_payoff(data_protective_put = Protective_Put_Payoff_XYZ,
                               data_stock = Stock_Payoff_XYZ, data_put = Put_Payoff_XYZ_180,
-                              main_title = "A Protective Put",
-                              sub_title = "Buy 100 XYZ shares at $200/share\nBuy 1 XYZ put for $16/share at the $180 strike.")
+                              main_title = "Protective Put",
+                              sub_title = "" )
+                              # sub_title = "Buy 100 shares at $200/share\nBuy 1 put for $16/share at the $180 strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
-     annotate( geom = "text", x = 125, y = -15, color = "red", hjust = 0,
-               label = paste0("Losses"), size = 5 ) +
-     annotate( geom = "text", x = 255, y = 10, color = "green3", hjust = 0,
-               label = paste0("Profits"), size = 5 ) +
+     # annotate( geom = "text", x = 125, y = -15, color = "red", hjust = 0,
+     #           label = paste0("Losses"), size = 5 ) +
+     # annotate( geom = "text", x = 255, y = 10, color = "green3", hjust = 0,
+     #           label = paste0("Profits"), size = 5 ) +
      annotate( geom = "text", x = Put_cost + Stock_cost - 15, 
                y = min(y_axis_labels)-20, color = "green3", hjust = 0,
                label = paste0("Breakeven: ", scales::dollar(Put_cost + Stock_cost)), size = 4 ) +
      annotate( geom = "text", x = Put_cost + Stock_cost - 15, 
                y = min(y_axis_labels)-20, color = "red", hjust = 0,
                label = "Breakev", size = 4 ) +
-     annotation_custom( sl1 ) + annotation_custom( sl2 )
+     # annotation_custom( sl1 ) + annotation_custom( sl2 ) + 
+     annotate( geom = "text", x = 152.5, y = 35, color = "gray50", hjust = 0, 
+               label = paste0("Put"), size = 4 ) +
+     annotate( geom = "text", x = 215, y = 59, color = "gray50", hjust = 0, 
+               label = paste0("Shares"), size = 4 ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     annotate( geom = "text", x = 175-16, y = 7.5, color = "gray50", hjust = 0,
+                  label = paste0("$164"), size = 3.5 ) +
+     annotate("point", x = 180-16, y = 0, colour = "gray50") + 
+     annotate( geom = "text", x = 195, y = 7.5, color = "gray50", hjust = 0,
+                  label = paste0("$200"), size = 3.5 ) +
+     annotate("point", x = 200, y = 0, colour = "gray50") 
 
 temp; rm(temp)
 ```
@@ -134,27 +151,45 @@ Covered_Call_Payoff_XYZ <- tibble( "Covered_Call_x" = seq(from = x_min, to = x_m
 sl1 <- bracketsGrob(0.25, 0.30, 0.25, 0.50, lwd=2, col="red")
 sl2 <- bracketsGrob(0.725, 0.655, 0.725, 0.50, lwd=2, col="green3")
 
+annotate_arrow_1 <- data.frame(x1 = 167.5, x2 = 155, y1 = 20, y2 = 15)
+annotate_arrow_2 <- data.frame(x1 = 222.5, x2 = 235, y1 = 51, y2 = 45)
+
 temp <- covered_call_payoff(data_covered_call = Covered_Call_Payoff_XYZ,
                             data_stock = Stock_Payoff_XYZ, data_call = Call_Payoff_XYZ_220,
-                            main_title = "A Covered Call",
-                            sub_title = "Buy 100 XYZ shares at $200/share\nSell 1 XYZ call for $8/share at the $220 strike.")
+                            main_title = "Covered Call",
+                            sub_title = "")
+                            # sub_title = "Buy 100 shares at $200/share\nSell 1 call for $8/share at the $220 strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
-     annotate( geom = "text", x = 125, y = -15, color = "red", hjust = 0,
-               label = paste0("Losses"), size = 5 ) +
-     annotate( geom = "text", x = 255, y = 10, color = "green3", hjust = 0,
-               label = paste0("Profits"), size = 5 ) +
+     # annotate( geom = "text", x = 125, y = -15, color = "red", hjust = 0,
+     #           label = paste0("Losses"), size = 5 ) +
+     # annotate( geom = "text", x = 255, y = 10, color = "green3", hjust = 0,
+     #           label = paste0("Profits"), size = 5 ) +
      annotate( geom = "text", x = Stock_cost - Call_cost - 15,
                y = min(y_axis_labels)-20, color = "green3", hjust = 0,
                label = paste0("Breakeven: ", scales::dollar(Stock_cost - Call_cost)), size = 4 ) +
      annotate( geom = "text", x = Stock_cost - Call_cost - 15,
                y = min(y_axis_labels)-20, color = "red", hjust = 0,
                label = "Breakev", size = 4 ) +
-     annotation_custom( sl1 ) + annotation_custom( sl2 )
+     # annotation_custom( sl1 ) + annotation_custom( sl2 ) + 
+     annotate( geom = "text", x = 169, y = 19, color = "gray50", hjust = 0, 
+               label = paste0("Call"), size = 4 ) +
+     annotate( geom = "text", x = 215, y = 59, color = "gray50", hjust = 0, 
+               label = paste0("Shares"), size = 4 ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     annotate( geom = "text", x = 228-4, y = -9, color = "gray50", hjust = 0,
+                  label = paste0("$164"), size = 3.5 ) +
+     annotate("point", x = 220+8, y = 0, colour = "gray50") + 
+     annotate( geom = "text", x = 196, y = -9, color = "gray50", hjust = 0,
+                  label = paste0("$200"), size = 3.5 ) +
+     annotate("point", x = 200, y = 0, colour = "gray50") 
 
 temp; rm(temp)
 ```
@@ -307,19 +342,39 @@ Straddle_Payoff_XYZ_right <- tibble( "Straddle_x" = seq(from = Breakeven_left, t
                                                            - Call_cost + (Straddle_x > Call_K)*(Straddle_x-Call_K) > 0, 
                                                            "Profit_right_straddle","Loss_right_straddle") )  
 
+annotate_arrow_1 <- data.frame(x1 = 180, x2 = 170, y1 = 25, y2 = 20)
+annotate_arrow_2 <- data.frame(x1 = 235, x2 = 245, y1 = 45, y2 = 40)
+
 temp <- straddle_payoff( data_straddle_left = Straddle_Payoff_XYZ_left,
                          data_straddle_center = Straddle_Payoff_XYZ_center,
                          data_straddle_right = Straddle_Payoff_XYZ_right,
                          data_call = Call_Payoff_XYZ, 
                          data_put = Put_Payoff_XYZ,
-                         main_title = "A Straddle",
-                         sub_title = "Buy 1 XYZ call for $10/share at the $200 strike.\nBuy 1 XYZ put for $15/share at the $200 strike.")
+                         main_title = "Straddle",
+                         sub_title = "" )
+                         # sub_title = "Buy 1 XYZ call for $10/share at the $200 strike.\nBuy 1 XYZ put for $15/share at the $200 strike.")
+
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
-temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
+     annotate( geom = "text", x = 182.5, y = 25, color = "gray50", hjust = 0, 
+               label = paste0("Put"), size = 4 ) +
+     annotate( geom = "text", x = 230, y = 49, color = "gray50", hjust = 0, 
+               label = paste0("Call"), size = 4 ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     annotate( geom = "text", x = 196, y = -19, color = "gray50", hjust = 0,
+               label = paste0("$200"), size = 3.5 ) +
+     annotate("point", x = 200, y = -15, colour = "gray50") + 
+     annotate( geom = "text", x = 194, y = -5, color = "gray50", hjust = 0,
+               label = paste0("$200"), size = 3.5 ) +
+     annotate("point", x = 200, y = -10, colour = "gray50") 
+
 temp; rm(temp)
 ```
 
@@ -372,11 +427,12 @@ temp <- straddle_payoff_dist_overlay( data_straddle_left = Straddle_Payoff_XYZ_l
                                       data_straddle_right = Straddle_Payoff_XYZ_right,
                                       data_distribution_overlay = Straddle_Payoff_Normal, 
                                       fill_rgb = col2rgb("cornflowerblue"),
-                                      main_title = "A Straddle",
-                                      sub_title = "Buy 1 XYZ call for $10/share at the $200 strike.\nBuy 1 XYZ put for $15/share at the $200 strike.",
+                                      main_title = "Straddle",
+                                      sub_title = "One trader's view of probable future market prices.",
                                       curve_text = "We capture \nthe trader's view \nof the unknown \nfuture price with \ncurves like this one.",
                                       curve_text_x = 200, 
                                       curve_text_y = 30 )
+
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -434,8 +490,8 @@ temp <- straddle_payoff_dist_overlay( data_straddle_left = Straddle_Payoff_XYZ_l
                                       data_straddle_right = Straddle_Payoff_XYZ_right,
                                       data_distribution_overlay = Straddle_Payoff_Lognormal, 
                                       fill_rgb = col2rgb("cornflowerblue"),
-                                      main_title = "A Straddle",
-                                      sub_title = "Another trader's view of the price of \nXYZ's shares on the expiry date.",
+                                      main_title = "Straddle",
+                                      sub_title = "Another trader's view of probable future market prices.",
                                       curve_text = "He thinks the \nstock is much \nmore likely to \nbe over $200.",
                                       curve_text_x = 225, 
                                       curve_text_y = 30 )
@@ -498,8 +554,8 @@ temp <- straddle_payoff_dist_overlay( data_straddle_left = Straddle_Payoff_XYZ_l
                                       data_straddle_right = Straddle_Payoff_XYZ_right,
                                       data_distribution_overlay = Straddle_Payoff_Multimodal, 
                                       fill_rgb = col2rgb("cornflowerblue"),
-                                      main_title = "A Straddle",
-                                      sub_title = "A third trader's view of the price of \nXYZ's shares on the expiry date.",
+                                      main_title = "Straddle",
+                                      sub_title = "A third trader's view of probable future market prices.",
                                       curve_text = "She thinks \nit is likely more \nthan $200 or less \nthan $200.",
                                       curve_text_x = 220.5, 
                                       curve_text_y = 17 )
@@ -520,7 +576,7 @@ In the covered call, we bought 100 shares and sold 1 call. In the protective put
 Put_cost <- 16; Put_K <- 180
 Call_cost <- 8; Call_K <- 220
 Stock_cost <- 200
-x_min <- 120; x_max = 280
+x_min <- 120; x_max = 260
 
 
 Stock_Payoff_XYZ <- tibble( "Stock_x" = seq(from = x_min, to = x_max, by = 0.01),
@@ -543,32 +599,61 @@ Collar_Payoff_XYZ <- tibble( "Collar_x" = seq(from = x_min, to = x_max, by = 0.0
                             + ( -Put_cost - (Collar_x < Put_K) * (Collar_x - Put_K) ) + Collar_x - Stock_cost,
                             "Profitable" = ifelse( Collar_y > 0, "Profit_collar","Loss_collar") ) 
 
-fill_color_left <- data.frame(xstart = 120, xend = 200, col = "aliceblue")
-fill_color_right <- data.frame(xstart = 200, xend = 280, col = "aliceblue")
-
-
 sl1 <- bracketsGrob(0.25, 0.345, 0.25, 0.51, lwd=2, col="red")
 sl2 <- bracketsGrob(0.725, 0.565, 0.725, 0.49, lwd=2, col="green3")
 
+# fill_color_left <- data.frame(xstart = 120, xend = 200, col = "aliceblue")
+# fill_color_right <- data.frame(xstart = 200, xend = 280, col = "aliceblue")
+
+fill_color_right <- data.frame(xstart = 120, xend = 200, col = "white")
+fill_color_left <- data.frame(xstart = 200, xend = 260, col = "white")
+
+annotate_arrow_1 <- data.frame(x1 = 155, x2 = 145, y1 = 30, y2 = 25)
+annotate_arrow_2 <- data.frame(x1 = 130, x2 = 140, y1 = -5, y2 = 2.5)
+annotate_arrow_3 <- data.frame(x1 = 167.5, x2 = 160, y1 = -55, y2 = -47.5)
+
 temp <- collar_payoff_left(data_collar = Collar_Payoff_XYZ, data_stock = Stock_Payoff_XYZ,
                       data_call = Call_Payoff_XYZ_220, data_put = Put_Payoff_XYZ_180,
-                      main_title = "A Collar", 
-                      sub_title = "Buy 100 shares of XYZ at $200/share.\nSell 1 XYZ call for $8/share at the $220 strike.\nBuy 1 XYZ put for $16/share at the $180 strike.")
+                      main_title = "Collar", 
+                      sub_title = "")
+                      # sub_title = "Buy 100 shares of at $200/share.\nSell 1 call for $8/share at the $220 strike.\nBuy 1 put for $16/share at the $180 strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
-     annotate( geom = "text", x = 125, y = -11, color = "red", hjust = 0,
-               label = paste0("Losses"), size = 5 ) +
-     annotate( geom = "text", x = 255, y = 5, color = "green3", hjust = 0,
-               label = paste0("Profits"), size = 5 ) +
-     annotate( geom = "text", x = Call_K+Call_cost-35, y = min(y_axis_labels)-20, color = "green3", hjust = 0,
-               label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost-Put_cost)), size = 4 ) +
-     annotate( geom = "text", x = Call_K+Call_cost-35, y = min(y_axis_labels)-20, color = "red", hjust = 0,
-               label = "Breakev", size = 4 ) +
-     annotation_custom( sl1 ) + annotation_custom( sl2 )
+     # annotate( geom = "text", x = 125, y = -11, color = "red", hjust = 0,
+     #           label = paste0("Losses"), size = 5 ) +
+     # annotate( geom = "text", x = 255, y = 5, color = "green3", hjust = 0,
+     #           label = paste0("Profits"), size = 5 ) +
+     annotate( geom = "text", x = Call_K+Call_cost-35, y = min(y_axis_labels), color = "green3", hjust = 0,
+               label = paste0("Breakeven: ", scales::dollar(Stock_cost-Call_cost+Put_cost)), size = 4 ) +
+     annotate( geom = "text", x = Call_K+Call_cost-35, y = min(y_axis_labels), color = "red", hjust = 0,
+               label = "Breakev", size = 4 ) + 
+     # annotation_custom( sl1 ) + annotation_custom( sl2 )
+     annotate( geom = "text", x = 157.5, y = 30, color = "gray50", hjust = 0, 
+               label = paste0("Put"), size = 4 ) +
+     annotate( geom = "text", x = 160, y = -60, color = "gray50", hjust = 0, 
+               label = paste0("Shares"), size = 4 ) + 
+     annotate( geom = "text", x = 120, y = -7, color = "gray50", hjust = 0, 
+               label = paste0("Call"), size = 4 ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     annotate("point", x = 180-16, y = 0, colour = "gray50") + 
+     annotate( geom = "text", x = 180-16-4, y = -7.5, color = "gray50", hjust = 0,
+               label = paste0("$164"), size = 3.5 ) +
+     annotate("point", x = 208, y = 0, colour = "gray65") + 
+     annotate( geom = "text", x = 208-4, y = -7.5, color = "gray65", hjust = 0,
+               label = paste0("$208"), size = 3.5 ) +
+     annotate("point", x = 228, y = 0, colour = "gray65") + 
+     annotate( geom = "text", x = 228-5, y = -7.5, color = "gray65", hjust = 0,
+               label = paste0("$228"), size = 3.5 ) 
+     
 
 temp; rm(temp)
 ```
@@ -577,7 +662,7 @@ temp; rm(temp)
 Put_cost <- 16; Put_K <- 180
 Call_cost <- 8; Call_K <- 220
 Stock_cost <- 200
-x_min <- 120; x_max = 280
+x_min <- 120; x_max = 260
 
 
 Stock_Payoff_XYZ <- tibble( "Stock_x" = seq(from = x_min, to = x_max, by = 0.01),
@@ -600,9 +685,15 @@ Collar_Payoff_XYZ <- tibble( "Collar_x" = seq(from = x_min, to = x_max, by = 0.0
                             + ( -Put_cost - (Collar_x < Put_K) * (Collar_x - Put_K) ) + Collar_x - Stock_cost,
                             "Profitable" = ifelse( Collar_y > 0, "Profit_collar","Loss_collar") ) 
 
-fill_color_left <- data.frame(xstart = 120, xend = 200, col = "aliceblue")
-fill_color_right <- data.frame(xstart = 200, xend = 280, col = "aliceblue")
+# fill_color_left <- data.frame(xstart = 120, xend = 200, col = "aliceblue")
+# fill_color_right <- data.frame(xstart = 200, xend = 280, col = "aliceblue")
 
+fill_color_right <- data.frame(xstart = 120, xend = 200, col = "white")
+fill_color_left <- data.frame(xstart = 200, xend = 260, col = "white")
+
+annotate_arrow_1 <- data.frame(x1 = 215, x2 = 225, y1 = 40, y2 = 35)
+annotate_arrow_2 <- data.frame(x1 = 210, x2 = 220, y1 = -27.5, y2 = -20)
+annotate_arrow_3 <- data.frame(x1 = 247.5, x2 = 240, y1 = 0, y2 = -7.5)
 
 sl1 <- bracketsGrob(0.25, 0.345, 0.25, 0.51, lwd=2, col="red")
 sl2 <- bracketsGrob(0.725, 0.55, 0.725, 0.49, lwd=2, col="green3")
@@ -610,22 +701,45 @@ sl2 <- bracketsGrob(0.725, 0.55, 0.725, 0.49, lwd=2, col="green3")
 temp <- collar_payoff_right(data_collar = Collar_Payoff_XYZ, data_stock = Stock_Payoff_XYZ,
                       data_call = Call_Payoff_XYZ_220, data_put = Put_Payoff_XYZ_180,
                       main_title = "A Collar", 
-                      sub_title = "Buy 100 shares of XYZ at $200/share.\nSell 1 XYZ call for $8/share at the $220 strike.\nBuy 1 XYZ put for $16/share at the $180 strike.")
+                      sub_title = "")
+                      # sub_title = "Buy 100 shares at $200/share.\nSell 1 call for $8/share at the $220 strike.\nBuy 1 put for $16/share at the $180 strike.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
-     annotate( geom = "text", x = 125, y = -11, color = "red", hjust = 0,
-               label = paste0("Losses"), size = 5 ) +
-     annotate( geom = "text", x = 255, y = 5, color = "green3", hjust = 0,
-               label = paste0("Profits"), size = 5 ) +
+     # annotate( geom = "text", x = 125, y = -11, color = "red", hjust = 0,
+     #           label = paste0("Losses"), size = 5 ) +
+     # annotate( geom = "text", x = 255, y = 5, color = "green3", hjust = 0,
+     #           label = paste0("Profits"), size = 5 ) +
      annotate( geom = "text", x = Call_K+Call_cost-35, y = min(y_axis_labels)-20, color = "green3", hjust = 0,
-               label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost-Put_cost)), size = 4 ) +
+               label = paste0("Breakeven: ", scales::dollar(Stock_cost-Call_cost+Put_cost)), size = 4 ) +
      annotate( geom = "text", x = Call_K+Call_cost-35, y = min(y_axis_labels)-20, color = "red", hjust = 0,
-               label = "Breakev", size = 4 ) +
-     annotation_custom( sl1 ) + annotation_custom( sl2 )
+               label = "Breakev", size = 4 ) + 
+     # annotation_custom( sl1 ) + annotation_custom( sl2 )
+     annotate( geom = "text", x = 202.5, y = -27.5, color = "gray50", hjust = 0, 
+               label = paste0("Put"), size = 4 ) +
+     annotate( geom = "text", x = 205, y = 47.5, color = "gray50", hjust = 0, 
+               label = paste0("Shares"), size = 4 ) + 
+     annotate( geom = "text", x = 249, y = 0, color = "gray50", hjust = 0, 
+               label = paste0("Call"), size = 4 ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     annotate("point", x = 180-16, y = 0, colour = "gray65") + 
+     annotate( geom = "text", x = 180-16-4, y = -7.5, color = "gray65", hjust = 0,
+               label = paste0("$164"), size = 3.5 ) +
+     annotate("point", x = 208, y = 0, colour = "gray50") + 
+     annotate( geom = "text", x = 208-4, y = -7.5, color = "gray50", hjust = 0,
+               label = paste0("$208"), size = 3.5 ) +
+     annotate("point", x = 228, y = 0, colour = "gray50") + 
+     annotate( geom = "text", x = 228-5, y = -7.5, color = "gray50", hjust = 0,
+               label = paste0("$228"), size = 3.5 ) 
+     
 
 temp; rm(temp)
 ```

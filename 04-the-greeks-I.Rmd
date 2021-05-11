@@ -82,15 +82,15 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
-     annotate( geom = "text", x = 160, y = -12, color = "red", hjust = 0, 
-               label = paste0("Losses"), size = 5 ) + 
-     annotate( geom = "text", x = 231, y = 12, color = "green3", hjust = 0, 
-               label = paste0("Profits"), size = 5 ) + 
+     # annotate( geom = "text", x = 160, y = -12, color = "red", hjust = 0, 
+     #           label = paste0("Losses"), size = 5 ) + 
+     # annotate( geom = "text", x = 231, y = 12, color = "green3", hjust = 0, 
+     #           label = paste0("Profits"), size = 5 ) + 
      annotate( geom = "text", x = Stock_cost-7.5, y = min(y_axis_labels), color = "green3", hjust = 0,
                label = paste0("Breakeven: ", scales::dollar(Stock_cost)), size = 4 ) + 
      annotate( geom = "text", x = Stock_cost-7.5, y = min(y_axis_labels), color = "red", hjust = 0,
-               label = "Breakev", size = 4 ) +
-     annotation_custom( s1 ) + annotation_custom( s2 ) 
+               label = "Breakev", size = 4 ) 
+     # annotation_custom( s1 ) + annotation_custom( s2 ) 
 
 temp; rm(temp)
 ```
@@ -117,15 +117,15 @@ tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)
                       "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
-     annotate( geom = "text", x = 145, y = -7, color = "red", hjust = 0, 
-               label = paste0("Losses"), size = 5 ) + 
-     annotate( geom = "text", x = 270, y = 20.5, color = "green3", hjust = 0, 
-               label = paste0("Profits"), size = 5 ) + 
+     # annotate( geom = "text", x = 145, y = -7, color = "red", hjust = 0, 
+     #           label = paste0("Losses"), size = 5 ) + 
+     # annotate( geom = "text", x = 270, y = 20.5, color = "green3", hjust = 0, 
+     #           label = paste0("Profits"), size = 5 ) + 
      annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-20, color = "green3", hjust = 0,
                label = paste0("Breakeven: ", scales::dollar(Call_K+Call_cost)), size = 4 ) + 
      annotate( geom = "text", x = Call_K+Call_cost-14, y = min(y_axis_labels)-20, color = "red", hjust = 0,
-               label = "Breakev", size = 4 ) +
-     annotation_custom( c1 ) + annotation_custom( c2 ) 
+               label = "Breakev", size = 4 ) 
+     # annotation_custom( c1 ) + annotation_custom( c2 ) 
 
 temp; rm(temp)
 ```

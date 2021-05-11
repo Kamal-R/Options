@@ -353,8 +353,6 @@ covered_call_payoff <- function(data_covered_call, data_stock, data_call, main_t
 collar_payoff_left <- function(data_collar, data_stock, data_put,  
                                data_call, main_title, sub_title = "") { 
   ggplot() + 
-    geom_rect(data = fill_color_left, fill = "aliceblue", alpha = 0.7,
-              aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = 50)) +
     geom_line(data = data_collar, aes(Collar_x, Collar_y, color = Profitable), 
               linetype = "solid") + 
     geom_segment(data = data_collar, linetype = "solid",
@@ -401,6 +399,8 @@ collar_payoff_left <- function(data_collar, data_stock, data_put,
                      y = min(Put_y), yend = min(Put_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
                  show.legend = FALSE, col = "red", linetype = "dotted") + 
+    geom_rect(data = fill_color_left, fill = "white", alpha = 0.4,
+              aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = 55)) +
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
     scale_y_continuous(label = scales::dollar) +
     scale_x_continuous(label = scales::dollar) + 
@@ -423,8 +423,6 @@ collar_payoff_left <- function(data_collar, data_stock, data_put,
 collar_payoff_right <- function(data_collar, data_stock, data_put, 
                                 data_call, main_title, sub_title = "") { 
   ggplot() + 
-    geom_rect(data = fill_color_right, fill = "aliceblue", alpha = 0.7,
-              aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = 85)) +
     geom_line(data = data_collar, aes(Collar_x, Collar_y, color = Profitable), 
               linetype = "solid") + 
     geom_segment(data = data_collar, linetype = "solid",
@@ -471,6 +469,8 @@ collar_payoff_right <- function(data_collar, data_stock, data_put,
                      y = min(Put_y), yend = min(Put_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
                  show.legend = FALSE, col = "red", linetype = "dotted") + 
+    geom_rect(data = fill_color_right, fill = "white", alpha = 0.4,
+              aes(xmin = xstart, xmax = xend, ymin = -Inf, ymax = 55)) +
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
     scale_y_continuous(label = scales::dollar) +
     scale_x_continuous(label = scales::dollar) + 
@@ -704,7 +704,7 @@ call_gamma_before_expiry_payoff <- function( call_delta_before_expiry, call_delt
     #              arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"),
     #              show.legend = FALSE, col = "green3", linetype = "dotted") +
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
-    scale_y_continuous(label = scales::dollar, limits = c(-0.01,1.01)) +
+    scale_y_continuous(limits = c(-0.01,1.01)) +
     scale_x_continuous(label = scales::dollar) + 
     scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
                                    "Show_gamma_first" = "gray50", "Hide_gamma_first" = "white",
@@ -820,3 +820,29 @@ call_theta_over_time <- function( call_theta_high_vol, call_theta_medium_vol,
 }
 
 
+call_vega_before_expiry_payoff <- function( call_vega_before_expiry, main_title, sub_title = "") { 
+  ggplot() + 
+    geom_line(data = call_vega_before_expiry, aes(Vega_x, Call_vega_first, color = Vega_first), linetype = "solid", size = 2) +   
+    geom_line(data = call_vega_before_expiry, aes(Vega_x, Call_vega_third, color = Vega_third), linetype = "solid", size = 2) +   
+    geom_line(data = call_vega_before_expiry, aes(Vega_x, Call_vega_second, color = Vega_second), linetype = "solid", size = 2) +   
+    # geom_segment(data = call_vega_before_expiry,
+    #              aes(x = min(Vega_x), xend = min(Vega_x), y = min(Call_payoff), yend = min(Call_payoff)), 
+    #              arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
+    #              show.legend = FALSE, col = "red", linetype = "dotted") + 
+    # geom_segment(data = call_vega_before_expiry,
+    #              aes(x = max(Vega_x)-1, xend = max(Vega_x), y = max(Call_payoff)-1, yend = max(Call_payoff)), 
+    #              arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
+    #              show.legend = FALSE, col = "green3", linetype = "dotted") + 
+    geom_line(data = call_vega_before_expiry, aes(Vega_x, Call_payoff), color = "black", linetype = "solid") +   
+    labs(title = main_title, subtitle = sub_title, x = "", y = "") +
+    scale_y_continuous(label = scales::dollar) +
+    scale_color_manual(values = c( "Show_vega_first" = "gray50", "Hide_vega_first" = "white",
+                                   "Show_vega_second" = "gray50", "Hide_vega_second" = "white",
+                                   "Show_vega_third" = "gray50", "Hide_vega_third" = "white" ),
+                       labels = c("", "", "", "", ""), guide = "legend") + 
+    guides(color = guide_legend(override.aes = list(color = c("white","white"),
+                                                    linetype = c("solid","solid")))) + 
+    options_theme() + 
+    theme( plot.title = element_text(vjust = -1), 
+           plot.subtitle = element_text(vjust = -5) )
+}
