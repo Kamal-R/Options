@@ -319,6 +319,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
 
@@ -381,6 +382,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
 
@@ -442,6 +444,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
 
@@ -505,6 +508,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
                       "red", "green3" )
 
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
 

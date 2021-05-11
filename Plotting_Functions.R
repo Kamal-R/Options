@@ -704,7 +704,7 @@ call_gamma_before_expiry_payoff <- function( call_delta_before_expiry, call_delt
     #              arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"),
     #              show.legend = FALSE, col = "green3", linetype = "dotted") +
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
-    scale_y_continuous(label = scales::dollar) +
+    scale_y_continuous(label = scales::dollar, limits = c(-0.01,1.01)) +
     scale_x_continuous(label = scales::dollar) + 
     scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red",
                                    "Show_gamma_first" = "gray50", "Hide_gamma_first" = "white",
@@ -788,6 +788,7 @@ call_gamma_over_time <- function( call_gamma_on_expiry, call_gamma_3months_expir
     geom_line(data = call_gamma_12months_expiry, aes(Call_x, Delta_y, color = Profitable), linetype = "solid") + 
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
     scale_x_continuous(label = scales::dollar) + 
+    scale_y_continuous(limits = c(0,0.05)) + 
     scale_color_manual(values = c( "Profit_call" = "green3", "Loss_call" = "red"),
                        labels = c("", "", "", "", ""), guide = "legend") +
     guides(color = guide_legend(override.aes = list(color = c("white","white"),
@@ -805,6 +806,8 @@ call_theta_over_time <- function( call_theta_high_vol, call_theta_medium_vol,
     geom_line(data = call_theta_medium_vol, aes(Theta_x, Price_y), color = "purple", linetype = "solid") +   
     geom_line(data = call_theta_low_vol, aes(Theta_x, Price_y), color = "gray35", linetype = "solid") + 
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
+    scale_x_continuous(label = scales::dollar) + 
+    scale_y_continuous(label = scales::dollar) + 
     scale_color_manual( values = c( "Color_High" = "cornflowerblue", 
                                     "Color_Med" = "purple",
                                     "Color_Low" = "gray35" ),

@@ -186,11 +186,12 @@ temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_X
                                          data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
                                          main_title = "Buy 1 XYZ call at the $200 strike",
                                          sub_title = "Payoff 3 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
-temp <- temp + ylim(-20,60)
+
+temp <- temp + scale_y_continuous(label = scales::dollar, limits = c(-20,60))
+
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
-tick_color <- c( ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
-                         "red", "green3" ) )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0, "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
         annotate( geom = "text", x = 150, y = 7.5, color = "gray50", hjust = 0, 
@@ -265,12 +266,13 @@ temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_X
                                          data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
                                          main_title = "Buy 1 XYZ call at the $200 strike",
                                          sub_title = "Payoff 6 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
-temp <- temp + ylim(-20,60)
+
+temp <- temp + scale_y_continuous(label = scales::dollar, limits = c(-20,60)) 
+
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
-tick_color <- c( ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
-                         "red", "green3" ) )
-
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0, "red", "green3" )
+  
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
         annotate( geom = "text", x = 150, y = 7.5, color = "gray50", hjust = 0, 
                   label = paste0("Stock: $160\nDelta: 0.054"), size = 4 ) + 
@@ -345,11 +347,12 @@ temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_X
                                          data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
                                          main_title = "Buy 1 XYZ call at the $200 strike",
                                          sub_title = "Payoff 12 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
-temp <- temp + ylim(-20,60)
+
+temp <- temp + scale_y_continuous(label = scales::dollar, limits = c(-20,60)) 
+
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
-tick_color <- c( ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
-                         "red", "green3" ), "green3" )
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0, "red", "green3" )
 
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) + 
         annotate( geom = "text", x = 150, y = 12.5, color = "gray50", hjust = 0, 
@@ -526,11 +529,8 @@ temp <- call_gamma_before_expiry_payoff( call_delta_before_expiry = Call_Delta_X
                              call_delta_on_expiry = Call_Delta_XYZ_200_On_Expiry,
                              main_title = "Buy 1 XYZ call at the $200 strike",
                              sub_title = "Delta 3 months before expiry (solid line) vs. \nDelta at expiry (dotted line).")
-temp <- temp + ylim(-0.01,1.01)
-y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
-y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 
-temp <- temp + 
+temp <- temp + ylim(-0.01,1.01) + 
         annotate( geom = "text", x = 150, y = 0.25, color = "gray50", hjust = 0, 
                   label = paste0("Stock: $160\nGamma: 0.0008"), size = 4 ) + 
         annotate( geom = "text", x = 175, y = 0.75, color = "gray50", hjust = 0, 
@@ -614,9 +614,6 @@ temp <- call_gamma_before_expiry_payoff( call_delta_before_expiry = Call_Delta_X
                              call_delta_on_expiry = Call_Delta_XYZ_200_On_Expiry,
                              main_title = "Buy 1 XYZ call at the $200 strike",
                              sub_title = "Delta 12 months before expiry (solid line) vs. \nDelta at expiry (dotted line).")
-temp <- temp + ylim(-0.01,1.01)
-y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
-y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 
 temp <- temp + 
         annotate( geom = "text", x = 150, y = 0.375, color = "gray50", hjust = 0, 
@@ -712,9 +709,6 @@ temp <- call_gamma_over_time( call_gamma_on_expiry = Call_Gamma_XYZ_200_On_Expir
                               call_gamma_12months_expiry = Call_Gamma_XYZ_200_12months_Expiry,
                               main_title = "Buy 1 XYZ call at the $200 strike",
                               sub_title = "Compare Call Gamma Across Time.")
-temp <- temp + ylim(0,0.05)
-y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
-y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 
 temp <- temp + 
         annotate( geom = "text", x = 207.5, y = 0.0375, color = "gray50", hjust = 0, 
