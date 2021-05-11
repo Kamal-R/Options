@@ -54,7 +54,7 @@ remove_negative_zeros <- function(x) { (x[which(-1e-4 < x & x < 1e-4)] = 0); ret
 ```
 
 
-# Thinking in Greeks (Part II) {#Second-Greeks}
+# Thinking in Greeks II {#Second-Greeks}
 
 So far, we've covered *delta*, *gamma*, and *rho*. There are two major greeks left -- *vega* and *theta*. They're both related to volatility, so we're taking them on together in this chapter. 
 
@@ -305,24 +305,33 @@ Call_Theta_XYZ_200_Low_Vol <- tibble( "Theta_x" = Theta_x,
                                       "Theta_y" = Call_theta_low_vol,
                                       "Color_Low" = rep(TRUE, length(Theta_x)) )
 
-annotate_arrow_1 <- data.frame(x1 = 400, x2 = 400, y1 = 10, y2 = 14.5)
+annotate_arrow_1 <- data.frame(x1 = 420, x2 = 420, y1 = 10, y2 = 14.5)
 annotate_arrow_2 <- data.frame(x1 = 455, x2 = 460, y1 = 25, y2 = 21.5)
 annotate_arrow_3 <- data.frame(x1 = 250, x2 = 250, y1 = 27.5, y2 = 22.5)
 
-temp <- call_theta_over_time( call_theta_high_vol = Call_Theta_XYZ_200_High_Vol,
-                              call_theta_medium_vol = Call_Theta_XYZ_200_Medium_Vol,
-                              call_theta_low_vol = Call_Theta_XYZ_200_Low_Vol,
+temp <- call_theta_over_time( call_theta_high_vol = Call_Theta_XYZ_200_High_Vol, # 370
+                              call_theta_medium_vol = Call_Theta_XYZ_200_Medium_Vol, # 244
+                              call_theta_low_vol = Call_Theta_XYZ_200_Low_Vol, # 116
                               main_title = "Buy 1 XYZ call at the $200 strike",
-                              sub_title = "Compare Theta Decay Over Time.") 
+                              sub_title = "Compare Theta Decay At Different Levels of Volatility.") 
 
 temp <- temp + scale_x_reverse() + xlab("Days to Expiry") + 
         theme( axis.title.x = element_text(size = 12, colour = "grey50") ) +
-        annotate( geom = "text", x = 435, y = 8.5, color = "gray35", hjust = 0,
+        annotate( geom = "text", x = 455, y = 8.5, color = "gray35", hjust = 0,
                   label = paste0("Volatility: 12"), size = 4 ) +
+        annotate( geom = "text", x = 504-116, y = 16, color = "gray35", hjust = 0,
+                  label = paste0("$15, 388 Days"), size = 4 ) +
+        annotate("point", x = 504-116, y = 15, colour = "gray35", hjust = 0) + 
         annotate( geom = "text", x = 450, y = 25, color = "purple", hjust = 0,
                   label = paste0("Volatility: 16"), size = 4 ) +
+        annotate( geom = "text", x = 504-244, y = 16, color = "purple", hjust = 0,
+                  label = paste0("$15, 260 Days"), size = 4 ) +
+        annotate("point", x = 504-244, y = 15, colour = "purple", hjust = 0) + 
         annotate( geom = "text", x = 285, y = 29, color = "cornflowerblue", hjust = 0,
                   label = paste0("Volatility: 24"), size = 4 ) +
+        annotate( geom = "text", x = 504-370, y = 16, color = "cornflowerblue", hjust = 0,
+                  label = paste0("$15, 134 Days"), size = 4 ) +
+        annotate("point", x = 504-370, y = 15, colour = "cornflowerblue", hjust = 0) + 
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
                     arrow = arrow(length = unit(0.03, "npc")), color = "gray35" ) +
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,

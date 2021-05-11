@@ -265,7 +265,7 @@ Jumping back into the picture, the breakeven is \$195. That's because we bought 
 
 --> 
 
-## The Straddle
+## Straddle
 
 ```{r XYZ-Straddle, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15
@@ -508,7 +508,7 @@ tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)
 temp; rm(temp)
 ```
 
-## The Collar 
+## Collar 
 
 In the covered call, we bought 100 shares and sold 1 call. In the protective put, we bought 100 shares and bought 1 put. In the collar, we *combine* these two strategies: we buy 100 shares, buy 1 put, and sell 1 call. The idea here is that we want the protection offered by the put, but we want to offset the cost of the put so we sell a call too. 
 
