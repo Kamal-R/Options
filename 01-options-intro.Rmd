@@ -50,7 +50,7 @@ Call_Payoff_Treadmill <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
                                  "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) > 0, 
                                                        "Profit","Loss") )
 
-temp <- call_payoff(data = Call_Payoff_Treadmill, main_title = "Treadmill Cost In 6 Months.",
+temp <- call_payoff(data = Call_Payoff_Treadmill, main_title = "Treadmill Cost In 6 Months",
                     sub_title = "When Does the $25 Start Helping?.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))

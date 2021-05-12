@@ -73,7 +73,7 @@ s1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
 s2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
 
 ### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
-temp <- stock_payoff(Stock_Payoff_XYZ, main_title = "Buy XYZ's shares at $200.")
+temp <- stock_payoff(Stock_Payoff_XYZ, main_title = "Buy shares at $200")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
@@ -125,7 +125,7 @@ Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.0
 c1 <- bracketsGrob(0.25, 0.10, 0.25, 0.255, lwd=2, col="red")
 c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.255, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_XYZ_200, main_title = "Buy 1 XYZ call at the $200 strike.")
+temp <- call_payoff(data = Call_Payoff_XYZ_200, main_title = "Buy 1 call at the $200 strike")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -179,7 +179,7 @@ c2 <- bracketsGrob(0.80, 0.70, 0.80, 0.45, lwd=2, col="green3", lty = "solid")
 
 temp <- stock_and_call_payoff( data_stock = Stock_Payoff_XYZ, data_call = Call_Payoff_XYZ_200, 
                                main_title = "Buying Shares vs. Buying a Call",
-                               sub_title = "Buy 1 XYZ call at the $200 strike (solid line)\nBuy XYZ shares for $200/share (dashed line).") 
+                               sub_title = "Buy 1 call at the $200 strike (solid line) vs. \nBuy shares for $200/share (dashed line).") 
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -222,7 +222,7 @@ Put_Payoff_XYZ_180 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.01)
 p1 <- bracketsGrob(0.625, 0.225, 0.625, 0.125, lwd=2, col="red", lty = "solid")
 p2 <- bracketsGrob(0.25, 0.225, 0.25, 0.625, lwd=2, col="green3", lty = "solid")
 
-temp <- put_payoff(data = Put_Payoff_XYZ_180, main_title = "Buy 1 XYZ $180 strike put.")
+temp <- put_payoff(data = Put_Payoff_XYZ_180, main_title = "Buy 1 XYZ $180 strike put")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -270,7 +270,7 @@ p2 <- bracketsGrob(0.50, 0.58, 0.50, 0.525, lwd=2, col="red", lty = "solid")
 
 temp <- stock_and_put_payoff( data_stock = Stock_Payoff_XYZ, data_put = Put_Payoff_XYZ_180, 
                               main_title = "Buying Shares vs. Buying a Put",
-                              sub_title = "Buy 1 XYZ put at the $180 strike (solid line)\nBuy XYZ shares for $200/share (dashed line).") 
+                              sub_title = "Buy 1 put at the $180 strike (solid line) vs. \nBuy shares for $200/share (dashed line).") 
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -314,7 +314,7 @@ Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
 c1 <- bracketsGrob(0.30, 0.085, 0.30, 0.265, lwd=2, col="red")
 c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.28, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_Apple_205, main_title = "Buy 1 Apple $205 strike call.")
+temp <- call_payoff(data = Call_Payoff_Apple_205, main_title = "Buy 1 Apple $205 strike call")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -402,7 +402,7 @@ Put_Payoff_Apple_205 <- tibble( "Put_x" = seq(from = x_min, to = x_max, by = 0.0
 p1 <- bracketsGrob(0.25, 0.265, 0.25, 0.55, lwd=2, col="green3")
 p2 <- bracketsGrob(0.60, 0.265, 0.60, 0.05, lwd=2, col="red")
 
-temp <- put_payoff(data = Put_Payoff_Apple_205, main = "Buy 1 Apple $205 strike put.")
+temp <- put_payoff(data = Put_Payoff_Apple_205, main = "Buy 1 $205 strike put")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -559,7 +559,7 @@ Call_Payoff_Apple_205 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0
 c1 <- bracketsGrob(0.25, 0.10, 0.25, 0.36, lwd=2, col="red")
 c2 <- bracketsGrob(0.775, 0.72, 0.775, 0.36, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_Apple_205, main = "Buy 1 Apple $205 strike call.")
+temp <- call_payoff(data = Call_Payoff_Apple_205, main = "Buy 1 $205 strike call.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,

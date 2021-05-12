@@ -76,7 +76,7 @@ s1 <- bracketsGrob(0.25, 0.25, 0.25, 0.5, lwd=2, col="red")
 s2 <- bracketsGrob(0.75, 0.75, 0.75, 0.5, lwd=2, col="green3")
 
 ### Source: https://stackoverflow.com/questions/35633239/add-curly-braces-to-ggplot2-and-then-use-ggsave
-temp <- stock_payoff(Stock_Payoff_XYZ, main_title = "Buy XYZ's shares at $200.")
+temp <- stock_payoff(Stock_Payoff_XYZ, main_title = "Buy shares at $200")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( y_axis_labels < 0, "red", "green3" )
@@ -96,7 +96,7 @@ temp; rm(temp)
 ```
 *Delta* is how much we participate in a stock moving up or down. If we own the stock, we make `r currency(1)` for every `r currency(1)` the stock goes up, and we lose `r currency(1)` for every `r currency(1)` the stock goes down. We call a stock a *delta one* asset as a shorthand way of describing this dollar-for-dollar relationship. 
 
-We've also seen payoff diagrams for options on their expiry dates, and spent lots of time talking about how they participate dollar-for-dollar in the performance of the stock once they're above their strike price. As a quick refresher, we looked at the call option below. Below it's strike price of \$200, the call expires worthless. It doesn't go up or down in price -- it has a delta of zero. Above it's strike price, it participates dollar-for-dollar in the stock's price movements -- it has a delta of one. 
+We've spent lots of time talking about how options participate dollar-for-dollar in the performance of their stock once they're above their strike price, on their expiry day. As a quick refresher, we looked at this call option. Below it's strike price of \$200, the call expires worthless. It doesn't go up or down in price -- it has a delta of zero. Above it's strike price, it participates dollar-for-dollar in the stock's price movements -- it has a delta of one. 
 
 ```{r Call-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Call_cost <- 15; Call_K <- 200
@@ -110,7 +110,7 @@ Call_Payoff_XYZ_200 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.0
 c1 <- bracketsGrob(0.25, 0.10, 0.25, 0.255, lwd=2, col="red")
 c2 <- bracketsGrob(0.80, 0.69, 0.80, 0.255, lwd=2, col="green3")
 
-temp <- call_payoff(data = Call_Payoff_XYZ_200, main_title = "Buy 1 XYZ call at the $200 strike.")
+temp <- call_payoff(data = Call_Payoff_XYZ_200, main_title = "Buy 1 call at the $200 strike")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
@@ -132,9 +132,9 @@ temp; rm(temp)
 
 Try not to confuse the strike price of `r currency(200)` with the breakeven of `r currency(215)`. For a call, the strike price is the price you have the option of buying the shares at. These calls cost `r currency(15)`, so we have to make `r currency(15)` back to get to breakeven before the call becomes profitable. But we start going up dollar-for-dollar at `r currency (200)` to make that `r currency (15)` back at `r currency (215)`. 
 
-We've seen stocks, which are delta one. And we've seen calls on their expiry date, which have a delta of zero below their strike price and a delta of one above their strike price. What about the payoffs of calls (and puts) before their expiry date? It depends on how far away from expiry the call is. We'll explore this by looking at the payoff diagram of the `r currency(200)` strike call 3, 6, and 12 months before it's expiry date. 
+We've seen stocks, which are delta one. And we've seen calls on their expiry date, which have a delta of zero below their strike price and a delta of one above their strike price. What about the payoffs of calls (and puts) before their expiry date? It depends on how far they are from expiring. We'll explore this by looking at the payoff diagram of the `r currency(200)` strike call 3, 6, and 12 months before it's expiry date. 
 
-Before we get into it, a quick note -- the cost of a call varies depending on how far away from expiry it is. The intuition is that the closer the `r currency(200)` strike call gets to expiring, the less time the stock has to go up. So it loses (time) value every day. We'll get into the details of how that works when we talk about two other greeks, *theta* and *vega*. For now, I'll say we bought the call for `r currency(15)` like before, and that we hold it until it is 3, 6, or 12 months from expiry. 
+Before we get into it, a quick note -- the cost of a call varies depending on how far away from expiry it is. The intuition is that the closer the `r currency(200)` strike call gets to expiring, the less time the stock has to go up. So it loses (time) value every day. We'll get into the details of how that works when we talk about *theta* and *vega* in the next chapter. For now, suppose we bought the call for `r currency(15)`, and that we hold it until it is 3, 6, or 12 months from expiry. 
 
 ```{r XYZ-Delta-3-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
 Call_K <- 200
@@ -184,7 +184,7 @@ annotate_arrow_3 <- data.frame(x1 = 240-2.5, x2 = 240-2.5, y1 = 42.5, y2 = 32.5)
 
 temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_XYZ_200_3months, 
                                          data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
-                                         main_title = "Buy 1 XYZ call at the $200 strike",
+                                         main_title = "Buy 1 call at the $200 strike",
                                          sub_title = "Payoff 3 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
 
 temp <- temp + scale_y_continuous(label = scales::dollar, limits = c(-20,60))
@@ -214,7 +214,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 temp; rm(temp)
 ```
 
-For a call, *delta* increases as we move from left to right. It goes from being near 0 at `r currency(160)` to near 1 at `r currency(240)`. *Gamma* is the rate that *delta* (the slope of the payoff) is increasing. The curve is almost a flat line at \$80, which means that *delta* is near 0. It steepens dramatically between \$95 and \$105, which means that *gamma* increases most quickly near \$100. After \$115, the payoff is an almost straight line and cannot steepen much more, which means *delta* is approaching 1 and *gamma* is approaching 0. 
+Add.
 
 ```{r XYZ-Delta-6-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
 Call_K <- 200
@@ -264,7 +264,7 @@ annotate_arrow_3 <- data.frame(x1 = 240-2.5, x2 = 240-2.5, y1 = 42.5, y2 = 32.5)
 
 temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_XYZ_200_6months, 
                                          data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
-                                         main_title = "Buy 1 XYZ call at the $200 strike",
+                                         main_title = "Buy 1 call at the $200 strike",
                                          sub_title = "Payoff 6 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
 
 temp <- temp + scale_y_continuous(label = scales::dollar, limits = c(-20,60)) 
@@ -293,9 +293,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-
-
-Although I haven't gone through examples yet, you can build good understanding of how *delta* and *gamma* behave just by looking at payoff diagrams. This is an important skill that we'll build up when we look at more options strategies. 
+Add.
 
 ```{r XYZ-Delta-12-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
 Call_K <- 200
@@ -345,7 +343,7 @@ annotate_arrow_3 <- data.frame(x1 = 237.5, x2 = 237.5, y1 = 47.5, y2 = 35)
 
 temp <- call_delta_before_expiry_payoff( data_call_before_expiry = Call_Payoff_XYZ_200_12months, 
                                          data_call_on_expiry = Call_Payoff_XYZ_200_expiry,
-                                         main_title = "Buy 1 XYZ call at the $200 strike",
+                                         main_title = "Buy 1 call at the $200 strike",
                                          sub_title = "Payoff 12 months before expiry (solid line) vs. \nPayoff at expiry (dotted line).")
 
 temp <- temp + scale_y_continuous(label = scales::dollar, limits = c(-20,60)) 
@@ -374,8 +372,8 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-
-There's also a broader risk-reward story here. The payoff of XYZ's call goes up faster and faster as the stock goes up, so we make money faster and faster. The flip side of that is that the payoff goes down slower and slower as the stock falls, so we lose money slower and slower. *Delta* and *gamma* try to describe this effect with numbers, but most of us won't be using *delta* or *gamma* to aggressively risk-manage positions the way a hedge fund or an algorithm would. That's too complicated and time-consuming for most of us. 
+Add.
+<!-- There's also a broader risk-reward story here. The payoff goes up faster and faster as the stock goes up, so we make money faster and faster. The flip side of that is that the payoff goes down slower and slower as the stock falls, so we lose money slower and slower. *Delta* and *gamma* try to describe this effect with numbers, but most of us won't be using *delta* or *gamma* to aggressively risk-manage positions the way a hedge fund or an algorithm would. That's too complicated and time-consuming for most of us. -->
 
 ```{r XYZ-Delta-Over-Time-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
 Call_K <- 200
@@ -435,7 +433,7 @@ temp <- call_delta_over_time( call_delta_on_expiry = Call_Delta_XYZ_200_On_Expir
                               call_delta_3months_expiry = Call_Delta_XYZ_200_3months_Expiry,
                               # call_delta_6months_expiry = Call_Delta_XYZ_200_6months_Expiry,
                               call_delta_12months_expiry = Call_Delta_XYZ_200_12months_Expiry,
-                              main_title = "Buy 1 XYZ call at the $200 strike",
+                              main_title = "Buy 1 call at the $200 strike",
                               sub_title = "Compare Call Delta Across Time.")
 y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
 y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
@@ -443,7 +441,7 @@ y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
 temp <- temp + 
         annotate( geom = "text", x = 171, y = 0.80, color = "gray50", hjust = 0, 
                   label = paste0("On expiry"), size = 4 ) + 
-        annotate( geom = "text", x = 182.5, y = 0.10, color = "gray50", hjust = 0, 
+        annotate( geom = "text", x = 183, y = 0.10, color = "gray50", hjust = 0, 
                   label = paste0("3 months\nfrom expiry"), size = 4 ) +
         annotate( geom = "text", x = 232.5, y = 0.675, color = "gray50", hjust = 0, 
                   label = paste0("12 months\nfrom expiry"), size = 4 ) + 
@@ -461,9 +459,7 @@ temp <- temp +
 temp; rm(temp)
 ```
 
-But we might use our knowledge of *delta* and *gamma* to construct favorable trades, and to effectively risk-manage them. We're going to do just that after we go through the three remaining greeks. Once we've finished explaining the greeks, we'll exploit our new knowledge to understand the construction and risk management of two more complicated option strategies - the straddle and the put spread. 
-
-Before we move on to *vega*, I want to emphasis that this call's payoff diagram (before expiry) is still *asymmetric*. It's not the all-or-nothing setup we saw in the first two chapters, and we don't quite get dollar-for-dollar participation to the upside. It took an almost \$15 move to the upside in XYZ's stock to get close to that. But there's still asymmetry: we make more and more money as the stock goes up, and lose less and less money as the stock goes down. In one way or another, all options strategies boil down to trying to exploit that asymmetry. 
+We're going to use our knowledge of *delta* and *gamma* to construct favorable trades, and to effectively risk-manage them once we go over the three remaining greeks. Before we move on to *vega*, I want to emphasis that this call's payoff diagram (before expiry) is still *asymmetric*. It's not the all-or-nothing setup we saw in the first two chapters, and we don't quite get dollar-for-dollar participation to the upside. It took an almost \$15 move to the upside in XYZ's stock to get close to that. But there's still asymmetry: we make more and more money as the stock goes up, and lose less and less money as the stock goes down. In one way or another, all options strategies boil down to trying to exploit that asymmetry. 
 
 
 ## Gamma
@@ -527,7 +523,7 @@ annotate_arrow_3 <- data.frame(x1 = 240, x2 = 240, y1 = 0.85, y2 = 0.95)
 
 temp <- call_gamma_before_expiry_payoff( call_delta_before_expiry = Call_Delta_XYZ_200_3months_Expiry,
                              call_delta_on_expiry = Call_Delta_XYZ_200_On_Expiry,
-                             main_title = "Buy 1 XYZ call at the $200 strike",
+                             main_title = "Buy 1 call at the $200 strike",
                              sub_title = "Delta 3 months before expiry (solid line) vs. \nDelta at expiry (dotted line).")
 
 temp <- temp + ylim(-0.01,1.01) + 
@@ -612,7 +608,7 @@ annotate_arrow_3 <- data.frame(x1 = 241, x2 = 241, y1 = 0.75, y2 = 0.875)
 
 temp <- call_gamma_before_expiry_payoff( call_delta_before_expiry = Call_Delta_XYZ_200_12months_Expiry,
                              call_delta_on_expiry = Call_Delta_XYZ_200_On_Expiry,
-                             main_title = "Buy 1 XYZ call at the $200 strike",
+                             main_title = "Buy 1 call at the $200 strike",
                              sub_title = "Delta 12 months before expiry (solid line) vs. \nDelta at expiry (dotted line).")
 
 temp <- temp + 
@@ -707,7 +703,7 @@ annotate_arrow_3 <-   data.frame(x1 = 147, x2 = 147, y1 = 0.015, y2 = 0.006)
 temp <- call_gamma_over_time( call_gamma_on_expiry = Call_Gamma_XYZ_200_On_Expiry, 
                               call_gamma_3months_expiry = Call_Gamma_XYZ_200_3months_Expiry,
                               call_gamma_12months_expiry = Call_Gamma_XYZ_200_12months_Expiry,
-                              main_title = "Buy 1 XYZ call at the $200 strike",
+                              main_title = "Buy 1 call at the $200 strike",
                               sub_title = "Compare Call Gamma Across Time.")
 
 temp <- temp + 

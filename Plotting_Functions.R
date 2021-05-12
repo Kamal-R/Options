@@ -40,12 +40,12 @@ stock_payoff <- function(data, main_title, sub_title = "") {
                  aes(x = min(stock_price_x)+1, xend = min(stock_price_x), 
                      y = min(stock_profit_y)+1, yend = min(stock_profit_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open", angle = 30), 
-                 show.legend = FALSE, col = "red") + 
+                 show.legend = FALSE, col = "red", linetype = "solid") + 
     geom_segment(data = data,
                  aes(x = max(stock_price_x)-1, xend = max(stock_price_x), 
                      y = max(stock_profit_y)-1, yend = max(stock_profit_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-                 show.legend = FALSE, col = "green3") + 
+                 show.legend = FALSE, col = "green3", linetype = "solid") + 
     scale_y_continuous(label = scales::dollar) +
     scale_x_continuous(label = scales::dollar) + 
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
@@ -67,12 +67,12 @@ call_payoff <- function(data, main_title, sub_title = "") {
                  aes(x = min(Call_x), xend = min(Call_x), 
                      y = min(Call_y), yend = min(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+                 show.legend = FALSE, col = "red", linetype = "solid") + 
     geom_segment(data = data,
                  aes(x = max(Call_x)-1, xend = max(Call_x), 
                      y = max(Call_y)-1, yend = max(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-                 show.legend = FALSE, col = "green3", linetype = "dotted") + 
+                 show.legend = FALSE, col = "green3", linetype = "solid") + 
     scale_y_continuous(label = scales::dollar) +
     scale_x_continuous(label = scales::dollar) + 
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
@@ -106,11 +106,11 @@ stock_and_call_payoff <- function(data_stock, data_call, main_title, sub_title =
     geom_segment(data = data_call,
                  aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+                 show.legend = FALSE, col = "red", linetype = "solid") + 
     geom_segment(data = data_call,
                  aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_y)-1, yend = max(Call_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-                 show.legend = FALSE, col = "green3", linetype = "dotted") + 
+                 show.legend = FALSE, col = "green3", linetype = "solid") + 
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
     scale_y_continuous(label = scales::dollar) +
     scale_x_continuous(label = scales::dollar) + 
@@ -170,11 +170,11 @@ stock_and_put_payoff <- function(data_stock, data_put, main_title, sub_title = "
     geom_segment(data = data_put,
                  aes(x = min(Put_x), xend = min(Put_x)-1, y = max(Put_y), yend = max(Put_y)+1), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-                 show.legend = FALSE, col = "green3", linetype = "dotted") + 
+                 show.legend = FALSE, col = "green3", linetype = "solid") + 
     geom_segment(data = data_put,
                  aes(x = max(Put_x), xend = max(Put_x), y = min(Put_y), yend = min(Put_y)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 210, type = "open"), 
-                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+                 show.legend = FALSE, col = "red", linetype = "solid") + 
     labs(title = main_title, subtitle = sub_title, x = "", y = "") +
     scale_y_continuous(label = scales::dollar) +
     scale_x_continuous(label = scales::dollar) + 
@@ -629,11 +629,11 @@ call_delta_before_expiry_payoff <- function( data_call_before_expiry, data_call_
     geom_segment(data = data_call_before_expiry,
                  aes(x = min(Call_x), xend = min(Call_x), y = min(Call_payoff), yend = min(Call_payoff)), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+                 show.legend = FALSE, col = "red", linetype = "solid") + 
     geom_segment(data = data_call_before_expiry,
                  aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_payoff)-1, yend = max(Call_payoff)), 
                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"), 
-                 show.legend = FALSE, col = "green3", linetype = "dotted") + 
+                 show.legend = FALSE, col = "green3", linetype = "solid") + 
     geom_line(data = data_call_on_expiry, aes(Call_x, Call_y, color = Profitable), linetype = "dotdash") +
     geom_segment(data = data_call_on_expiry,
                  aes(x = min(Call_x), xend = min(Call_x), y = min(Call_y), yend = min(Call_y)), 
@@ -689,11 +689,11 @@ call_gamma_before_expiry_payoff <- function( call_delta_before_expiry, call_delt
     geom_segment(data = call_delta_before_expiry,
                  aes(x = min(Call_x), xend = min(Call_x), y = min(Call_delta), yend = min(Call_delta)), 
                  arrow = arrow(length = unit(0.50, "cm"), type = "open"), 
-                 show.legend = FALSE, col = "red", linetype = "dotted") + 
+                 show.legend = FALSE, col = "red", linetype = "solid") + 
     geom_segment(data = call_delta_before_expiry,
                  aes(x = max(Call_x)-1, xend = max(Call_x), y = max(Call_delta), yend = max(Call_delta)),
                  arrow = arrow(length = unit(0.50, "cm"), angle = 30, type = "open"),
-                 show.legend = FALSE, col = "green3", linetype = "dotted") +
+                 show.legend = FALSE, col = "green3", linetype = "solid") +
     geom_line(data = call_delta_on_expiry, aes(Call_x, Call_delta, color = Profitable), linetype = "dotdash") +
     geom_segment(data = call_delta_on_expiry,
                  aes(x = min(Call_x), xend = min(Call_x), y = min(Call_delta), yend = min(Call_delta)),
