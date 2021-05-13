@@ -411,7 +411,8 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
                   label = paste0("$15"), size = 4 ) +
         annotate("point", x = 504-370, y = 15, colour = "cornflowerblue") + 
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
-                    arrow = arrow(length = unit(0.03, "npc")), color = "gray35" ) +
+                    arrow = arrow(length = unit(0.03, "npc")), color = "gray35",
+                    curvature = -0.5 ) +
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
                     arrow = arrow(length = unit(0.03, "npc")), color = "purple" ) +
         geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,

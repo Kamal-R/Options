@@ -120,7 +120,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-Let's look at the \$180 strike put first. It goes up dollar-for-dollar as the stock falls below \$180. The stock (always) goes up dollar-for-dollar, so below \$180 the put and stock cancel each other. The protective put captures this, as it is flat below \$180. Above \$180, the put's payoff does not change while the stock goes up dollar-for-dollar. The protective put goes up dollar-for-dollar above \$180, but is parallel to the stock because the put cost \$16. This makes the payoff of the protective payoff \$16 less than the stock (which is also reflected in its higher breakeven of \$216 = \$200 + \$16, which has to recover this \$16 before becoming profitable).
+Let's look at the \$180 strike put first. It goes up dollar-for-dollar as the stock falls below \$180. The stock (always) goes up dollar-for-dollar, so below \$180 the put and stock cancel each other out. The protective put captures this, as it is flat below \$180. Above \$180, the put's payoff does not change while the stock goes up dollar-for-dollar. The protective put goes up dollar-for-dollar above \$180, but is parallel to the stock because the put cost \$16/share. This makes the payoff of the protective payoff \$16 less than the stock. This is also reflected in its higher breakeven of \$216 = \$200 + \$16.
 
 The takeaway is that we can use a put to "cancel out" losses from buying shares that are below the strike price of the put (on the expiry date of the put). Also, breaking up the payoff diagram based on the behavior of the options we're considering is a fundamental strategy that we'll be repeating every time we encounter a new options strategy. It will be more familiar over time, and let you construct trades with your desired payoff structure relatively easily. 
 
@@ -134,6 +134,8 @@ Here's something to think about: which of these two scenarios is the protective 
 ## Covered Call
 
 A covered call combines owning shares of a stock with selling calls on the same stock. The goal of this strategy is *yield enhancement*: repeatedly selling calls against a stock we already own gives us extra cash every month. This payoff diagram has two dotted lines -- buying shares at \$200 and selling a call at \$8/share. The solid line, the covered call, combines the two dotted lines.
+
+Since we'll be buying and selling options in these strategies, we need an easy way to refer to if we bought or sold them. We say we're long if we buy something, and short if we sell something. When we buy a call, we say we're long a call or have a long call. When we buy a put, we say we're long a put or have a long put. But remember, puts make money when their stock goes down. So saying we're long a put doesn't mean we make money when the stock goes up. It means we bought the put. 
 
 ```{r XYZ-Covered-Call, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 8; Call_K <- 220
@@ -203,11 +205,95 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-Since we'll be buying and selling options, depending on the strategy we consider, we need an easy way to refer to if we bought or sold it. We say we're long if we buy something, and say we're short if we sold something. When we buy a call, we might say we're long a call or have a long call. When we buy a put, we might say we're long a put or have a long put. But remember, puts make money when their stock goes down. So saying we're long a put doesn't mean we make money when the stock goes up. It means we bought the put. 
+Just like last time, we'll break up the payoff diagram into two sections: above and below the strike price of the option. We sold the call, so we have a short call at a \$220 strike. Before \$220, we make \$8/share from selling the call. That makes the covered call, which combines owning shares at \$200 with selling this call, \$8/share more profitable than just owning shares. The payoff diagram shows the covered call shifted upwards, compared to just owning the shares. After \$220, the call loses a dollar-for-dollar what the shares make, and so the covered call flattens out. We bought the shares at \$200 and sold the call at the \$220 strike, so we make \$20/share from owning the shares before the short call kicks in. We still make \$8/share for selling the call, for a maximum gain of \$28/share. The cost of collecting \$8/share in income is that we sold away all potential gains from owning the shares above \$220. 
 
-Just like last time, we'll break up the payoff diagram into two sections: above and below the strike price of the option. We sold the call at the \$220 strike, so we have a short call position with a \$220 strike. Before \$220, we make the \$8 we get from selling the call. That makes the covered call, which combines owning shares at \$200 with selling the call, \$8 more profitable than just owning the shares. The diagram shows the covered call shifted upwards, compared to owning the shares. 
+If we open a covered call, we probably don't want to sell the shares and keep the call. The risk is that the stock goes through the roof, to say \$250. The person who owns the \$220 strike call will exercise it. Since we sold the call, we're obligated to deliver the shares to them. If we don't own the shares, we have to buy at \$250, and sell at \$220 to fulfill our commitment. We'll lose \$30/share, and if the stock goes higher than \$250 we'll lose even more. To avoid the potential for those kinds of large losses, we have to view the shares and short call as a package deal -- if we own one, we own the other. 
 
-We're also long the shares, After \$220, the call loses a dollar for dollar what the shares make, and the covered call captures this by flattening out. It's still profitable by the \$8 we received for selling the call, but 
+If the stock falls below \$192, the covered call loses money, but it loses less than than just owning shares. Your perspective on if this is a good outcome might depend on why you entered the trade. If you view the stock as a long-term holding, you'll likely hold through a decline, so the \$8/share of income you collect is a bonus. While you're not happy the stock is below \$192, you're probably happy the call let you recoup \$8/share of those losses. You might even consider selling another call to help recoup more of your losses. If you view the covered call as a tactical position and it loses money, you're faced with the decision of taking the loss or selling another covered call to try and recoup your losses. In this case, you probably wish you sold the covered call when the shares were above \$192.
+
+What are the favorable outcomes for a covered call? For me, the answer comes by comparing it to just owning shares. The covered call is worse above \$228, and better below \$228. But even it loses money below \$192, which we'd like to avoid. The sweet spot for the covered call is between \$192 and \$228, where it's both profitable and more profitable than just owning shares. Most people who write covered calls use it as a *yield enhancement* strategy, where they sell calls to produce income. If the stock stays between \$192 and \$220, the call expires worthless and we keep \$8/share in income from selling the calls. Once the call expires, we can sell another call against our shares, and collect more income. 
+
+```{r XYZ-Covered-Call-Scenario, fig.align = "center", out.width = out_width_plot, message = FALSE}
+Call_cost <- 8; Call_K <- 220
+Stock_cost <- 200
+x_min <- 120; x_max = 280
+
+Stock_Payoff_XYZ <- tibble( "stock_price_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "stock_profit_y" = -Stock_cost + seq(from = x_min, to = x_max, by = 0.01),
+                            "Profitable" = ifelse(-Stock_cost + seq(from = x_min, to = x_max, by = 0.01) > 0, 
+                                                  "Profit_stock","Loss_stock") )
+
+Call_Payoff_XYZ_220 <- tibble( "Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                               "Call_y" = -( -Call_cost + (Call_x > Call_K)*(Call_x-Call_K) ),
+                               "Profitable" = ifelse(-Call_cost + (Call_x > Call_K)*(Call_x-Call_K) <= 0,
+                                                    "Profit_call", "Loss_call") )
+
+Covered_Call_Payoff_XYZ <- tibble( "Covered_Call_x" = seq(from = x_min, to = x_max, by = 0.01),
+                            "Covered_Call_y" = -(-Call_cost + (Covered_Call_x > Call_K)*(Covered_Call_x-Call_K)) + 
+                                                  seq(from = x_min, to = x_max, by = 0.01) - Stock_cost,
+                            "Profitable" = ifelse( -( -Call_cost + (Covered_Call_x > Call_K)*(Covered_Call_x-Call_K) ) + 
+                                                  seq(from = x_min, to = x_max, by = 0.01) - Stock_cost > 0, 
+                                                  "Profit_covered_call","Loss_covered_call") )
+
+
+sl1 <- bracketsGrob(0.25, 0.30, 0.25, 0.50, lwd=2, col="red")
+sl2 <- bracketsGrob(0.725, 0.655, 0.725, 0.50, lwd=2, col="green3")
+
+annotate_arrow_1 <- data.frame(x1 = 167.5, x2 = 155, y1 = 20, y2 = 15)
+annotate_arrow_2 <- data.frame(x1 = 222.5, x2 = 235, y1 = 51, y2 = 45)
+annotate_arrow_3 <- data.frame(x1 = 207.5, x2 = 220, y1 = 37.5, y2 = 35)
+
+temp <- covered_call_payoff(data_covered_call = Covered_Call_Payoff_XYZ,
+                            data_stock = Stock_Payoff_XYZ, data_call = Call_Payoff_XYZ_220,
+                            main_title = "Covered Call",
+                            sub_title = "")
+                            # sub_title = "Buy 100 shares at $200/share\nSell 1 call for $8/share at the $220 strike.")
+y_axis_labels <- na.omit( ggplot_build(temp)$layout$panel_params[[1]]$y$get_labels() )
+y_axis_labels <- as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)))
+tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels))) < 0,
+                      "red", "green3" )
+
+temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
+     # annotate( geom = "text", x = 125, y = -15, color = "red", hjust = 0,
+     #           label = paste0("Losses"), size = 5 ) +
+     # annotate( geom = "text", x = 255, y = 10, color = "green3", hjust = 0,
+     #           label = paste0("Profits"), size = 5 ) +
+     annotate( geom = "text", x = Stock_cost - Call_cost - 15,
+               y = min(y_axis_labels)-20, color = "green3", hjust = 0,
+               label = paste0("Breakeven: ", scales::dollar(Stock_cost - Call_cost)), size = 4 ) +
+     annotate( geom = "text", x = Stock_cost - Call_cost - 15,
+               y = min(y_axis_labels)-20, color = "red", hjust = 0,
+               label = "Breakev", size = 4 ) +
+     # annotation_custom( sl1 ) + annotation_custom( sl2 ) + 
+     annotate( geom = "text", x = 169, y = 19, color = "gray50", hjust = 0, 
+               label = paste0("Call"), size = 4 ) +
+     annotate( geom = "text", x = 215, y = 59, color = "gray50", hjust = 0, 
+               label = paste0("Shares"), size = 4 ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_1,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_2,
+                 arrow = arrow(length = unit(0.03, "npc")), color = "gray50" ) + 
+     annotate( geom = "text", x = 228-4, y = -9, color = "gray50", hjust = 0,
+                  label = paste0("$228"), size = 3.5 ) +
+     annotate("point", x = 220+8, y = 0, colour = "gray50") + 
+     annotate( geom = "text", x = 196, y = -9, color = "gray50", hjust = 0,
+                  label = paste0("$200"), size = 3.5 ) +
+     annotate("point", x = 200, y = 0, colour = "gray50") + 
+     annotate( "path", color = "cornflowerblue",
+               x = 224 + 4 * cos( seq(0,2*pi,length.out=100) ),
+               y = 28 + 4 * sin( seq(0,2*pi,length.out=100) ) ) + 
+    geom_curve( aes(x = x1, y = y1, xend = x2, yend = y2), data = annotate_arrow_3,
+                arrow = arrow(length = unit(0.03, "npc")), color = "cornflowerblue",
+                curvature = -0.5 ) + 
+     annotate( geom = "text", x = 169.5, y = 37.5, color = "cornflowerblue", hjust = 0,
+               label = paste0("One more scenario"), size = 3.75 )
+
+temp; rm(temp)
+```
+
+There's one more scenario -- the shares are between \$220 and \$228 on the expiry date. The call has a strike price of \$220, so it will get exercised and we're obligated to deliver our shares. The short call removed all upside from owning the shares above \$220, but we make \$20/share as they rise from \$200 to \$220 and \$8/share from selling the call. Since we bought the shares at \$200 and they're under \$228 when we have to deliver the shares, the covered call is still more profitable than owning shares. At this point, we have a decision to make -- we can buy back the shares for less than \$228 and possibly sell another call against them, or we can buy back the call we sold to book the profits and possibly sell another call against our shares.
+
+Just like with the protective put, the payoff diagram for the covered call doesn't tell me how likely these different scenarios are. I have to construct the trade based on my views about the future price of the stock, which is uncertain. Because the most favorable outcomes for this covered call happen between \$192 and \$220, it is a very different trade than just owning shares. When I just own shares, I just want the shares to go up. When I own a covered call, I want the shares to mostly stay where they are. Just like the protective put, the covered call changes your opinion of what the most favorable outcome of the trade is. This is the true power of options strategies -- being able to construct payoff diagrams where your trade is profitable under different outcomes than just the stock going up. The covered call also produces some income and helps protect against potential losses while owning shares, which are appealing in their own right.
 
 <!-- 
 ## Sythentic Long Stock
@@ -316,6 +402,8 @@ Jumping back into the picture, the breakeven is \$195. That's because we bought 
 
 ## Straddle
 
+The straddle combines two options positions -- a long call and a long put. Unlike the protective put and covered call, we don't own any shares in this position. The put makes money if the stock falls a lot, and the call makes money if the stock goes up a lot. The beauty of the straddle is that it is profitable regardless of the direction the stock moves. You don't have to get the direction right to make money. The downside is that the moves have to be large enough to pay back the cost of the long call and long put.
+
 ```{r XYZ-Straddle, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15
 Call_K <- 200; Put_K <- 200
@@ -391,6 +479,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
+Here, we can see a \$200 strike call that cost \$10/share and a \$200 strike put that cost \$15/share. To make money, the straddle has to move more than \$25 in either direction. That's below \$175 if it heads lower, and above \$225 if it heads higher. 
 
 ```{r XYZ-Straddle-Normal, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15

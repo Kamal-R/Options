@@ -32,7 +32,7 @@ options(kableExtra.html.bsTable = TRUE)
 options(kableExtra.auto_format = FALSE)
 
 out_width_plot <- "97.5%"
-out_width_table <- "97.5%"
+out_width_table <- "80%"
 grid::grid.locator(unit="npc") 
 
 plot_bg <- "#FFFFFF"
@@ -338,7 +338,7 @@ Here's a payoff diagram of the call option. Below `r currency(205)`, the buyer l
 
 This next table compares how much money a buyer can make with 100 shares of Apple at `r currency(205.44)` and 1 call on Apple shares at `r currency(6.84)` (with a strike price of `r currency(205)` that expires on September 20, 2019). The relative return column tell us how much the call owner participates in the upside (or downside) experienced by the shareholder. This last column is the most important - it will help us understand how to size our option investments. To give the dollar amounts some context, 100 shares of Apple at `r currency(205.44)` will cost `r currency(205.44)` x 100 = `r currency(100*205.44)` to buy, and one call that gives the buyer the option to buy 100 shares of Apple at `r currency(205)` on September 20, 2019 will cost `r currency(6.84)` x 100 = `r currency(100*6.84)`.
 
-```{r Apple-Call-Table, out.width = out_width_plot, fig.align = "center", message = FALSE}
+```{r Apple-Call-Table, out.width = out_width_table, fig.align = "center", message = FALSE}
 Apple_Current_Price <- 205.44
 Apple_Call_K <- 205
 Apple_Call_Cost <- 6.84
@@ -422,7 +422,7 @@ This put gives its buyer the option to sell shares of Apple at `r currency(205)`
 
 The put has the same, or potentially even better, characteristics as the call. It gives limited downside to the buyer of the put, as their maximum loss is limited to the price they paid for the put. It also provides dollar for dollar participation to the downside of the stock. This corresponds to the upside of the put. We'll use this ability to make money when prices are going down many times when discussing different ways to use options to construct investment portfolios.
 
-```{r Apple-Put-Table, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
+```{r Apple-Put-Table, out.width = out_width_table, fig.align = "center", message = FALSE, warning = FALSE}
 Apple_Current_Price <- 205.44
 Apple_Put_K <- 205
 Apple_Put_Cost <- 6.10
@@ -481,7 +481,7 @@ Apple_Future_Prices <- c(150, 200, 220, 245, 300)
 
 In the first example, we considered possible profits or losses when holding `r currency(205)` strike options to their expiry date of September 20, 2019. There is nothing special about `r currency(205)` or September 20, 2019. Many other strike prices and expiry dates are available. For the next example, we'll choose an expiry date of December 20, 2019 and consider the profit or loss for calls with strike prices of `r currency(145)`, `r currency(180)`, `r currency(205)`, and `r currency(230)`. On September 11, 2019, one share of Apple was trading at `r currency(222.76)` and its options prices are listed below.
 
-```{r Apple-Different-Strikes-Table, out.width = "30%", fig.align = "center", message = FALSE, warning = FALSE}
+```{r Apple-Different-Strikes-Table, out.width = paste0( toString( 100 * ( as.numeric(sub("%","",out_width_table))/100 ) / 3.5 ), "%" ), fig.align = "center", message = FALSE, warning = FALSE}
 Apple_Different_Strikes <- tibble( "Strike" = currency(Apple_Prices_K),
                                    "1 Call" = currency(Apple_Call_Costs),
                                    "1 Put" = currency(Apple_Put_Costs) ) 
@@ -504,7 +504,7 @@ To keep the discussion simple, we’ll continue to focus on the price of the opt
 4. Increase a little to `r currency(245)`.
 5. Increase a lot to `r currency(300)`.
 
-```{r Apple-Different-Strikes-Call-Payoff-Table, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
+```{r Apple-Different-Strikes-Call-Payoff-Table, out.width = out_width_table, fig.align = "center", message = FALSE, warning = FALSE}
 Apple_Different_Strikes_Call_Payoff <- tibble( "Stock Price" = scales::dollar(Apple_Future_Prices),
       "100 Shares" = scales::dollar(100 * (Apple_Future_Prices - Apple_Current_Price),
                                     negative_parens = TRUE), 
@@ -595,7 +595,7 @@ To summarize, here are the main ideas that we want to be thinking about when we'
 
 This is the picture we get is we look at the table column-by-column. If we switch to looking at the table row-by-row, we can see how much of the gains or losses each call participated in, relative to someone who owns the shares. To make this easier, we'll look at a table of relative returns. 
 
-```{r Apple-Different-Strikes-Call-Relative-Payoff-Table, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
+```{r Apple-Different-Strikes-Call-Relative-Payoff-Table, out.width = out_width_table, fig.align = "center", message = FALSE, warning = FALSE}
 Apple_Future_Prices <- c(150, 200, 220, 245, 300)
 Apple_Current_Price <- 222.76
 Apple_Future_Returns <-  Apple_Future_Prices - Apple_Current_Price

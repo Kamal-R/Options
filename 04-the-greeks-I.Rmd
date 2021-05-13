@@ -697,7 +697,7 @@ Call_Gamma_XYZ_200_12months_Expiry <- tibble( "Call_x" = seq(from = x_min, to = 
                                                       "Profit_call","Loss_call") )
 
 annotate_arrow_1 <- data.frame(x1 = 212.5, x2 = 202.5, y1 = 0.04, y2 = 0.04)
-annotate_arrow_2 <- data.frame(x1 = 175, x2 = 180, y1 = 0.025, y2 = 0.016)
+annotate_arrow_2 <- data.frame(x1 = 175, x2 = 182.5, y1 = 0.025, y2 = 0.019)
 annotate_arrow_3 <-   data.frame(x1 = 147, x2 = 147, y1 = 0.015, y2 = 0.006)
 
 temp <- call_gamma_over_time( call_gamma_on_expiry = Call_Gamma_XYZ_200_On_Expiry, 
