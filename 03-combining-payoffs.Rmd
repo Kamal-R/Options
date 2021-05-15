@@ -205,7 +205,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-Just like last time, we'll break up the payoff diagram into two sections: above and below the strike price of the option. We sold the call, so we have a short call at a \$220 strike. Before \$220, we make \$8/share from selling the call. That makes the covered call, which combines owning shares at \$200 with selling this call, \$8/share more profitable than just owning shares. The payoff diagram shows the covered call shifted upwards, compared to just owning the shares. After \$220, the call loses a dollar-for-dollar what the shares make, and so the covered call flattens out. We bought the shares at \$200 and sold the call at the \$220 strike, so we make \$20/share from owning the shares before the short call kicks in. We still make \$8/share for selling the call, for a maximum gain of \$28/share. The cost of collecting \$8/share in income is that we sold away all potential gains from owning the shares above \$220. 
+Just like last time, we'll break up the payoff diagram into two sections: above and below the strike price of the option. We sold the call, so we have a short call at a \$220 strike. Before \$220, we make \$8/share from selling the call. That makes the covered call, which combines owning shares at \$200 with selling this call, \$8/share more profitable than just owning shares. The payoff diagram shows the covered call shifted upwards, compared to just owning the shares. After \$220, the call loses a dollar-for-dollar what the shares make, and so the covered call flattens out. We bought the shares at \$200 and sold the call at the \$220 strike, so we make \$20/share from owning the shares before the short call kicks in. We still make \$8/share for selling the call, for a maximum gain of \$28/share. The cost of collecting \$8/share in income is that we "canceled out" all potential gains from the shares going above \$220. 
 
 If we open a covered call, we probably don't want to sell the shares and keep the call. The risk is that the stock goes through the roof, to say \$250. The person who owns the \$220 strike call will exercise it. Since we sold the call, we're obligated to deliver the shares to them. If we don't own the shares, we have to buy at \$250, and sell at \$220 to fulfill our commitment. We'll lose \$30/share, and if the stock goes higher than \$250 we'll lose even more. To avoid the potential for those kinds of large losses, we have to view the shares and short call as a package deal -- if we own one, we own the other. 
 
@@ -290,7 +290,6 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-
 There's one more scenario -- the shares are between \$220 and \$228 on the expiry date. The call has a strike price of \$220, so it will get exercised and we're obligated to deliver our shares. The short call removed all upside from owning the shares above \$220, but we make \$20/share as they rise from \$200 to \$220 and \$8/share from selling the call. Since we bought the shares at \$200 and they're under \$228 when we have to deliver the shares, the covered call is still more profitable than owning shares. At this point, we have a decision to make -- we can buy back the shares for less than \$228 and possibly sell another call against them, or we can buy back the call we sold to book the profits and possibly sell another call against our shares.
 
 Just like with the protective put, the payoff diagram for the covered call doesn't tell me how likely these different scenarios are. I have to construct the trade based on my views about the future price of the stock, which is uncertain. Because the most favorable outcomes for this covered call happen between \$192 and \$220, it is a very different trade than just owning shares. When I just own shares, I just want the shares to go up. When I own a covered call, I want the shares to mostly stay where they are. Just like the protective put, the covered call changes your opinion of what the most favorable outcome of the trade is. This is the true power of options strategies -- being able to construct payoff diagrams where your trade is profitable under different outcomes than just the stock going up. The covered call also produces some income and helps protect against potential losses while owning shares, which are appealing in their own right.
@@ -402,7 +401,7 @@ Jumping back into the picture, the breakeven is \$195. That's because we bought 
 
 ## Straddle
 
-The straddle combines two options positions -- a long call and a long put. Unlike the protective put and covered call, we don't own any shares in this position. The put makes money if the stock falls a lot, and the call makes money if the stock goes up a lot. The beauty of the straddle is that it is profitable regardless of the direction the stock moves. You don't have to get the direction right to make money. The downside is that the moves have to be large enough to pay back the cost of the long call and long put.
+The straddle combines two options positions -- a long call and a long put (with the same expiry date). Unlike the protective put and covered call, we don't own any shares in this position. The put makes money if the stock falls a lot, and the call makes money if the stock goes up a lot. The beauty of the straddle is that can be profitable regardless of the direction the stock moves, so you don't have to get the direction right to make money. The downside is that the moves have to be large enough to pay back the cost of the long call and long put, so you're hoping for a big market move in either direction. 
 
 ```{r XYZ-Straddle, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15
@@ -479,7 +478,9 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-Here, we can see a \$200 strike call that cost \$10/share and a \$200 strike put that cost \$15/share. To make money, the straddle has to move more than \$25 in either direction. That's below \$175 if it heads lower, and above \$225 if it heads higher. 
+Here, we can see a \$200 strike call that cost \$10/share and a \$200 strike put that cost \$15/share. To make money, the straddle has to make enough to cover the \$10/share the call cost, and the \$15/share the put cost. It can do that by moving more than \$25 in either direction -- below \$175 if it heads lower, and above \$225 if it heads higher. The protective put removes the downside risk associated with owning shares, and the covered call produces income by selling calls against shares you already own. The straddle consists of two options -- a call and a put -- and no shares. We'll get into more details about volatility when we talk about *vega* in Chapter 5, but at its heart the straddle is a long volatility trade. The optimal outcome is that the stock moves a lot, either up or down. It doesn't matter which. 
+
+To get a better idea about how to use a straddle, we'll consider three different traders' views about likely future prices. Remember that these views are just opinions, and none of these these traders know where the shares will end up on the expiry date. These different opinions make some people buyers and some people sellers. Those people coming together gives us a market where people are willing to trade, so it's a good thing. But there's no way to know if a particular view is correct until it happens. Even worse, even if the trade is profitable, it's not obvious how to judge if the view was was successful. The next three pictures show the problem -- views describe how probable a particular price is in the future, which we can put together to tell us how likely the straddle is to be profitable on its expiry date. So even if the straddle is highly likely to be profitable, it can still be unprofitable. That means that losing money doesn't mean our views were wrong. To get an idea of how to use our views to help make profitable trades, let's look at three trader's views of what the market may do. 
 
 ```{r XYZ-Straddle-Normal, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15
@@ -544,6 +545,9 @@ tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
+Our first trader (above) has a symmetric view -- he thinks the shares are equally likely to end up above \$200 or below \$200. Under his views, the straddle is unlikely to expire profitably. It seems strange for this trader to buy something that he thinks is likely to lose money, so why might he buy this straddle? The most compelling reason is as a hedge against potential stock market declines. Most of us buy stocks and we make money if they go up, but have nothing to protect us if they go down. The straddle combines upside participation (via a call) with downside protection (via a put). Provided the stock goes up *enough* before it expires, the call allows us to be profitable while still holding the put for protection. 
+
+One major difference between a straddle and protective put is that the straddle involves buying two options that decay in value, while the protective put involves buying only one. This means we lose the entire cost of the straddle if the put and call expire worthless, while with the protective put we only lose the cost of the put. To illustrate another major difference, suppose we bought 100 shares at \$200 and a put at \$15/share. The shares cost \$200 x 100 = \$20,000 and the put costs \$15 x 100 = \$1,500, for a total cost of \$20,000 + \$1,500 = \$21,500. The call costs \$10 x 100 = \$1,000 per 100 shares and the put \$15 x 1000 = \$1,500 per 100 shares. This is a total outlay of \$2,500, which is significantly cheaper. Even though the two trades have different payoffs and risk characteristics, the straddle is a significantly cheaper way to enter a hedged position. That might be enough to entice someone to buy a straddle instead of a protective put. We'll return to the straddle and discuss more differences between it and the protective put after working our way through the greeks in the next two chapters.
 
 ```{r XYZ-Straddle-Lognormal-Over-K, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15
@@ -606,7 +610,11 @@ tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
+Our second trader (above) does not have a symmetric view. He considers it much more likely that the stock will be above \$200 when the put and call expire, and that it is almost impossible for the put to make money. It's extremely unlikely that this trader will buy the straddle as a hedge, but what might compel him to do it? The first thing to notice is that if he's right and the stock heads higher, the straddle will make money. If he's right, he makes money. If his forecast is wrong and the stock heads lower, the straddle has a good chance of making money. If this trader has lost lots of money when he had similarly confident forecasts in the past, his experience may have taught him to diversify into strategies that perform well when the "impossible" happens. Under his views, the straddle is very likely to make money as the stock goes higher. If he's wrong and the picture above is a bad forecast, the straddle still has a good chance of making money. 
 
+Another reason to buy the straddle is that the trader may not be confident in his forecast. If he thinks his views may be wrong, he might buy the straddle to diversify the bets he is taking. In this case, another choice is to not buy the straddle and instead search for investment opportunities where he is more confident in his forecasts. When we revisit the straddle to see how its payoff diagram behaves before its expiry date, we'll see this trader's views (if correct) will help him "defend" the straddle. We often don't want to hold an options position to expiry and run the risk of losing our entire investment. There are a truly enormous number of ways to adjust options positions to manage this risk. We'll talk about some of them later in the book. 
+
+If it's available, one simple adjustment is to use the profits we get when the shares go higher. Suppose the shares are at \$240 and the straddle is profitable by \$10/share one month before expiry. We can sell the straddle and use the proceeds to buy another at the \$240 strike that is three months from expiry. That adjustment lets us stay in a straddle for another few more months. We can, of course, repeat this adjustment as many times as we want to stay invested in a straddle indefinitely. As long as the stock keeps going higher (or lower) fast enough, we can make money on each adjustment. When the stock doesn't move enough before we need to make an adjustment, we'll lose money to defend the position and push the expiry date further out. 
 
 ```{r XYZ-Straddle-Multimodal, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15
@@ -670,6 +678,7 @@ tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
+The third trader (above) has a more complicated view of possible future prices. Her 
 
 ## Collar 
 
@@ -836,8 +845,8 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotate("point", x = 180-16, y = 0, colour = "gray65") + 
      annotate( geom = "text", x = 180-16-4, y = -7.5, color = "gray65", hjust = 0,
                label = paste0("$164"), size = 3.5 ) +
-     annotate("point", x = 200, y = 0, colour = "gray65") +
-     annotate( geom = "text", x = 200-9, y = 3, color = "gray65", hjust = 0,
+     annotate("point", x = 200, y = 0, colour = "gray50") +
+     annotate( geom = "text", x = 200-9, y = 3, color = "gray50", hjust = 0,
                label = paste0("$200"), size = 3.5 ) +
      annotate("point", x = 228, y = 0, colour = "gray50") + 
      annotate( geom = "text", x = 228-5, y = -7.5, color = "gray50", hjust = 0,
