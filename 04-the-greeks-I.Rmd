@@ -94,9 +94,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-*Delta* is how much we participate in a stock moving up or down. If we own the stock, we make `r currency(1)` for every `r currency(1)` the stock goes up, and we lose `r currency(1)` for every `r currency(1)` the stock goes down. We call a stock a *delta one* asset as a shorthand way of describing this dollar-for-dollar relationship. 
-
-We've spent lots of time talking about how options participate dollar-for-dollar in the performance of their stock once they're above their strike price, on their expiry day. As a quick refresher, we looked at this call option. Below it's strike price of \$200, the call expires worthless. It doesn't go up or down in price -- it has a delta of zero. Above it's strike price, it participates dollar-for-dollar in the stock's price movements -- it has a delta of one. 
+*Delta* is how much we participate in a stock moving up or down. If we own the stock, we make \$1 for every \$1 the stock goes up, and lose \$1 for every \$1 the stock goes down. We call a stock a *delta 1* asset as a shorthand way of describing this dollar-for-dollar relationship. We've looked at the payoff diagram of options on their expiry date, and how they participate dollar-for-dollar in the performance of their stock once they're past their strike price. As a quick refresher, we looked at this call option. Below it's strike price of \$200, the call expires worthless. It doesn't go up or down in price -- it is delta 0. Above it's strike price, it participates dollar-for-dollar in the stock's price movements -- it is delta 1. 
 
 ```{r Call-Option-Payoff-Plot, out.width = out_width_plot, fig.align = "center", message = FALSE}
 Call_cost <- 15; Call_K <- 200
@@ -130,11 +128,11 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 temp; rm(temp)
 ```
 
-Try not to confuse the strike price of `r currency(200)` with the breakeven of `r currency(215)`. For a call, the strike price is the price you have the option of buying the shares at. These calls cost `r currency(15)`, so we have to make `r currency(15)` back to get to breakeven before the call becomes profitable. But we start going up dollar-for-dollar at `r currency (200)` to make that `r currency (15)` back at `r currency (215)`. 
+Just a quick reminder -- try not to confuse the strike price of \$200 with the breakeven of \$215. For a call, the strike price is the price you have the choice to buy shares at. These calls cost \$15, so we have to make \$15 to get to breakeven before the call becomes profitable. But we start going up dollar-for-dollar at \$200 so that we make \$15 back and reach breakeven at \$215.
 
-We've seen stocks, which are delta one. And we've seen calls on their expiry date, which have a delta of zero below their strike price and a delta of one above their strike price. What about the payoffs of calls (and puts) before their expiry date? It depends on how far they are from expiring. We'll explore this by looking at the payoff diagram of the `r currency(200)` strike call 3, 6, and 12 months before it's expiry date. 
+We've seen stocks, which are delta one. We've seen calls on their expiry date, which have a delta of zero below their strike price and a delta of one above their strike price. Similarly, puts are delta 0 above their strike price since their price does not change. They are delta -1 below their strike price, because they make \$1 for every \$1 the stock goes down. What about before their expiry date? It depends on how far the puts or calls are are from expiring. We'll look at the payoff diagram of the \$200 strike call 3, 6, and 12 months before it's expiry date. 
 
-Before we get into it, a quick note -- the cost of a call varies depending on how far away from expiry it is. The intuition is that the closer the `r currency(200)` strike call gets to expiring, the less time the stock has to go up. So it loses (time) value every day. We'll get into the details of how that works when we talk about *theta* and *vega* in the next chapter. For now, suppose we bought the call for `r currency(15)`, and that we hold it until it is 3, 6, or 12 months from expiry. 
+Before getting into it, a quick note -- the cost of a call varies depending on how far away from expiry it is. The intuition is that the closer a call gets to expiring, the less time the stock has to go up. This reduces the chance the call has to be profitable, and so it loses (time) value every day. We'll get into the details of how that works when we talk about *theta* and *vega*. For now, suppose we have bought a call for \$15, and that we hold it until it is 3, 6, or 12 months from expiry. 
 
 ```{r XYZ-Delta-3-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
 Call_K <- 200
@@ -213,8 +211,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
-
-Add.
+This call is 3 months from expiring. The 
 
 ```{r XYZ-Delta-6-Months-Before-Expiry-200, echo = FALSE, out.width = out_width_plot, fig.align = "center", message = FALSE, warning = FALSE}
 Call_K <- 200

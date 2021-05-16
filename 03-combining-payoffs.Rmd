@@ -46,7 +46,7 @@ remove_negative_zeros <- function(x) { (x[which(-1e-4 < x & x < 1e-4)] = 0); ret
 
 # Building Options Strategies
 
-We can do a lot more with options than just buying or selling one put or one call. Stocks, calls, and puts are the basic building blocks that we can combine to construct investments with any payoff structure we want. There are tons of options strategies, and they're all just combinations of these building blocks. You don't need to know their names to understand their strengths and weaknesses, and the goal of this chapter is to show you how to construct options strategies on-the-fly that have the payoff that you want. In the next few chapters, we'll talk about the greeks, which will let us understand how options change price before their expiry date. They're the tool we need before we can consider payoff diagrams before expiry dates. For now, let's nail down how to construct payoff diagrams for strategies on expiry dates. 
+We can do a lot more with options than just buying or selling one put or one call. Stocks, calls, and puts are the basic building blocks that we can combine to construct investments with any payoff structure we want. There are tons of options strategies, and they're all just combinations of these building blocks. You don't need to know their names to understand their strengths and weaknesses, and the goal of this chapter is to show you how to construct options strategies on-the-fly that have the payoff that you want. In the next few chapters, we'll talk about the greeks, which are the tools we need to understand payoff diagrams and how they change before an option's expiry date. For now, let's nail down how to construct payoff diagrams for strategies on expiry dates and why you might prefer certain payoff diagrams over the one offered by just owning shares.
 
 ## Protective Put
 
@@ -547,7 +547,7 @@ temp; rm(temp)
 ```
 Our first trader (above) has a symmetric view -- he thinks the shares are equally likely to end up above \$200 or below \$200. Under his views, the straddle is unlikely to expire profitably. It seems strange for this trader to buy something that he thinks is likely to lose money, so why might he buy this straddle? The most compelling reason is as a hedge against potential stock market declines. Most of us buy stocks and we make money if they go up, but have nothing to protect us if they go down. The straddle combines upside participation (via a call) with downside protection (via a put). Provided the stock goes up *enough* before it expires, the call allows us to be profitable while still holding the put for protection. 
 
-One major difference between a straddle and protective put is that the straddle involves buying two options that decay in value, while the protective put involves buying only one. This means we lose the entire cost of the straddle if the put and call expire worthless, while with the protective put we only lose the cost of the put. To illustrate another major difference, suppose we bought 100 shares at \$200 and a put at \$15/share. The shares cost \$200 x 100 = \$20,000 and the put costs \$15 x 100 = \$1,500, for a total cost of \$20,000 + \$1,500 = \$21,500. The call costs \$10 x 100 = \$1,000 per 100 shares and the put \$15 x 1000 = \$1,500 per 100 shares. This is a total outlay of \$2,500, which is significantly cheaper. Even though the two trades have different payoffs and risk characteristics, the straddle is a significantly cheaper way to enter a hedged position. That might be enough to entice someone to buy a straddle instead of a protective put. We'll return to the straddle and discuss more differences between it and the protective put after working our way through the greeks in the next two chapters.
+One major difference between a straddle and protective put is that the straddle involves buying two options that decay in value, while the protective put involves buying only one. This means we lose the entire cost of the straddle if the put and call expire worthless, while with the protective put we only lose the cost of the put. To illustrate another major difference, suppose we bought 100 shares at \$200 and a put at \$15/share. The shares cost \$200 x 100 = \$20,000 and the put costs \$15 x 100 = \$1,500, for a total cost of \$20,000 + \$1,500 = \$21,500. The call costs \$10 x 100 = \$1,000 per 100 shares and the put \$15 x 1000 = \$1,500 per 100 shares. This is a total outlay of \$2,500, which is significantly cheaper. Even though the two trades have different payoffs and risk characteristics, the straddle is a significantly cheaper way to enter a hedged position. That might be enough to entice someone to buy a straddle instead of a protective put. We'll return to the straddle and discuss more differences between it and the protective put after working through the greeks in the next two chapters.
 
 ```{r XYZ-Straddle-Lognormal-Over-K, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Call_cost <- 10; Put_cost <- 15
@@ -678,11 +678,15 @@ tick_color <- ifelse( as.numeric(gsub('\\(','-',gsub('[)$,]', '', y_axis_labels)
 temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) )
 temp; rm(temp)
 ```
-The third trader (above) has a more complicated view of possible future prices. Her 
+The third trader (above) has a more complicated view of possible future prices. She thinks that the stock is unlikely to stay near \$200, and that it is very likely to move towards prices where the straddle is either profitable or where the position can be defended at a reasonable cost. Of the three traders we've considered, she has the best risk-reward on the straddle. She may buy it not at a hedge against unlikely events occurring or the unlikely scenario of unforeseen catastrophic loss, but to gain exposure to the superior risk-reward profile illustrated by the payoff diagram that describes her views. 
 
 ## Collar 
 
-In the covered call, we bought 100 shares and sold 1 call. In the protective put, we bought 100 shares and bought 1 put. In the collar, we *combine* these two strategies: we buy 100 shares, buy 1 put, and sell 1 call. The idea here is that we want the protection offered by the put, but we want to offset the cost of the put so we sell a call too. 
+In the covered call, we bought 100 shares and sold 1 call. In the protective put, we bought 100 shares and bought 1 put. In the collar, we *combine* these two strategies: we buy 100 shares, buy 1 put, and sell 1 call. The idea here is that we want the protection offered by the put, but we want to offset the cost of the put so we sell a call too. To break down the collar, I've shown two payoff diagrams. The first focuses on its left-hand side, and the second focuses on it's right-hand side. I'm going into that much detail to show how the put and call work together to create the collar, but I wouldn't recommend thinking about the collar in quite that way. 
+
+An easier way is to combine the knowledge we have about the protective put and covered call. The protective put involves buying a put that "cancels out" some of the potential downside from owning shares, and the covered call "cancels out" some of the potential upside from owning shares. That's the exact behavior we see on the left-hand and right-hand side of the collar, which we can use to reconstruct the collar. It consists of owning shares, owning a put with a strike price where the payoff diagram flattens out on the left-hand side, and owning a call with a strike price where the payoff diagram flattens out on the right-hand side.
+
+The two payoff diagrams we'll look at are for the same scenarios we considered when looking at the protective put and covered call. We buy the shares at \$200, buy the \$180 strike put for \$16, and sell the \$220 strike call for \$8. 
 
 ```{r XYZ-Collar-Left, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Put_cost <- 16; Put_K <- 180
@@ -759,8 +763,8 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
      annotate("point", x = 180-16, y = 0, colour = "gray50") + 
      annotate( geom = "text", x = 180-16-4, y = -7.5, color = "gray50", hjust = 0,
                label = paste0("$164"), size = 3.5 ) +
-     annotate("point", x = 200, y = 0, colour = "gray50") +
-     annotate( geom = "text", x = 200-9, y = 3, color = "gray50", hjust = 0,
+     annotate("point", x = 200, y = 0, colour = "gray65") +
+     annotate( geom = "text", x = 200-9, y = 3, color = "gray65", hjust = 0,
                label = paste0("$200"), size = 3.5 ) +
      annotate("point", x = 228, y = 0, colour = "gray65") + 
      annotate( geom = "text", x = 228-5, y = -7.5, color = "gray65", hjust = 0,
@@ -769,6 +773,7 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
+Let's look at the left-hand side of the payoff diagram (above) first. It's a little busy, so you might not be able to follow it right away, but let's break it down. There's a short call, which is profitable but flat. It shifts the payoff of the collar up, but does not do anything else. There are shares and a protective put, which "cancel out" after the \$180 strike price of the put. We still lose \$20/share as the shares fall from \$200 to \$180 (before the put kicks in), plus \$16/share from buying the put. We make \$8/share from selling the call, for a total loss of \$20 + \$16 - \$8 = $28. We lose \$28 whenever the shares are below \$180, since the put removes any potential loses below \$180. This is less than the \$36 we would lose if we had not sold the call -- the \$8/share we collected by selling it pays for half of the \$16/share the put cost.
 
 ```{r XYZ-Collar-Right, fig.align = "center", out.width = out_width_plot, message = FALSE}
 Put_cost <- 16; Put_K <- 180
@@ -855,3 +860,11 @@ temp <- temp + theme( axis.text.y = element_markdown(colour = tick_color) ) +
 
 temp; rm(temp)
 ```
+
+The right-hand side of the payoff diagram (above) looks at what happens when the shares are at \$180 and above. It is a little more complicated than the left-hand side, because there are two different regions to consider. Between \$180 and \$220, the \$180 strike put or \$220 strike call only influence the collar by shifting its payoff diagram down by the \$8 the long put/short call combo cost. We bought the shares at \$200, so the collar breaks even at \$208 after it recovers that \$8 cost. It becomes more profitable up until \$220, when the short call cancels out any additional potential gains the shares could provide. 
+
+The two major disadvantages of the collar are that it can increase your breakeven, if the put is more expensive than the call. You can chose to construct collars so that they don't increase your breakeven -- this involves buying either a cheaper put (that offers less protection) or selling a more expensive call (that gives up more potential upside). Both of these are undesirable, so another approach is to only employ the collar when calls are relatively expensive compared to puts. Stocks tend to have very expensive puts, but commodity ETFs like GLD have much more favorable options pricing for this strategy. One could seek to execute collars only for commodity ETFs (and the rare stock) that give favorable pricing. 
+
+Suppose we're entering a trade on GLD. We're viewing every trade we make as a bet that our view will be profitable, preferably prior to our options expiring so that we do not have to defend the position. If we're entering a trade on GLD, we may want to limit the downside while being able to lock in enough of the upside to move the strike price of the put and call higher. If we can do this successfully a few times, we will have locked in enough gains to be confident the GLD trade will be profitable even without the put and remove the collar. When we do this, we're viewing the gains we've already made by running the GLD collar as enough protection to not worry about the downside in owning GLD. 
+
+The key idea here is that when put and call pricing is favorable, entering a collar gives reasonable upside (for GLD, perhaps 10%) while limiting our downside with the protective put. If the trade goes against us, we will lose much less money than if we had just bought shares, and if the option pricing is favorable we're still able to participate in enough upside to remove the collar after one or two adjustments that move the strike price of the call and put higher (and perhaps move the expiry dates out). 
